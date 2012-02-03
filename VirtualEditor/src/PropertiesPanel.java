@@ -1,6 +1,5 @@
-import java.awt.GridLayout;
-
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -17,7 +16,7 @@ public class PropertiesPanel extends JPanel{
 	
 	public PropertiesPanel() {
 		super();
-		//setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
+		setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
 		addTranslatePanel();
 		addScalePanel();
 		addRotationPanel();
