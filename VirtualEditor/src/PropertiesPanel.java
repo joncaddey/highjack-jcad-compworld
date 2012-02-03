@@ -40,8 +40,8 @@ public class PropertiesPanel extends JPanel{
 		final JPanel p = new JPanel();
 		p.setBorder(BorderFactory.createTitledBorder("Scale"));
 		scaleField = new JTextField(5);
-		p.add(new JLabel("scale:"));
 		p.add(scaleField);
+		p.add(new JLabel("%"));
 		add(p);
 	}
 	

@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.awt.event.*;
 import java.nio.IntBuffer;
+import java.util.Observable;
+
 import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
 import javax.media.opengl.glu.*;
@@ -8,50 +10,36 @@ import javax.swing.*;
 import com.jogamp.common.nio.*;
 import com.jogamp.opengl.util.*;
 
-public class Demo4 implements GLEventListener {
-	private static JFrame appFrame;
-	private static SceneGraphNode sceneGraphRoot;
-	private static boolean pickNextFrame;
-	private static Point pickedPoint;
-	private static double left, right, top, bottom;
-	private static int displayListID = -1;
+public class VirtualCanvas extends Observable implements GLEventListener {
+	private SceneGraphNode sceneGraphRoot;
+	private boolean pickNextFrame;
+	private Point pickedPoint;
+	private double left, right, top, bottom;
+	private int displayListID = -1;
+	private final GLCanvas my_canvas;
 	
-	public static void main(String[] args) {
-		GLProfile.initSingleton();
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				(new Demo4()).createAndShowGUI();
-			}
-		});
-	}
-
-	private void createAndShowGUI() {
-		// Fix for background flickering
-		// System.setProperty("sun.awt.noerasebackground", "true");
-		
+	private SceneGraphNode selected;
+	
+	
+	
+	public VirtualCanvas() {
 		GLProfile profile = GLProfile.getDefault();
 		GLCapabilities capabilities = new GLCapabilities(profile);
-		GLCanvas canvas = new GLCanvas(capabilities);
-		canvas.addGLEventListener(this);
-		canvas.addMouseListener(new MouseAdapter() {
+		my_canvas = new GLCanvas(capabilities);
+		my_canvas.addGLEventListener(this);
+		my_canvas.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				pickNextFrame = true;
 				pickedPoint = new Point(e.getX(), e.getY());
 			}
 		});
-
-		sceneGraphRoot = SierpinskiTriangle.create(2);
-		
-		appFrame = new JFrame("JOGL Demo 4");
-		appFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-		appFrame.setMinimumSize(new Dimension(256, 256));
-		appFrame.add(canvas);
-		appFrame.pack();
-		if (Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH))
-			appFrame.setExtendedState(appFrame.getExtendedState() | JFrame.MAXIMIZED_BOTH);
-		appFrame.setVisible(true);
+		sceneGraphRoot = new Triangle(); // TODO should be null.
 	}
 
+
+	public Component getCanvas() {
+		return my_canvas;
+	}
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -78,8 +66,7 @@ public class Demo4 implements GLEventListener {
 			gl.glEndList();
 		} else
 			gl.glCallList(displayListID);
-//		sceneGraphRoot.render(drawable);
-//		sceneGraphRoot.rotation++;
+
 		gl.glRotatef(1, 0, 0, 1);
 	}
 
