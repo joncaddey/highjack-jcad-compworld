@@ -18,7 +18,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
 	
-	private SceneGraphNode selected;
+	private SceneGraphNode my_selected;
 	
 	
 	
@@ -31,15 +31,30 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			public void mouseClicked(MouseEvent e) {
 				pickNextFrame = true;
 				pickedPoint = new Point(e.getX(), e.getY());
+				setChanged();
+				notifyObservers(my_selected);
 			}
 		});
-		sceneGraphRoot = new Triangle(); // TODO should be null.
+		sceneGraphRoot = new SceneGraphNode();
+		SceneGraphNode aTriangle = new Triangle();
+		sceneGraphRoot.addChild(aTriangle);
+		my_selected = aTriangle;
+		
 	}
 
 
 	public Component getCanvas() {
 		return my_canvas;
 	}
+	
+	public SceneGraphNode getSelected() {
+		return my_selected;
+	}
+	
+	public void refresh() {
+		displayListID = -1;
+	}
+	
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
@@ -67,7 +82,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		} else
 			gl.glCallList(displayListID);
 
-		gl.glRotatef(1, 0, 0, 1);
+		//gl.glRotatef(1, 0, 0, 1);
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
