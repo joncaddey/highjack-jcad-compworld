@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.geom.Point2D;
 import java.nio.IntBuffer;
 import java.util.Observable;
 
@@ -14,9 +15,14 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	private SceneGraphNode sceneGraphRoot;
 	private boolean pickNextFrame;
 	private Point pickedPoint;
+	
 	private double left, right, top, bottom;
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
+	SceneGraphNode deleteThis;
+	
+	float my_oldX;
+	float my_oldY;
 	
 	private SceneGraphNode my_selected;
 	
@@ -28,20 +34,35 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		my_canvas = new GLCanvas(capabilities);
 		my_canvas.addGLEventListener(this);
 		my_canvas.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+			public void mousePressed(MouseEvent e) {
+				my_oldX = my_selected.translateX;
+				my_oldY = my_selected.translateY;
 				pickNextFrame = true;
 				pickedPoint = new Point(e.getX(), e.getY());
 				setChanged();
 				notifyObservers(my_selected);
 			}
+			
+			public void mouseReleased(MouseEvent e) {
+				System.out.println("Dragging");
+				my_selected.translateX = my_oldX + (float) ((right - left) / my_canvas.getWidth() *  (e.getX() - pickedPoint.x));
+				my_selected.translateY = my_oldY + (float) ((bottom - top) / my_canvas.getHeight() *  (e.getY() - pickedPoint.y));
+				refresh();
+			}
 		});
 		sceneGraphRoot = new SceneGraphNode();
-		SceneGraphNode aTriangle = new Triangle();
-		sceneGraphRoot.addChild(aTriangle);
-		my_selected = aTriangle;
-		
+		deleteThis = new Triangle();
+		sceneGraphRoot.addChild(deleteThis);
+		my_selected = deleteThis;
 	}
 
+	
+	private Point2D.Float pixelToCoor(int x, int y) {
+		Point2D.Float point = new Point2D.Float();
+		point.x = (float) ((right - left) * x / my_canvas.getWidth() + left);
+		point.y = (float) ((top - bottom) * y / my_canvas.getHeight() + top);
+		return point;
+	}
 
 	public Component getCanvas() {
 		return my_canvas;
@@ -53,6 +74,8 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	
 	public void refresh() {
 		displayListID = -1;
+		//my_canvas.repaint();
+		
 	}
 	
 	public void display(GLAutoDrawable drawable) {
@@ -82,7 +105,6 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		} else
 			gl.glCallList(displayListID);
 
-		//gl.glRotatef(1, 0, 0, 1);
 	}
 
 	public void dispose(GLAutoDrawable drawable) {

@@ -2,6 +2,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -9,7 +11,9 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
+
 
 
 public class PropertiesPanel extends JPanel implements Observer, ActionListener, FocusListener{
@@ -17,6 +21,7 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 	private JTextField my_xField;
 	private JTextField my_yField;
 	private JTextField my_scaleField;
+	private JSlider my_scaleSlider;
 	private JTextField my_degreesField;
 	
 	private final VirtualCanvas my_canvas;
@@ -58,7 +63,22 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 		my_scaleField.addActionListener(this);
 		p.add(my_scaleField);
 		p.add(new JLabel("%"));
+
+
+		my_scaleSlider = new JSlider();
+		my_scaleSlider.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseReleased(MouseEvent the_e) {
+				fixScaleSlider();
+			}
+		});
+//		p.add(my_scaleSlider());
+		fixScaleSlider();
 		add(p);
+	}
+	
+	private void fixScaleSlider() {
+		//my_scaleSlider.setMinimum(minimum)
 	}
 	
 	private void addRotationPanel() {
@@ -84,32 +104,54 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 			return;
 		}
 		
-		if (obj instanceof SceneGraphNode) {
+		//if (obj instanceof SceneGraphNode) { // should probably be enum.
 			updateSelected();
-		}
+		//}
 		
 	}
 	
 	private void updateSelected() {
 		// this is kind of dirty, simply asking for reference to node itself
 		SceneGraphNode sgn = my_canvas.getSelected();
-		my_xField.setText(String.valueOf(sgn.translateX));
-		my_yField.setText(String.valueOf(sgn.translateY));
-		my_scaleField.setText(String.valueOf(sgn.scale));
-		my_degreesField.setText(String.valueOf(sgn.rotation));
+		if (sgn == null) {
+			if (my_xField.isEnabled()) {
+				my_xField.setEnabled(false);
+				my_yField.setEnabled(false);
+				my_scaleField.setEnabled(false);
+				my_degreesField.setEnabled(false);
+				
+				my_xField.setText("");
+				my_yField.setText("");
+				my_scaleField.setText("");
+				my_degreesField.setText("");
+			}
+		} else {
+			if (!my_xField.isEnabled()) {
+				my_xField.setEnabled(true);
+				my_yField.setEnabled(true);
+				my_scaleField.setEnabled(true);
+				my_degreesField.setEnabled(true);
+			}
+			my_xField.setText(String.valueOf(sgn.translateX));
+			my_yField.setText(String.valueOf(sgn.translateY));
+			my_scaleField.setText(String.valueOf(sgn.scale));
+			my_degreesField.setText(String.valueOf(sgn.rotation));
+		}
 	}
 	
 	private void parseTextFields() {
-		try {
-			my_canvas.getSelected().translateX = Float.parseFloat(my_xField.getText());
-			my_canvas.getSelected().translateY = Float.parseFloat(my_yField.getText());
-			my_canvas.getSelected().scale = Float.parseFloat(my_scaleField.getText());
-			my_canvas.getSelected().rotation = Float.parseFloat(my_degreesField.getText()); // TODO: FUCK
-		} catch (NumberFormatException the_nfe) {
-			// don't caaare
+		if (my_canvas.getSelected() != null) {
+			try {
+				my_canvas.getSelected().translateX = Float.parseFloat(my_xField.getText());
+				my_canvas.getSelected().translateY = Float.parseFloat(my_yField.getText());
+				my_canvas.getSelected().scale = Float.parseFloat(my_scaleField.getText());
+				my_canvas.getSelected().rotation = Float.parseFloat(my_degreesField.getText());
+			} catch (NumberFormatException the_nfe) {
+				// don't caaare
+			}
+			updateSelected();
+			my_canvas.refresh();
 		}
-		updateSelected();
-		my_canvas.refresh();
 	}
 
 	@Override
