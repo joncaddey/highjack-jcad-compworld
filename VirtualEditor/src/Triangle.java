@@ -1,4 +1,7 @@
-import javax.media.opengl.*;
+
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
 
 public class Triangle extends SceneGraphNode {
 	public static final float SIN_60 = (float)Math.sin(Math.PI / 3);
