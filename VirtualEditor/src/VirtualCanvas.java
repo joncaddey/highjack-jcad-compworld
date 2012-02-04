@@ -8,6 +8,8 @@ import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
 import javax.media.opengl.glu.*;
 import javax.swing.*;
+
+
 import com.jogamp.common.nio.*;
 import com.jogamp.opengl.util.*;
 
@@ -51,7 +53,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			}
 		});
 		sceneGraphRoot = new SceneGraphNode();
-		deleteThis = new Triangle();
+		deleteThis = new Arrow();
 		sceneGraphRoot.addChild(deleteThis);
 		my_selected = deleteThis;
 	}

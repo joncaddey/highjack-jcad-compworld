@@ -1,3 +1,4 @@
+
 public class Triforce extends SceneGraphNode {
 	public Triforce() {
 		this(true);

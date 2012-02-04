@@ -1,3 +1,4 @@
+
 public class SierpinskiTriangle {
 	public static SceneGraphNode create(int depth) {
 		if (depth <= 1)
