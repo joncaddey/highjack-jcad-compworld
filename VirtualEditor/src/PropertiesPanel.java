@@ -9,23 +9,26 @@ import java.util.Observer;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 
-
-public class PropertiesPanel extends JPanel implements Observer, ActionListener, FocusListener{
+@SuppressWarnings("serial")
+public class PropertiesPanel extends JPanel implements Observer,
+		ActionListener, FocusListener {
 
 	private JTextField my_xField;
 	private JTextField my_yField;
 	private JTextField my_scaleField;
 	private JSlider my_scaleSlider;
 	private JTextField my_degreesField;
-	
+
 	private final VirtualCanvas my_canvas;
-	
+	private JButton my_delteButton;
+
 	public PropertiesPanel(final VirtualCanvas the_canvas) {
 		super();
 		my_canvas = the_canvas;
@@ -34,19 +37,21 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 		addTranslatePanel();
 		addScalePanel();
 		addRotationPanel();
+		addDeletePanel();
 		updateSelected();
+
 	}
-	
+
 	private void addTranslatePanel() {
 		final JPanel p = new JPanel();
 		p.setBorder(BorderFactory.createTitledBorder("Position"));
-		
+
 		my_xField = new JTextField(5);
 		my_xField.addFocusListener(this);
 		my_xField.addActionListener(this);
 		p.add(new JLabel("x:"));
 		p.add(my_xField);
-		
+
 		my_yField = new JTextField(5);
 		my_yField.addFocusListener(this);
 		my_yField.addActionListener(this);
@@ -54,7 +59,7 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 		p.add(my_yField);
 		add(p);
 	}
-	
+
 	private void addScalePanel() {
 		final JPanel p = new JPanel();
 		p.setBorder(BorderFactory.createTitledBorder("Scale"));
@@ -64,7 +69,6 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 		p.add(my_scaleField);
 		p.add(new JLabel("%"));
 
-
 		my_scaleSlider = new JSlider();
 		my_scaleSlider.addMouseListener(new MouseAdapter() {
 			@Override
@@ -72,15 +76,15 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 				fixScaleSlider();
 			}
 		});
-//		p.add(my_scaleSlider());
+		// p.add(my_scaleSlider());
 		fixScaleSlider();
 		add(p);
 	}
-	
+
 	private void fixScaleSlider() {
-		//my_scaleSlider.setMinimum(minimum)
+		// my_scaleSlider.setMinimum(minimum)
 	}
-	
+
 	private void addRotationPanel() {
 		final JPanel p = new JPanel();
 		p.setBorder(BorderFactory.createTitledBorder("Rotation"));
@@ -91,25 +95,30 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 		p.add(my_degreesField);
 		add(p);
 	}
-	
-	
-	
-	
-	
-	
+
+	/**
+	 * Makes a pannel with a delete button and adds it to the properties panel
+	 */
+	private void addDeletePanel() {
+		final JPanel p = new JPanel();
+		p.setBorder(BorderFactory.createTitledBorder("Option"));
+		my_delteButton = new JButton();
+		my_delteButton.setText("Delete");
+		my_delteButton.addFocusListener(this);
+		my_delteButton.addActionListener(this);
+		p.add(my_delteButton);
+		add(p);
+	}
 
 	@Override
 	public void update(Observable the_canvas, Object obj) {
 		if (the_canvas != my_canvas) {
 			return;
 		}
-		
-		//if (obj instanceof SceneGraphNode) { // should probably be enum.
-			updateSelected();
-		//}
-		
+		updateSelected();
+
 	}
-	
+
 	private void updateSelected() {
 		// this is kind of dirty, simply asking for reference to node itself
 		SceneGraphNode sgn = my_canvas.getSelected();
@@ -119,7 +128,8 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 				my_yField.setEnabled(false);
 				my_scaleField.setEnabled(false);
 				my_degreesField.setEnabled(false);
-				
+				my_delteButton.setEnabled(false);
+
 				my_xField.setText("");
 				my_yField.setText("");
 				my_scaleField.setText("");
@@ -131,6 +141,7 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 				my_yField.setEnabled(true);
 				my_scaleField.setEnabled(true);
 				my_degreesField.setEnabled(true);
+				my_delteButton.setEnabled(true);
 			}
 			my_xField.setText(String.valueOf(sgn.translateX));
 			my_yField.setText(String.valueOf(sgn.translateY));
@@ -138,14 +149,18 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 			my_degreesField.setText(String.valueOf(sgn.rotation));
 		}
 	}
-	
+
 	private void parseTextFields() {
 		if (my_canvas.getSelected() != null) {
 			try {
-				my_canvas.getSelected().translateX = Float.parseFloat(my_xField.getText());
-				my_canvas.getSelected().translateY = Float.parseFloat(my_yField.getText());
-				my_canvas.getSelected().scale = Float.parseFloat(my_scaleField.getText());
-				my_canvas.getSelected().rotation = Float.parseFloat(my_degreesField.getText());
+				my_canvas.getSelected().translateX = Float.parseFloat(my_xField
+						.getText());
+				my_canvas.getSelected().translateY = Float.parseFloat(my_yField
+						.getText());
+				my_canvas.getSelected().scale = Float.parseFloat(my_scaleField
+						.getText());
+				my_canvas.getSelected().rotation = Float
+						.parseFloat(my_degreesField.getText());
 			} catch (NumberFormatException the_nfe) {
 				// don't caaare
 			}
@@ -161,7 +176,7 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 	@Override
 	public void focusLost(FocusEvent arg0) {
 		parseTextFields();
-		
+
 	}
 
 	@Override
@@ -171,18 +186,10 @@ public class PropertiesPanel extends JPanel implements Observer, ActionListener,
 			JTextField f = (JTextField) e.getSource();
 			f.setCaretPosition(0);
 			f.moveCaretPosition(f.getText().length());
+		} else if (e.getSource() == my_delteButton) {
+			my_canvas.remove();
 		}
-		
+
 	}
-	
-	
-	
-//	public static void main(String[] args) {
-//		// TODO Auto-generated method stub
-//		JFrame f = new JFrame();
-//		f.add(new PropertiesPanel(new VirtualCanvas()));
-//		f.pack();
-//		f.setVisible(true);
-//	}
 
 }
