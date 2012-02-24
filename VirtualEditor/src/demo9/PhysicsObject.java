@@ -151,43 +151,55 @@ public class PhysicsObject {
 		if (distances[maxIndex] >= 0)
 			return null;
 		
-		// OH SHNAP WE'RE FREESTYLIN'
-		boolean good = false; // whether this is a valid collision
-		
-		final Vector2f toLeftVertex = new Vector2f(a.position);
-		toLeftVertex.sumScale(vertices[maxIndex], -1);
-		good = toLeftVertex.length() < a.radius; // good if within radius of left vertex.
-		if (!good) {
-			int nextIndex = (maxIndex + 1) % vertices.length;
-			final Vector2f toRightVertex = new Vector2f(a.position);
-			toRightVertex.sumScale(vertices[nextIndex], -1);
-			good = toRightVertex.length() < a.radius; // good if within radius of right vertex.
-			if (!good) {
-				// oh dear not within radius of either vertex.
-				// To be good, projected center must be in between vertexes.
-				Vector2f side = new Vector2f(vertices[maxIndex]);
-				side.sumScale(vertices[nextIndex], -1);
-				side.normalize();
-				float left = side.dot(vertices[maxIndex]);
-				float right = side.dot(vertices[nextIndex]);
-				float center = side.dot(a.position);
-				good = (left - center) * (right - center) <= 0;
+		// our code
+		int nextIndex = (maxIndex + 1) % vertices.length;
+		Vector2f side = new Vector2f(-normals[maxIndex].y, normals[maxIndex].x);
+		float left = side.dot(vertices[maxIndex]);
+		float right = side.dot(vertices[nextIndex]);
+		float center = side.dot(a.position);
+		if ((left <= center && center <= right) || (right <= center && center <= left)) {
+			// circle side collision
+			CollisionInfo cInfo = new CollisionInfo();
+			cInfo.depth = -distances[maxIndex];
+			cInfo.normal = new Vector2f(normals[maxIndex]);
+			cInfo.normal.scale(-1);
+			cInfo.positionA = new Vector2f(a.position);
+			cInfo.positionA.sumScale(cInfo.normal, a.radius);
+			cInfo.positionB = new Vector2f(a.position);
+			cInfo.positionB.sumScale(cInfo.normal, a.radius - cInfo.depth);
+			return cInfo;
+		} else {
+			// circle to corner collision (similar to circle collision)
+			int cornerIndex;
+			Vector2f centerToCorner;
+			float distance;
+			Vector2f centerToLeft = new Vector2f(vertices[maxIndex]);
+			centerToLeft.sumScale(a.position, -1);
+			float distanceLeft = centerToLeft.length() - a.radius;
+			Vector2f centerToRight = new Vector2f(vertices[nextIndex]);
+			centerToRight.sumScale(a.position, -1);
+			float distanceRight = centerToRight.length() - a.radius;
+			if (distanceLeft < distanceRight) {
+				cornerIndex = maxIndex;
+				centerToCorner = centerToLeft;
+				distance = distanceLeft;
+			} else {
+				cornerIndex = nextIndex;
+				centerToCorner = centerToRight;
+				distance = distanceRight;
 			}
-		}
-		if (!good) {
-			return null;
-		}
-		// end freestylin'
-		
-		CollisionInfo cInfo = new CollisionInfo();
-		cInfo.depth = -distances[maxIndex];
-		cInfo.normal = new Vector2f(normals[maxIndex]);
-		cInfo.normal.scale(-1);
-		cInfo.positionA = new Vector2f(a.position);
-		cInfo.positionA.sumScale(cInfo.normal, a.radius);
-		cInfo.positionB = new Vector2f(a.position);
-		cInfo.positionB.sumScale(cInfo.normal, a.radius - cInfo.depth);
-		return cInfo;
+			if (distance >= 0) {
+				return null;
+			}
+			CollisionInfo cInfo = new CollisionInfo();
+			cInfo.depth = -distance; // length of overlap
+			centerToCorner.normalize(); // normal from A center to nearest corner
+			cInfo.normal = centerToCorner;
+			cInfo.positionA = new Vector2f(a.position);
+			cInfo.positionA.sumScale(cInfo.normal, a.radius); // where A would kiss B
+			cInfo.positionB = new Vector2f(vertices[cornerIndex]); // where B would kiss A
+			return cInfo;
+		}		
 	}
 	
 	private static CollisionInfo getCollision(Triangle a, Triangle b) {
