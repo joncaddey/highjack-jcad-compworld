@@ -151,35 +151,33 @@ public class PhysicsObject {
 		if (distances[maxIndex] >= 0)
 			return null;
 		
-		// OH SHNAP JON'S FREESTYLIN'
+		// OH SHNAP WE'RE FREESTYLIN'
 		boolean good = false; // whether this is a valid collision
 		
-		Vector2f toLeftVertex = new Vector2f(a.position);
+		final Vector2f toLeftVertex = new Vector2f(a.position);
 		toLeftVertex.sumScale(vertices[maxIndex], -1);
 		good = toLeftVertex.length() < a.radius; // good if within radius of left vertex.
 		if (!good) {
-			int j = (maxIndex + 1) / vertices.length;
-			Vector2f toRightVertex = new Vector2f(a.position);
-			toLeftVertex.sumScale(vertices[j], -1);
+			int nextIndex = (maxIndex + 1) % vertices.length;
+			final Vector2f toRightVertex = new Vector2f(a.position);
+			toRightVertex.sumScale(vertices[nextIndex], -1);
 			good = toRightVertex.length() < a.radius; // good if within radius of right vertex.
 			if (!good) {
 				// oh dear not within radius of either vertex.
 				// To be good, projected center must be in between vertexes.
 				Vector2f side = new Vector2f(vertices[maxIndex]);
-				side.sumScale(vertices[j], -1);
-				//side.normalize();
-				//good = side.dot(other)
-				// TODO make work
-				
+				side.sumScale(vertices[nextIndex], -1);
+				side.normalize();
+				float left = side.dot(vertices[maxIndex]);
+				float right = side.dot(vertices[nextIndex]);
+				float center = side.dot(a.position);
+				good = (left - center) * (right - center) <= 0;
 			}
 		}
 		if (!good) {
-			//return null;
+			return null;
 		}
-		
-		
-		
-		
+		// end freestylin'
 		
 		CollisionInfo cInfo = new CollisionInfo();
 		cInfo.depth = -distances[maxIndex];
