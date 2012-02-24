@@ -1,8 +1,9 @@
+package demo9;
 import javax.media.opengl.*;
 
 public class Triangle extends PhysicsObject {
-	private static final float[] VERTICES = {0, 0, 1, 0, 0, 1};
-	
+	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
+	private static final float[] VERTICES = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};//{0, 0, 1, 0, 0, 1};
 	private Vector2f[] vertexCache;
 	private Vector2f[] normalCache;
 	
@@ -20,8 +21,8 @@ public class Triangle extends PhysicsObject {
 	}
 
 	public Triangle(float size) {
-		centerOfMass.x = centerOfMass.y = size / 3;
-		inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18);
+		centerOfMass.x = centerOfMass.y = 0;//size / 3;
+		inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18); // TODO must recalculate (look it up, that's what engineers do).  currently is for right triangle.
 		renderable = new Renderable();
 		renderable.scale = size;
 		renderable.CoMX = centerOfMass.x;

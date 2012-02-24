@@ -1,3 +1,5 @@
+package demo9;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.nio.*;
@@ -54,7 +56,7 @@ public class Demo9 implements GLEventListener {
 //		obj.angularVelocity = 2f;
 //		obj.velocity.x = 3;
 		obj.velocity.y = 16;
-		obj.acceleration.y = -10;
+		obj.acceleration.y =0;// -10;
 		attachObject(obj);
 		for (int y = 0; y < 7; y++)
 			for (int x = 0; x < 10; x++) {
@@ -66,7 +68,7 @@ public class Demo9 implements GLEventListener {
 				obj.position.y = 4.5f - y;
 				obj.velocity.x = (float)(2 * Math.random() - 1);
 				obj.velocity.y = (float)(2 * Math.random() - 1);
-				obj.acceleration.y = -10;
+				obj.acceleration.y = 0;//-10;
 //				obj.angularVelocity = .5f;
 				attachObject(obj);
 			}

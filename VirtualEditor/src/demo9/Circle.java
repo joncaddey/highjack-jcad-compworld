@@ -1,4 +1,6 @@
+package demo9;
 import javax.media.opengl.*;
+
 
 public class Circle extends PhysicsObject {
 	private class Renderable extends SceneGraphNode {
