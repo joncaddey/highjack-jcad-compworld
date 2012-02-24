@@ -151,8 +151,8 @@ public class Demo9 implements GLEventListener {
 					}
 				}
 			}
-			if (!(repeat+1 < 10 && !noCollisions))
-				System.out.println(repeat + 1);
+			/*if (!(repeat+1 < 10 && !noCollisions))
+				System.out.println(repeat + 1);*/
 		}
 		for (PhysicsObject object : objects)
 			object.updateRenderable();
