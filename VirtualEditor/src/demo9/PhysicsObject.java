@@ -158,7 +158,7 @@ public class PhysicsObject {
 		float right = side.dot(vertices[nextIndex]);
 		float center = side.dot(a.position);
 		if ((left <= center && center <= right) || (right <= center && center <= left)) {
-			// circle side collision
+			// circle to side collision
 			CollisionInfo cInfo = new CollisionInfo();
 			cInfo.depth = -distances[maxIndex];
 			cInfo.normal = new Vector2f(normals[maxIndex]);
@@ -168,7 +168,7 @@ public class PhysicsObject {
 			cInfo.positionB = new Vector2f(a.position);
 			cInfo.positionB.sumScale(cInfo.normal, a.radius - cInfo.depth);
 			return cInfo;
-		} else {
+		} else if (a.radius > 0){
 			// circle to corner collision (similar to circle collision)
 			int cornerIndex;
 			Vector2f centerToCorner;
@@ -188,7 +188,7 @@ public class PhysicsObject {
 				centerToCorner = centerToRight;
 				distance = distanceRight;
 			}
-			if (distance >= 0) {
+			if (distance >= 0 || centerToCorner.length() == 0) { // second should be rare.
 				return null;
 			}
 			CollisionInfo cInfo = new CollisionInfo();
@@ -199,11 +199,68 @@ public class PhysicsObject {
 			cInfo.positionA.sumScale(cInfo.normal, a.radius); // where A would kiss B
 			cInfo.positionB = new Vector2f(vertices[cornerIndex]); // where B would kiss A
 			return cInfo;
-		}		
+		} else {
+			return null;
+		}
 	}
 	
 	private static CollisionInfo getCollision(Triangle a, Triangle b) {
-		return null; // TODO
+		// check if one has vertices in the other, then if the other has vertices in this.
+		// Similar to circle-triangle, except no radius on vertices.
+				
+		CollisionInfo winner = null;
+		
+		// oh this will make me feel dirty.  or efficient.
+		Vector2f[] verticesA = a.getVertices();
+		Vector2f[] verticesB = b.getVertices();
+		
+		// first make sure their bounding boxes intersect
+		float right = verticesA[0].x;
+		float left = right;
+		float top = verticesA[0].y;
+		float bot = top;
+		for (int i = 1; i < verticesA.length; i++) {
+			right = Math.max(right,  verticesA[i].x);
+			left = Math.min(left,  verticesA[i].x);
+			top = Math.max(top,  verticesA[i].y);
+			bot = Math.min(bot,  verticesA[i].y);
+		}
+		
+		boolean check = false;
+		for (int i = 0; !check && i < verticesB.length; i++) {
+			final float x = verticesB[i].x;
+			final float y = verticesB[i].y;
+			check = ((x > left && x < right) || (x > right && x < left)) &&
+					((y > bot && y < top) || (y > top && y < bot));
+		}
+		if (!check) {
+			// TODO uncomment return null;
+		}
+		
+		// assuming vertex of A is inside B
+		for (Vector2f v : verticesA) {
+			Circle corner = new Circle(0f);
+			corner.position = v;			
+			CollisionInfo cInfo = getCollision(corner, b);
+			if (cInfo != null && (winner == null || cInfo.depth > winner.depth)) {
+				winner = cInfo;
+			}
+		}
+		
+		// assuming vertex of B is inside A
+		for (Vector2f v : verticesB) {
+			Circle corner = new Circle(0f);
+			corner.position = v;			
+			CollisionInfo cInfo = getCollision(corner, a);
+			if (cInfo != null && (winner == null || cInfo.depth > winner.depth)) {
+				cInfo.normal.scale(-1);
+				winner = cInfo;
+			}
+		}
+		
+		return winner;
+		
+			
 	}
 	
 	public void resolveCollision(PhysicsObject other, CollisionInfo cInfo) {

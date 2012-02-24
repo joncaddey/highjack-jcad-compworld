@@ -62,6 +62,7 @@ public class Demo9 implements GLEventListener {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
+				//obj = new Triangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;

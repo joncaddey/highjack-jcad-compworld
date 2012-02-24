@@ -7,11 +7,15 @@ public class Triangle extends PhysicsObject {
 	private Vector2f[] vertexCache;
 	private Vector2f[] normalCache;
 	
+	float red;
+	float green;
+	float blue;
+	
 	private class Renderable extends SceneGraphNode {
 		public void renderGeometry(GLAutoDrawable drawable) {
 			GL2 gl = drawable.getGL().getGL2();
 
-			gl.glColor3f(1, 1, 1);
+			gl.glColor3f(red, green, blue);
 			gl.glBegin(GL.GL_TRIANGLES);
 			for (int i = 0; i < VERTICES.length; i += 2) {
 				gl.glVertex2f(VERTICES[i], VERTICES[i+1]);
@@ -21,12 +25,18 @@ public class Triangle extends PhysicsObject {
 	}
 
 	public Triangle(float size) {
+		this(size, (float)Math.random(), (float)Math.random(), (float)Math.random());
+	}
+	public Triangle(float size, float red, float green, float blue) {
 		centerOfMass.x = centerOfMass.y = 0;//size / 3;
 		inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18); // TODO must recalculate (look it up, that's what engineers do).  currently is for right triangle.
 		renderable = new Renderable();
 		renderable.scale = size;
 		renderable.CoMX = centerOfMass.x;
 		renderable.CoMY = centerOfMass.y;
+		this.red = red;
+		this.green = green;
+		this.blue = blue;
 	}
 	
 	public void clearCaches() {
