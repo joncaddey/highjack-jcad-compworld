@@ -239,6 +239,13 @@ public class PhysicsObject {
 			}
 		}
 		
+		if (winner != null) {
+			Vector2f tmp = new Vector2f(b.position);
+			tmp.sumScale(a.position, -1);
+			winner.normal.scale(tmp.dot(winner.normal));
+			winner.normal.normalize();
+		}
+		
 		return winner;
 		
 			

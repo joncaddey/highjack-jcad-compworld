@@ -56,20 +56,21 @@ public class Demo9 implements GLEventListener {
 //		obj.angularVelocity = 2f;
 //		obj.velocity.x = 3;
 		obj.velocity.y = 16;
-		obj.acceleration.y =0;// -10;
+		//obj.acceleration.y = -10;
 		attachObject(obj);
 		for (int y = 0; y < 7; y++)
-			for (int x = 0; x < 5; x++) {
+			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
-				//obj = new Circle((float)(Math.sqrt(mass) * .5));
-				obj = new Triangle((float)(Math.sqrt(mass)));
+				obj = new Circle((float)(Math.sqrt(mass) * .5));
+				//if (Math.random() < .5) 
+					obj = new Triangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
 				obj.position.y = 4.5f - y;
 				obj.velocity.x = (float)(2 * Math.random() - 1);
 				obj.velocity.y = (float)(2 * Math.random() - 1);
-				obj.acceleration.y = 0;//-10;
+				//obj.acceleration.y = -10;
 //				obj.angularVelocity = .5f;
 				attachObject(obj);
 			}
@@ -139,7 +140,7 @@ public class Demo9 implements GLEventListener {
 		for (PhysicsObject object : objects)
 			object.updateState(1f / TARGET_FPS / 10);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < 1 && !noCollisions; repeat++) {
+		for (int repeat = 0; repeat < 10 && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObject a = objects.get(i);
@@ -152,8 +153,6 @@ public class Demo9 implements GLEventListener {
 					}
 				}
 			}
-			/*if (!(repeat+1 < 10 && !noCollisions))
-				System.out.println(repeat + 1);*/
 		}
 		for (PhysicsObject object : objects)
 			object.updateRenderable();
