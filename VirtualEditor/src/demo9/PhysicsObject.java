@@ -191,7 +191,9 @@ public class PhysicsObject {
 		CollisionInfo winner = null;
 		
 		Vector2f[] verticesA = a.getVertices();
+		Vector2f[] normalsA = a.getNormals();
 		Vector2f[] verticesB = b.getVertices();
+		Vector2f[] normalsB = b.getNormals();
 		
 		/*/ first make sure their bounding boxes intersect
 		float right = verticesA[0].x;
@@ -217,17 +219,17 @@ public class PhysicsObject {
 		}
 		//*/
 		
-		// assuming vertex of A is inside B
+		/*/ assuming vertex of A is inside B
 		for (Vector2f v : verticesA) {
 			Circle corner = new Circle(0f);
-			corner.position = v;			
+			corner.position = v;
 			CollisionInfo cInfo = getCollision(corner, b);
 			if (cInfo != null && (winner == null || cInfo.depth > winner.depth)) {
-				
+
 				winner = cInfo;
 			}
 		}
-		
+
 		// assuming vertex of B is inside A
 		for (Vector2f v : verticesB) {
 			Circle corner = new Circle(0f);
@@ -237,14 +239,150 @@ public class PhysicsObject {
 				cInfo.normal.scale(-1);
 				winner = cInfo;
 			}
-		}
-		
+		}// */
+
+		/*/
 		if (winner != null) {
 			Vector2f tmp = new Vector2f(b.position);
 			tmp.sumScale(a.position, -1);
 			winner.normal.scale(tmp.dot(winner.normal));
+			// winner.normal = tmp;
 			winner.normal.normalize();
+		}// */
+		
+		
+		
+		// TODO going to write shit code, clean up later
+		
+		boolean almostColliding = false;
+		boolean colliding = false;
+		
+		// distances from vertex on A to sides of B.  distances are positive if vertex A is on outside of edge.
+		float distancesA[][] = new float[verticesA.length][verticesB.length];
+		for (int i = 0; i < verticesA.length; i++) {
+			boolean allInside = true;
+			for (int j = 0; j < verticesB.length; j++) {
+				Vector2f tmp = new Vector2f(verticesA[i]);
+				tmp.sumScale(verticesB[j], -1);
+				distancesA[i][j] = tmp.dot(normalsB[j]);
+				allInside = allInside && distancesA[i][j] <= 0;
+			}
+			//colliding = colliding || allInside;
 		}
+		
+		if (!colliding) {
+			
+			// maybe vertex of B is inside A
+			float distancesB[][] = new float[verticesB.length][verticesA.length];
+			for (int i = 0; i < verticesB.length; i++) {
+				boolean allInside = true;
+				for (int j = 0; j < verticesA.length; j++) {
+					Vector2f tmp = new Vector2f(verticesB[i]);
+					tmp.sumScale(verticesA[j], -1);
+					distancesB[i][j] = tmp.dot(normalsA[j]);
+					allInside = allInside && distancesB[i][j] <= 0;
+				}
+				//colliding = colliding || allInside;
+			}
+			
+			if (!colliding) {
+				// go deeper
+				
+				// see if both triangles are overlapping, without any vertices inside each other.
+				
+				boolean singleOutsideFound = false;
+				
+				// index of the edge the singleOutsideVertex was outside of
+				int outsideIndex = -1;
+				
+				// determine whether a single vertex is outside of only one line
+				for (int i = 0; i < verticesA.length; i++) {
+					int outsides = 0;
+					for (int j = 0; j < verticesB.length; j++) {
+						if (distancesA[i][j] > 0) {
+							outsides++;
+							outsideIndex = j;
+						}
+					}
+					if (outsides == 1) {
+						singleOutsideFound = true;
+						break;
+					}
+				}
+				
+				if (singleOutsideFound) {
+					// find vertex which is inside the edge the singleOutside vertex is outside of
+					for (int i = 0; i < verticesA.length; i++) {
+						if (distancesA[i][outsideIndex] <= 0) {
+							almostColliding = true;
+							break;
+						}
+					}
+				}
+				
+				if (almostColliding) {
+					
+					
+					singleOutsideFound = false;
+					
+					// index of the edge the singleOutsideVertex was outside of
+					outsideIndex = -1;
+					
+					// determine whether a single vertex is outside of only one line
+					for (int i = 0; i < verticesB.length; i++) {
+						int outsides = 0;
+						for (int j = 0; j < verticesA.length; j++) {
+							if (distancesB[i][j] > 0) {
+								outsides++;
+								outsideIndex = j;
+							}
+						}
+						if (outsides == 1) {
+							singleOutsideFound = true;
+							break;
+						}
+					}
+					
+					if (singleOutsideFound) {
+						// find vertex which is inside the edge the singleOutside vertex is outside of
+						for (int i = 0; i < verticesA.length; i++) {
+							if (distancesB[i][outsideIndex] <= 0) {
+								colliding = true;
+								break;
+							}
+						}
+					}
+					
+				}
+				
+				// problem?
+				
+			}
+			
+			
+			
+			
+			
+			
+			
+		}
+
+		if (!colliding) {
+			return null;
+		} else {
+			a.green = 1;
+			a.red = 0;
+			b.green = 1;
+			b.red = 0;
+		}
+		
+		
+		// END shit code
+		
+		
+		
+		
+		
 		
 		return winner;
 		
