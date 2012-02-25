@@ -58,7 +58,7 @@ public class Demo9 implements GLEventListener {
 		obj.velocity.y = 16;
 		//obj.acceleration.y = -10;
 		attachObject(obj);
-		for (int y = 0; y < 7; y++)
+		for (int y = 0; y < 1; y++)
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
@@ -138,9 +138,9 @@ public class Demo9 implements GLEventListener {
 			pickNextFrame = false;
 		}
 		for (PhysicsObject object : objects)
-			object.updateState(1f / TARGET_FPS / 10);
+			object.updateState(1f / TARGET_FPS / 20);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < 10 && !noCollisions; repeat++) {
+		for (int repeat = 0; repeat < 1 && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObject a = objects.get(i);
@@ -154,9 +154,17 @@ public class Demo9 implements GLEventListener {
 				}
 			}
 		}
-		for (PhysicsObject object : objects)
+		for (PhysicsObject object : objects){
 			object.updateRenderable();
+		}
 		sceneGraphRoot.render(drawable);
+		for (PhysicsObject object : objects){
+			if (object instanceof Triangle) {
+				Triangle a = (Triangle) object;
+				a.green = 0;
+				a.red = 1;
+			}
+		}
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
