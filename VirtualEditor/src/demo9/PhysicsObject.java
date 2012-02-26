@@ -195,68 +195,48 @@ public class PhysicsObject {
 		Vector2f[] verticesB = b.getVertices();
 		Vector2f[] normalsB = b.getNormals();
 		
-		/*/ first make sure their bounding boxes intersect
-		float right = verticesA[0].x;
-		float left = right;
-		float top = verticesA[0].y;
-		float bot = top;
+		/*/ first make sure their bounding boxes intersect TODO this seems to slow it down
+		float rightA = verticesA[0].x;
+		float leftA = rightA;
+		float topA = verticesA[0].y;
+		float botA = topA;
 		for (int i = 1; i < verticesA.length; i++) {
-			right = Math.max(right,  verticesA[i].x);
-			left = Math.min(left,  verticesA[i].x);
-			top = Math.max(top,  verticesA[i].y);
-			bot = Math.min(bot,  verticesA[i].y);
+			final float x = verticesA[i].x;
+			final float y = verticesA[i].y;
+			if (x > rightA) rightA = x;
+			if (x < leftA) leftA = x;
+			if (y > topA) topA = y;
+			if (y < botA) botA = y;
 		}
 		
-		boolean check = false;
-		for (int i = 0; !check && i < verticesB.length; i++) {
-			final float x = verticesB[i].x;
-			final float y = verticesB[i].y;
-			check = ((x > left && x < right) || (x > right && x < left)) &&
-					((y > bot && y < top) || (y > top && y < bot));
+		float rightB = verticesA[0].x;
+		float leftB = rightB;
+		float topB = verticesA[0].y;
+		float botB = topB;
+		for (int i = 1; i < verticesA.length; i++) {
+			final float x = verticesA[i].x;
+			final float y = verticesA[i].y;
+			if (x > rightB) rightB = x;
+			if (x < leftB) leftB = x;
+			if (y > topB) topB = y;
+			if (y < botB) botB = y;
 		}
-		if (!check) {
+		
+		boolean overlap = ((leftB >= leftA && leftB <= rightA) || (leftA >= leftB && leftA <= rightB)) &&
+				((botB >= botA && botB <= topA) || (botA >= botB && botA <= topB));
+		if (!overlap) {
 			return null;
 		}
-		//*/
+		// end bounding box intersection test */
 		
-		/*/ assuming vertex of A is inside B
-		for (Vector2f v : verticesA) {
-			Circle corner = new Circle(0f);
-			corner.position = v;
-			CollisionInfo cInfo = getCollision(corner, b);
-			if (cInfo != null && (winner == null || cInfo.depth > winner.depth)) {
-
-				winner = cInfo;
-			}
-		}
-
-		// assuming vertex of B is inside A
-		for (Vector2f v : verticesB) {
-			Circle corner = new Circle(0f);
-			corner.position = v;
-			CollisionInfo cInfo = getCollision(corner, a);
-			if (cInfo != null && (winner == null || cInfo.depth > winner.depth)) {
-				cInfo.normal.scale(-1);
-				winner = cInfo;
-			}
-		}// */
-
-		/*/
-		if (winner != null) {
-			Vector2f tmp = new Vector2f(b.position);
-			tmp.sumScale(a.position, -1);
-			winner.normal.scale(tmp.dot(winner.normal));
-			// winner.normal = tmp;
-			winner.normal.normalize();
-		}// */
 		
 		
 		
 		// TODO going to write shit code, clean up later
 		
 		
-		boolean almostColliding = false;
-		boolean colliding = false;
+		//boolean almostColliding = false;
+		//boolean colliding = false;
 		
 		
 		
@@ -265,47 +245,35 @@ public class PhysicsObject {
 		// distances from vertex on A to sides of B.  distances are positive if vertex A is on outside of edge.
 		float distancesA[][] = new float[verticesA.length][verticesB.length];
 		for (int i = 0; i < verticesA.length; i++) {
-			boolean allInside = true;
+			//boolean allInside = true;
 			for (int j = 0; j < verticesB.length; j++) {
 				Vector2f tmp = new Vector2f(verticesA[i]);
 				tmp.sumScale(verticesB[j], -1);
 				distancesA[i][j] = tmp.dot(normalsB[j]);
-				allInside = allInside && distancesA[i][j] <= 0;
+				//allInside = allInside && distancesA[i][j] <= 0;
 			}
-			colliding = colliding || allInside;
+			//colliding = colliding || allInside;
 		}
 		
 		// maybe vertex of B is inside A
 		float distancesB[][] = new float[verticesB.length][verticesA.length];
 		for (int i = 0; i < verticesB.length; i++) {
-			boolean allInside = true;
+			//boolean allInside = true;
 			for (int j = 0; j < verticesA.length; j++) {
 				Vector2f tmp = new Vector2f(verticesB[i]);
 				tmp.sumScale(verticesA[j], -1);
 				distancesB[i][j] = tmp.dot(normalsA[j]);
-				allInside = allInside && distancesB[i][j] <= 0;
+				//allInside = allInside && distancesB[i][j] <= 0;
 			}
-			colliding = colliding || allInside;
+			//colliding = colliding || allInside;
 		}
 		
 		
 		
 		
 		
-		// TODO for each edge of A, see what the distance is to each vertex of
-		// B.
-		// Remember the index of the vertex of B that is the least distance
-		// (most overlap) from the
-		// edge of A. If this distance is less than the previous least distance,
-		// remember it instead (the edge index and vertex distance.)
-		// The vertex of B with the least distance from A is the vertex that "collided"
-		// with A first.  The vertex is the first to collide.
 		
-		// Then do the same with each edge of B.
-		
-		
-		
-		
+		/*/ do I even need colliding?
 		
 		if (!colliding) {
 			
@@ -378,19 +346,15 @@ public class PhysicsObject {
 							}
 						}
 					}
-					
 				}
-				
-				// problem?
-				
 			}
-	
 		}
 
 		if (!colliding) {
 			return null;
 		}
-		
+ 		//*/
+	
 		int deepestAVer = 0;  // the vertex of A deepest in this side of B
 		for (int aver = 1; aver < verticesA.length; aver++) {
 			if (distancesA[aver][0] < distancesA[deepestAVer][0]) {
@@ -406,8 +370,7 @@ public class PhysicsObject {
 					deepestAVer = aver;
 				}
 			}
-			
-			if (distancesA[deepestAVer][bside] < distancesA[leastDeepAVer][leastDeepBSide]) {
+			if (distancesA[deepestAVer][bside] > distancesA[leastDeepAVer][leastDeepBSide]) {
 				leastDeepAVer = deepestAVer;
 				leastDeepBSide = bside;
 			}
@@ -431,43 +394,55 @@ public class PhysicsObject {
 				}
 			}
 			
-			if (distancesB[deepestBVer][aside] < distancesB[leastDeepBVer][leastDeepASide]) {
+			if (distancesB[deepestBVer][aside] > distancesB[leastDeepBVer][leastDeepASide]) {
 				leastDeepBVer = deepestBVer;
 				leastDeepASide = aside;
 			}	
 		}
-		
+		if (distancesB[leastDeepBVer][leastDeepASide] > 0 || distancesA[leastDeepAVer][leastDeepBSide] > 0) {
+			return null;
+		}
 		float[][] distances;
 		
 		int ver;
 		int side;
 		Vector2f[] normals;
 		Vector2f[] vertices;
-		if (distancesB[leastDeepBVer][leastDeepASide] < distancesA[leastDeepAVer][leastDeepBSide]) {
+		if (distancesB[leastDeepBVer][leastDeepASide] > distancesA[leastDeepAVer][leastDeepBSide]) {
 			distances = distancesB;
 			ver = leastDeepBVer;
+			vertices = verticesB;
 			side = leastDeepASide;
 			normals = normalsA;
-			vertices = verticesB;
 		} else {
 			distances = distancesA;
 			ver = leastDeepAVer;
+			vertices = verticesA;
 			side = leastDeepBSide;
 			normals = normalsB;
-			vertices = verticesA;
 		}
 		
 		
-		
+		// below assumes A vertex penetrated B side.
 		CollisionInfo cInfo = new CollisionInfo();
 		cInfo.depth = -distances[ver][side];
 		cInfo.normal = new Vector2f(normals[side]);
+		cInfo.normal.scale(-1);
 		cInfo.positionA = new Vector2f(vertices[ver]);
 		cInfo.positionB = new Vector2f(vertices[ver]);
-		cInfo.positionB.sumScale(cInfo.normal, - cInfo.depth);
+		cInfo.positionB.sumScale(cInfo.normal, -cInfo.depth);
 		
-		if (distances == distancesB) {
+		
+		
+		
+		
+		
+		if (vertices == verticesB) {
 			cInfo.normal.scale(-1);
+			Vector2f t = cInfo.positionA;
+			cInfo.positionA = cInfo.positionB;
+			cInfo.positionB = t;
+			
 		}
 		// END shit code
 		
