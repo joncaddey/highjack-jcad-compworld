@@ -3,7 +3,7 @@ import javax.media.opengl.*;
 
 public class Triangle extends PhysicsObject {
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
-	private static final float[] VERTICES = {0, 0, 1, 0, 0, 1f}; //{-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};//
+	private static final float[] VERTICES = {-1, 0, 1, 0, 0, 1}; //{-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};//
 	private Vector2f[] vertexCache;
 	private Vector2f[] normalCache;
 	
