@@ -1,3 +1,4 @@
+package main;
 import java.util.*;
 import javax.media.opengl.*;
 
@@ -6,6 +7,8 @@ public class SceneGraphNode {
 	public float rotation;
 	public float translateX;
 	public float translateY;
+	public float CoMX;
+	public float CoMY;
 	private List<SceneGraphNode> children;
 	private boolean pickable;
 	
@@ -33,8 +36,9 @@ public class SceneGraphNode {
 		GL2 gl = drawable.getGL().getGL2();
 		
 		gl.glPushMatrix();
-		gl.glTranslatef(translateX, translateY, 0);
+		gl.glTranslatef(translateX + CoMX, translateY + CoMY, 0);
 		gl.glRotatef(rotation, 0, 0, 1);
+		gl.glTranslatef(-CoMX, -CoMY, 0);
 		gl.glScalef(scale, scale, scale);
 		if (children.size() == 0)
 			renderGeometry(drawable);
@@ -66,7 +70,8 @@ public class SceneGraphNode {
 		gl.glScalef(scale, scale, scale);
 		if (children.size() == 0) {
 			renderGeometry(drawable);
-			if (gl.glRenderMode(GL2.GL_SELECT) > 0)
+			int hits = gl.glRenderMode(GL2.GL_SELECT);
+			if (hits > 0)
 				if (pickable)
 					picked.add(this);
 				else

@@ -1,3 +1,4 @@
+package main;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -10,7 +11,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-
+/**
+ * 
+ * @author Steven Cozart Jonathan Caddey
+ *
+ */
 @SuppressWarnings("serial")
 public class ViewPanel extends JPanel implements ActionListener, FocusListener{
 	private VirtualCanvas my_canvas;

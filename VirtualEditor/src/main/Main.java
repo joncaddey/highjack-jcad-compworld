@@ -1,7 +1,12 @@
+package main;
 import javax.media.opengl.GLProfile;
 import javax.swing.SwingUtilities;
 
-
+/**
+ * 
+ * @author Steven Cozart Jonathan Caddey
+ *
+ */
 public class Main {
 
 	VirtualCanvas my_canvas;

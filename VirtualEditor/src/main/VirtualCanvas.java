@@ -1,3 +1,4 @@
+package main;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -18,6 +19,12 @@ import javax.media.opengl.glu.GLU;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.FPSAnimator;
 
+
+/**
+ * 
+ * @author Steven Cozart Jonathan Caddey
+ *
+ */
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private SceneGraphNode my_root;
 	private boolean pickNextFrame;
@@ -128,7 +135,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		final double UNIT = 2;
+		final double UNIT = 10;
 
 		if (width < height) {
 			left = -UNIT / 2;
