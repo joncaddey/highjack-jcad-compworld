@@ -1,5 +1,12 @@
+package main;
 import javax.media.opengl.*;
 
+
+/**
+ * 
+ * @author Steven Cozart Jonathan Caddey
+ *
+ */
 public class Circle extends SceneGraphNode {
 
 	private static final int PARTS = 100;

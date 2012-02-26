@@ -1,3 +1,4 @@
+package main;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -15,7 +16,11 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
-
+/**
+ * 
+ * @author Steven Cozart Jonathan Caddey
+ *
+ */
 @SuppressWarnings("serial")
 public class PropertiesPanel extends JPanel implements Observer,
 		ActionListener, FocusListener {

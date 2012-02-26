@@ -1,4 +1,4 @@
-package demo9;
+package phyObj;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -8,6 +8,9 @@ import javax.media.opengl.*;
 import javax.media.opengl.awt.*;
 import javax.media.opengl.glu.*;
 import javax.swing.*;
+
+import main.SceneGraphNode;
+
 import com.jogamp.common.nio.*;
 import com.jogamp.opengl.util.*;
 
@@ -48,7 +51,7 @@ public class Demo9 implements GLEventListener {
 		objects = new ArrayList<PhysicsObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		PhysicsObject obj = new Triangle(2);
+		PhysicsObject obj = new PhyTriangle(2);
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.x = 0;
@@ -58,10 +61,10 @@ public class Demo9 implements GLEventListener {
 		obj.velocity.y = 16;
 		//obj.acceleration.y = -10;
 		attachObject(obj);
-		for (int y = 0; y < 2; y++)
+		for (int y = 0; y < 7; y++)
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
-				obj = new Circle((float)(Math.sqrt(mass) * .5));
+				obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
 				//if (Math.random() < .5) 
 				//	obj = new Triangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
@@ -138,9 +141,9 @@ public class Demo9 implements GLEventListener {
 			pickNextFrame = false;
 		}
 		for (PhysicsObject object : objects)
-			object.updateState(1f / TARGET_FPS / 20);
+			object.updateState(1f / TARGET_FPS / 10);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < 1 && !noCollisions; repeat++) {
+		for (int repeat = 0; repeat < 10 && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObject a = objects.get(i);
@@ -154,11 +157,9 @@ public class Demo9 implements GLEventListener {
 				}
 			}
 		}
-		for (PhysicsObject object : objects){
+		for (PhysicsObject object : objects)
 			object.updateRenderable();
-		}
 		sceneGraphRoot.render(drawable);
-		
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
