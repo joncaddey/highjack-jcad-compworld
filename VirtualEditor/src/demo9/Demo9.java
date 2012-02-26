@@ -14,10 +14,11 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
-	private static final float GRAVITY = 00;
-	private static final float SLOW_FACTOR = 20;
-	private static final int RESOLUTION_REPEATS = 1;
+	private static final float GRAVITY = 10;
+	private static final float SLOW_FACTOR = 1;
+	private static final int MAX_RESOLUTION_REPEATS = 100;
 	
+	private static int resolution_repeats = 10;
 	private static JFrame appFrame;
 	private static SceneGraphNode sceneGraphRoot;
 	private static boolean pickNextFrame;
@@ -62,11 +63,11 @@ public class Demo9 implements GLEventListener {
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
-		for (int y = 4; y < 5; y++)
-			for (int x = 5; x < 6; x++) {
+		for (int y = 0; y < 7; y++)
+			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
-				//if (Math.random() < .5) 
+				//if (Math.random() < .3) 
 					obj = new Triangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
@@ -144,7 +145,8 @@ public class Demo9 implements GLEventListener {
 		for (PhysicsObject object : objects)
 			object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
+		int repeat = 0;
+		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObject a = objects.get(i);
@@ -157,7 +159,16 @@ public class Demo9 implements GLEventListener {
 					}
 				}
 			}
+			
+			
 		}
+		if (repeat < resolution_repeats) {
+			resolution_repeats = repeat + 1;
+		}
+		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS){
+			resolution_repeats++;
+		}
+		
 		for (PhysicsObject object : objects){
 			object.updateRenderable();
 		}

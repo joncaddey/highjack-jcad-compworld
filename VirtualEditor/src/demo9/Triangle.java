@@ -21,6 +21,12 @@ public class Triangle extends PhysicsObject {
 				gl.glVertex2f(VERTICES[i], VERTICES[i+1]);
 			}
 			gl.glEnd();
+			
+			/*gl.glBegin(GL.GL_TRIANGLES);
+			for (int i = 4; i < VERTICES.length + 2; i += 2) {
+				gl.glVertex2f(VERTICES[i % VERTICES.length], VERTICES[i % VERTICES.length +1]);
+			}
+			gl.glEnd();*/
 		}
 	}
 
