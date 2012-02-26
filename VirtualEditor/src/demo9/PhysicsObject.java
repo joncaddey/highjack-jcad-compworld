@@ -449,10 +449,12 @@ public class PhysicsObject {
 		}
 		// END shit code
 		*/
-		
 		CollisionInfo c = getCollision(verticesA, verticesB, normalsB);
 		if (c != null) {
 			CollisionInfo d = getCollision(verticesB, verticesA, normalsA);
+			if (d == null) {
+				return null;
+			}
 			if (d != null && d.depth < c.depth) {
 				c = d;
 				c.normal.scale(-1);
@@ -508,7 +510,7 @@ public class PhysicsObject {
 		}
 		
 		CollisionInfo c = new CollisionInfo();
-		c.depth = -shallowestDistance;
+		c.depth = -shallowestDistance * 1f;
 		c.normal = new Vector2f(normalB[shallowestSide]);
 		c.normal.scale(-1);
 		c.positionA = new Vector2f(verA[shallowestVer]);
