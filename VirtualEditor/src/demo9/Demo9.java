@@ -14,6 +14,8 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
+	private static final float GRAVITY = 10;
+	
 	private static JFrame appFrame;
 	private static SceneGraphNode sceneGraphRoot;
 	private static boolean pickNextFrame;
@@ -56,7 +58,7 @@ public class Demo9 implements GLEventListener {
 //		obj.angularVelocity = 2f;
 //		obj.velocity.x = 3;
 		obj.velocity.y = 16;
-		//obj.acceleration.y = -10;
+		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
 		for (int y = 0; y < 2; y++)
 			for (int x = 0; x < 10; x++) {
@@ -70,7 +72,7 @@ public class Demo9 implements GLEventListener {
 				obj.position.y = 4.5f - y;
 				obj.velocity.x = (float)(2 * Math.random() - 1);
 				obj.velocity.y = (float)(2 * Math.random() - 1);
-				//obj.acceleration.y = -10;
+				obj.acceleration.y = -GRAVITY;
 //				obj.angularVelocity = .5f;
 				attachObject(obj);
 			}
@@ -138,9 +140,9 @@ public class Demo9 implements GLEventListener {
 			pickNextFrame = false;
 		}
 		for (PhysicsObject object : objects)
-			object.updateState(1f / TARGET_FPS / 20);
+			object.updateState(1f / TARGET_FPS / 1);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < 1 && !noCollisions; repeat++) {
+		for (int repeat = 0; repeat < 10 && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObject a = objects.get(i);
