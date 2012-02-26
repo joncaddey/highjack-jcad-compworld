@@ -232,11 +232,11 @@ public class PhysicsObject {
 		
 		
 		
-		// TODO going to write shit code, clean up later
+		/*/ TODO going to write shit code, clean up later
 		
 		
-		//boolean almostColliding = false;
-		//boolean colliding = false;
+		boolean almostColliding = false;
+		boolean colliding = false;
 		
 		
 		
@@ -245,27 +245,27 @@ public class PhysicsObject {
 		// distances from vertex on A to sides of B.  distances are positive if vertex A is on outside of edge.
 		float distancesA[][] = new float[verticesA.length][verticesB.length];
 		for (int i = 0; i < verticesA.length; i++) {
-			//boolean allInside = true;
+			boolean allInside = true;
 			for (int j = 0; j < verticesB.length; j++) {
 				Vector2f tmp = new Vector2f(verticesA[i]);
 				tmp.sumScale(verticesB[j], -1);
 				distancesA[i][j] = tmp.dot(normalsB[j]);
-				//allInside = allInside && distancesA[i][j] <= 0;
+				allInside = allInside && distancesA[i][j] <= 0;
 			}
-			//colliding = colliding || allInside;
+			colliding = colliding || allInside;
 		}
 		
 		// maybe vertex of B is inside A
 		float distancesB[][] = new float[verticesB.length][verticesA.length];
 		for (int i = 0; i < verticesB.length; i++) {
-			//boolean allInside = true;
+			boolean allInside = true;
 			for (int j = 0; j < verticesA.length; j++) {
 				Vector2f tmp = new Vector2f(verticesB[i]);
 				tmp.sumScale(verticesA[j], -1);
 				distancesB[i][j] = tmp.dot(normalsA[j]);
-				//allInside = allInside && distancesB[i][j] <= 0;
+				allInside = allInside && distancesB[i][j] <= 0;
 			}
-			//colliding = colliding || allInside;
+			colliding = colliding || allInside;
 		}
 		
 		
@@ -273,7 +273,7 @@ public class PhysicsObject {
 		
 		
 		
-		/*/ do I even need colliding?
+		// do I even need colliding?
 		
 		if (!colliding) {
 			
@@ -355,6 +355,9 @@ public class PhysicsObject {
 		}
  		//*/
 	
+		
+		
+		/*/
 		int deepestAVer = 0;  // the vertex of A deepest in this side of B
 		for (int aver = 1; aver < verticesA.length; aver++) {
 			if (distancesA[aver][0] < distancesA[deepestAVer][0]) {
@@ -445,15 +448,73 @@ public class PhysicsObject {
 			
 		}
 		// END shit code
+		*/
+		
+		CollisionInfo c = getCollision(verticesA, verticesB, normalsB);
+		if (c != null) {
+			CollisionInfo d = getCollision(verticesB, verticesA, normalsA);
+			if (d != null && d.depth < c.depth) {
+				c = d;
+				c.normal.scale(-1);
+				Vector2f t = c.positionA;
+				c.positionA = c.positionB;
+				c.positionB = t;
+			}
+		}
 		
 		
 		
-		
-		
-		
-		return cInfo;
+		return c;
 		
 			
+	}
+	
+
+	/**
+	 * Gives collision, assuming the collision occurs from the deepest vertex relative to a side penetrating that side,
+	 * where the side is the side with the most shallow deepest vertex among all the sides.  The depth of a vertex
+	 * is its negative distance from the normal.
+	 * @param verA vertices forming a convex polygon, assuming to penetrate B.
+	 * @param verB vertices forming a convex polygon.
+	 * @param normalB normals of the edges of a convex polygon.
+	 * @return a collision, or null if there is no collision.
+	 */
+	private static CollisionInfo getCollision(Vector2f[] verA, Vector2f[] verB, Vector2f[] normalB) {
+		
+		float shallowestDistance = Float.NEGATIVE_INFINITY;
+		int shallowestSide = -1;
+		int shallowestVer = -1;
+		for (int side = 0; side < normalB.length; side++) {
+			int deepestVer = -1;
+			float deepestDistance = 1;
+			for (int ver = 0; ver < verA.length; ver++) {
+				Vector2f tmp = new Vector2f(verA[ver]);
+				tmp.sumScale(verB[side], -1);
+				float distance = tmp.dot(normalB[side]);
+				if (distance < deepestDistance) {
+					deepestDistance = distance;
+					deepestVer = ver;
+				}
+			}
+			if (deepestDistance > 0) {
+				return null;
+			}
+			if (deepestDistance > shallowestDistance) {
+				shallowestDistance = deepestDistance;
+				shallowestSide = side;
+				shallowestVer = deepestVer;
+			}
+			
+		}
+		
+		CollisionInfo c = new CollisionInfo();
+		c.depth = -shallowestDistance;
+		c.normal = new Vector2f(normalB[shallowestSide]);
+		c.normal.scale(-1);
+		c.positionA = new Vector2f(verA[shallowestVer]);
+		c.positionB = new Vector2f(verA[shallowestVer]);
+		c.positionB.sumScale(c.normal, -c.depth);
+		return c;
 	}
 	
 	public void resolveCollision(PhysicsObject other, CollisionInfo cInfo) {

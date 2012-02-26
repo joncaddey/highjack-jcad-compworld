@@ -14,7 +14,9 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
-	private static final float GRAVITY = 10;
+	private static final float GRAVITY = 00;
+	private static final float SLOW_FACTOR = 20;
+	private static final int RESOLUTION_REPEATS = 1;
 	
 	private static JFrame appFrame;
 	private static SceneGraphNode sceneGraphRoot;
@@ -60,12 +62,12 @@ public class Demo9 implements GLEventListener {
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
-		for (int y = 0; y < 2; y++)
-			for (int x = 0; x < 10; x++) {
+		for (int y = 4; y < 5; y++)
+			for (int x = 5; x < 6; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
 				//if (Math.random() < .5) 
-				//	obj = new Triangle((float)(Math.sqrt(mass)));
+					obj = new Triangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
@@ -140,9 +142,9 @@ public class Demo9 implements GLEventListener {
 			pickNextFrame = false;
 		}
 		for (PhysicsObject object : objects)
-			object.updateState(1f / TARGET_FPS / 1);
+			object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < 10 && !noCollisions; repeat++) {
+		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
 				PhysicsObject a = objects.get(i);
