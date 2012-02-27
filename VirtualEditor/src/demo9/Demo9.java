@@ -14,9 +14,9 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
-	private static final float GRAVITY = 10;
-	private static final float SLOW_FACTOR = 1;
-	private static final int MAX_RESOLUTION_REPEATS = 100;
+	private static final float GRAVITY = 0;
+	private static final float SLOW_FACTOR = 10;
+	private static final int MAX_RESOLUTION_REPEATS = 80;
 	
 	private static int resolution_repeats = 10;
 	private static JFrame appFrame;
@@ -53,7 +53,9 @@ public class Demo9 implements GLEventListener {
 		objects = new ArrayList<PhysicsObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		PhysicsObject obj = PhyPolygon.getEqTriangle(2);
+		PhysicsObject obj = PhyPolygon.getRightTriangle(2);
+		//PhysicsObject obj = new Circle(.5f);
+		//PhysicsObject obj = PhyCompositeObject.getPair(1);
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.x = 0;
@@ -74,7 +76,7 @@ public class Demo9 implements GLEventListener {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
 				//if (Math.random() < .3) 
-					obj = PhyPolygon.getSquare((float)(Math.sqrt(mass)));
+					obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
