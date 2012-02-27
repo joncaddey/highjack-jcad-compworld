@@ -1,4 +1,7 @@
 package demo9;
+
+
+
 public class PhysicsObject {
 	float inverseMass;
 	Vector2f position;
@@ -9,6 +12,7 @@ public class PhysicsObject {
 	float orientation;
 	float angularVelocity;
 	SceneGraphNode renderable;
+	PhysicsObject[] objects;
 	
 	public PhysicsObject() {
 		inverseMass = 1;
@@ -48,7 +52,7 @@ public class PhysicsObject {
 				return getCollision((HalfSpace)this, (Circle)other);
 			} else if (other instanceof PhyPolygon) {
 				return getCollision((HalfSpace)this, (PhyPolygon)other);
-			}			
+			}	
 		} else if (this instanceof Circle) {
 			if (other instanceof HalfSpace) {
 				CollisionInfo cInfo = getCollision((HalfSpace)other, (Circle)this);
@@ -74,9 +78,61 @@ public class PhysicsObject {
 			} else if (other instanceof PhyPolygon) {
 				return getCollision((PhyPolygon)this, (PhyPolygon)other);
 			}
-		}			
+		} else if (this instanceof PhyCompositeObject) {
+			if (!(other instanceof PhyCompositeObject)) {
+				return getCollision((PhyCompositeObject) this, (PhysicsObject) other);
+			}
+		}
 		return null;
 	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private static CollisionInfo getCollision(PhysicsObject a, PhyCompositeObject b) {
+		
+		CollisionInfo winner = null;
+		for (PhysicsObject o : b.objects){
+			//o.position = b.position;
+			o.orientation = b.orientation;
+			CollisionInfo c = a.getCollision(o);
+			winner = c;
+//			if (c != null && (winner == null || c.depth > winner.depth)){
+//				winner = c;
+//			}
+		}
+		return winner;
+	}
+	private static CollisionInfo getCollision(PhyCompositeObject a, PhysicsObject b) {
+		CollisionInfo winner = getCollision(b, a);
+		if (winner != null) {
+			winner.normal.scale(-1);
+			Vector2f tmp = winner.positionA;
+			winner.positionA = winner.positionB;
+			winner.positionB = tmp;
+		}
+		return winner;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	private static CollisionInfo getCollision(HalfSpace a, Circle b) {
 		float distance = a.normal.dot(b.position);
