@@ -28,9 +28,6 @@ public class PhysicsObject {
 		position.sumScale(acceleration, timePeriod * timePeriod / 2);
 		velocity.sumScale(acceleration, timePeriod);
 		orientation += angularVelocity * timePeriod;
-		if (this instanceof PhyPolygon) {
-			System.out.println(this.position);
-		}
 		clearCaches();
 	}
 	
@@ -136,16 +133,17 @@ public class PhysicsObject {
 	
 	
 	private static CollisionInfo getCollision(HalfSpace a, Circle b) {
-		float distance = a.normal.dot(b.position);
+		Vector2f position = b.getCenter();
+		float distance = a.normal.dot(position);
 		distance -= a.intercept; // distance is same as norm of line dot (center of circle - point on line)
 		if (distance >= b.radius)
 			return null;
 		CollisionInfo cInfo = new CollisionInfo();
 		cInfo.depth = b.radius - distance;
 		cInfo.normal = new Vector2f(a.normal);
-		cInfo.positionA = new Vector2f(b.position);
+		cInfo.positionA = new Vector2f(position);
 		cInfo.positionA.sumScale(cInfo.normal, -b.radius + cInfo.depth);
-		cInfo.positionB = new Vector2f(b.position);
+		cInfo.positionB = new Vector2f(position);
 		cInfo.positionB.sumScale(cInfo.normal, -b.radius);
 		return cInfo;
 	}
@@ -176,7 +174,8 @@ public class PhysicsObject {
 	
 	private static CollisionInfo getCollision(Circle a, Circle b) {
 		Vector2f tmp = new Vector2f(b.position);
-		tmp.sumScale(a.position, -1); // reaches from A center to B center
+		Vector2f positionA = a.getCenter();
+		tmp.sumScale(positionA, -1); // reaches from A center to B center
 		float distance = tmp.length() - a.radius - b.radius; // negative overlap along tmp
 		if (distance >= 0 || tmp.length() == 0)
 			return null;
@@ -184,9 +183,9 @@ public class PhysicsObject {
 		cInfo.depth = -distance; // length of overlap
 		tmp.normalize(); // normal from A center to B
 		cInfo.normal = tmp;
-		cInfo.positionA = new Vector2f(a.position);
+		cInfo.positionA = new Vector2f(positionA);
 		cInfo.positionA.sumScale(cInfo.normal, a.radius); // where A would kiss B
-		cInfo.positionB = new Vector2f(b.position);
+		cInfo.positionB = new Vector2f(b.getCenter());
 		cInfo.positionB.sumScale(cInfo.normal, -b.radius); // where B would kiss A
 		return cInfo;
 	}
@@ -194,10 +193,11 @@ public class PhysicsObject {
 	private static CollisionInfo getCollision(Circle a, PhyPolygon b) {
 		Vector2f[] vertices = b.getVertices();
 		Vector2f[] normals = b.getNormals();
+		Vector2f positionA = a.getCenter();
 		float[] distances = new float[vertices.length];
 		
 		for (int i = 0; i < vertices.length; i++) {
-			Vector2f tmp = new Vector2f(a.position);
+			Vector2f tmp = new Vector2f(positionA);
 			tmp.sumScale(vertices[i], -1);
 			distances[i] = tmp.dot(normals[i]) - a.radius;
 		}
@@ -213,16 +213,16 @@ public class PhysicsObject {
 		Vector2f side = new Vector2f(-normals[maxIndex].y, normals[maxIndex].x);
 		float left = side.dot(vertices[maxIndex]);
 		float right = side.dot(vertices[nextIndex]);
-		float center = side.dot(a.position);
+		float center = side.dot(positionA);
 		if ((left <= center && center <= right) || (right <= center && center <= left)) {
 			// circle to side collision
 			CollisionInfo cInfo = new CollisionInfo();
 			cInfo.depth = -distances[maxIndex];
 			cInfo.normal = new Vector2f(normals[maxIndex]);
 			cInfo.normal.scale(-1);
-			cInfo.positionA = new Vector2f(a.position);
+			cInfo.positionA = new Vector2f(positionA);
 			cInfo.positionA.sumScale(cInfo.normal, a.radius);
-			cInfo.positionB = new Vector2f(a.position);
+			cInfo.positionB = new Vector2f(positionA);
 			cInfo.positionB.sumScale(cInfo.normal, a.radius - cInfo.depth);
 			return cInfo;
 		} else if (a.radius > 0){
@@ -309,14 +309,14 @@ public class PhysicsObject {
 		// Calculate the velocity of the collision point on the calling object.
 		Vector2f relativeCollisionPositionA = new Vector2f(cInfo.positionA);
 		relativeCollisionPositionA.sumScale(position, -1);
-		relativeCollisionPositionA.sumScale(centerOfMass, -1);
+		//relativeCollisionPositionA.sumScale(centerOfMass, -1);
 		Vector2f linearVelocityA = new Vector2f(-relativeCollisionPositionA.y, relativeCollisionPositionA.x);
 		linearVelocityA.scale(angularVelocity);
 		linearVelocityA.sum(velocity);
 		// Calculate the velocity of the collision point on the other object.
 		Vector2f relativeCollisionPositionB = new Vector2f(cInfo.positionB);
 		relativeCollisionPositionB.sumScale(other.position, -1);
-		relativeCollisionPositionB.sumScale(other.centerOfMass, -1);
+		//relativeCollisionPositionB.sumScale(other.centerOfMass, -1);
 		Vector2f linearVelocityB = new Vector2f(-relativeCollisionPositionB.y, relativeCollisionPositionB.x);
 		linearVelocityB.scale(other.angularVelocity);
 		linearVelocityB.sum(other.velocity);
