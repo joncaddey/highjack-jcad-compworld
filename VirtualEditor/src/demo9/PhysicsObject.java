@@ -42,12 +42,12 @@ public class PhysicsObject {
 		if (inverseMass == 0 && other.inverseMass == 0) {
 			return null;
 		}
-		// HalfSpace, Circle, Triangle
+		// HalfSpace, Circle, Triangle, Composite
 		if (this instanceof HalfSpace) {
 			if (other instanceof Circle) {
 				return getCollision((HalfSpace)this, (Circle)other);
-			} else if (other instanceof Triangle) {
-				return getCollision((HalfSpace)this, (Triangle)other);
+			} else if (other instanceof PhyPolygon) {
+				return getCollision((HalfSpace)this, (PhyPolygon)other);
 			}			
 		} else if (this instanceof Circle) {
 			if (other instanceof HalfSpace) {
@@ -57,22 +57,22 @@ public class PhysicsObject {
 				return cInfo;
 			} else if (other instanceof Circle) {
 				return getCollision((Circle)this, (Circle)other);
-			} else if (other instanceof Triangle) {
-				return getCollision((Circle)this, (Triangle)other);
+			} else if (other instanceof PhyPolygon) {
+				return getCollision((Circle)this, (PhyPolygon)other);
 			}
-		} else if (this instanceof Triangle) {
+		} else if (this instanceof PhyPolygon) {
 			if (other instanceof HalfSpace) {
-				CollisionInfo cInfo = getCollision((HalfSpace)other, (Triangle)this);
+				CollisionInfo cInfo = getCollision((HalfSpace)other, (PhyPolygon)this);
 				if (cInfo != null)
 					cInfo.normal.scale(-1);
 				return cInfo;
 			} else if (other instanceof Circle) {
-				CollisionInfo cInfo = getCollision((Circle)other, (Triangle)this);
+				CollisionInfo cInfo = getCollision((Circle)other, (PhyPolygon)this);
 				if (cInfo != null)
 					cInfo.normal.scale(-1);
 				return cInfo;
-			} else if (other instanceof Triangle) {
-				return getCollision((Triangle)this, (Triangle)other);
+			} else if (other instanceof PhyPolygon) {
+				return getCollision((PhyPolygon)this, (PhyPolygon)other);
 			}
 		}			
 		return null;
@@ -93,7 +93,7 @@ public class PhysicsObject {
 		return cInfo;
 	}
 	
-	private static CollisionInfo getCollision(HalfSpace a, Triangle b) {
+	private static CollisionInfo getCollision(HalfSpace a, PhyPolygon b) {
 		Vector2f[] vertices = b.getVertices();
 		float[] distances = new float[vertices.length];
 		
@@ -134,7 +134,7 @@ public class PhysicsObject {
 		return cInfo;
 	}
 	
-	private static CollisionInfo getCollision(Circle a, Triangle b) {
+	private static CollisionInfo getCollision(Circle a, PhyPolygon b) {
 		Vector2f[] vertices = b.getVertices();
 		Vector2f[] normals = b.getNormals();
 		float[] distances = new float[vertices.length];
@@ -184,274 +184,13 @@ public class PhysicsObject {
 		}
 	}
 	
-	private static CollisionInfo getCollision(Triangle a, Triangle b) {
-		// check if one has vertices in the other, then if the other has vertices in this.
-		// Similar to circle-triangle, except no radius on vertices.
-				
-		CollisionInfo winner = null;
-		
+	private static CollisionInfo getCollision(PhyPolygon a, PhyPolygon b) {
 		Vector2f[] verticesA = a.getVertices();
-		Vector2f[] normalsA = a.getNormals();
 		Vector2f[] verticesB = b.getVertices();
-		Vector2f[] normalsB = b.getNormals();
 		
-		/*/ first make sure their bounding boxes intersect TODO this seems to slow it down
-		float rightA = verticesA[0].x;
-		float leftA = rightA;
-		float topA = verticesA[0].y;
-		float botA = topA;
-		for (int i = 1; i < verticesA.length; i++) {
-			final float x = verticesA[i].x;
-			final float y = verticesA[i].y;
-			if (x > rightA) rightA = x;
-			if (x < leftA) leftA = x;
-			if (y > topA) topA = y;
-			if (y < botA) botA = y;
-		}
-		
-		float rightB = verticesA[0].x;
-		float leftB = rightB;
-		float topB = verticesA[0].y;
-		float botB = topB;
-		for (int i = 1; i < verticesA.length; i++) {
-			final float x = verticesA[i].x;
-			final float y = verticesA[i].y;
-			if (x > rightB) rightB = x;
-			if (x < leftB) leftB = x;
-			if (y > topB) topB = y;
-			if (y < botB) botB = y;
-		}
-		
-		boolean overlap = ((leftB >= leftA && leftB <= rightA) || (leftA >= leftB && leftA <= rightB)) &&
-				((botB >= botA && botB <= topA) || (botA >= botB && botA <= topB));
-		if (!overlap) {
-			return null;
-		}
-		// end bounding box intersection test */
-		
-		
-		
-		
-		/*/ TODO going to write shit code, clean up later
-		
-		
-		boolean almostColliding = false;
-		boolean colliding = false;
-		
-		
-		
-		
-		
-		// distances from vertex on A to sides of B.  distances are positive if vertex A is on outside of edge.
-		float distancesA[][] = new float[verticesA.length][verticesB.length];
-		for (int i = 0; i < verticesA.length; i++) {
-			boolean allInside = true;
-			for (int j = 0; j < verticesB.length; j++) {
-				Vector2f tmp = new Vector2f(verticesA[i]);
-				tmp.sumScale(verticesB[j], -1);
-				distancesA[i][j] = tmp.dot(normalsB[j]);
-				allInside = allInside && distancesA[i][j] <= 0;
-			}
-			colliding = colliding || allInside;
-		}
-		
-		// maybe vertex of B is inside A
-		float distancesB[][] = new float[verticesB.length][verticesA.length];
-		for (int i = 0; i < verticesB.length; i++) {
-			boolean allInside = true;
-			for (int j = 0; j < verticesA.length; j++) {
-				Vector2f tmp = new Vector2f(verticesB[i]);
-				tmp.sumScale(verticesA[j], -1);
-				distancesB[i][j] = tmp.dot(normalsA[j]);
-				allInside = allInside && distancesB[i][j] <= 0;
-			}
-			colliding = colliding || allInside;
-		}
-		
-		
-		
-		
-		
-		
-		// do I even need colliding?
-		
-		if (!colliding) {
-			
-			
-			
-			if (!colliding) {
-				// go deeper
-				
-				// see if both triangles are overlapping, without any vertices inside each other.
-				
-				boolean singleOutsideFound = false;
-				
-				// index of the edge the singleOutsideVertex was outside of
-				int outsideIndex = -1;
-				
-				// determine whether a single vertex is outside of only one line
-				for (int i = 0; i < verticesA.length; i++) {
-					int outsides = 0;
-					for (int j = 0; j < verticesB.length; j++) {
-						if (distancesA[i][j] > 0) {
-							outsides++;
-							outsideIndex = j;
-						}
-					}
-					if (outsides == 1) {
-						singleOutsideFound = true;
-						break;
-					}
-				}
-				
-				if (singleOutsideFound) {
-					// find vertex which is inside the edge the singleOutside vertex is outside of
-					for (int i = 0; i < verticesA.length; i++) {
-						if (distancesA[i][outsideIndex] <= 0) {
-							almostColliding = true;
-							break;
-						}
-					}
-				}
-				
-				if (almostColliding) {
-					
-					
-					singleOutsideFound = false;
-					
-					// index of the edge the singleOutsideVertex was outside of
-					outsideIndex = -1;
-					
-					// determine whether a single vertex is outside of only one line
-					for (int i = 0; i < verticesB.length; i++) {
-						int outsides = 0;
-						for (int j = 0; j < verticesA.length; j++) {
-							if (distancesB[i][j] > 0) {
-								outsides++;
-								outsideIndex = j;
-							}
-						}
-						if (outsides == 1) {
-							singleOutsideFound = true;
-							break;
-						}
-					}
-					
-					if (singleOutsideFound) {
-						// find vertex which is inside the edge the singleOutside vertex is outside of
-						for (int i = 0; i < verticesA.length; i++) {
-							if (distancesB[i][outsideIndex] <= 0) {
-								colliding = true;
-								break;
-							}
-						}
-					}
-				}
-			}
-		}
-
-		if (!colliding) {
-			return null;
-		}
- 		//*/
-	
-		
-		
-		/*/
-		int deepestAVer = 0;  // the vertex of A deepest in this side of B
-		for (int aver = 1; aver < verticesA.length; aver++) {
-			if (distancesA[aver][0] < distancesA[deepestAVer][0]) {
-				deepestAVer = aver;
-			}
-		}
-		int leastDeepAVer = deepestAVer;
-		int leastDeepBSide = 0;
-		for (int bside = 1; bside < normalsB.length; bside++) {
-			deepestAVer = 0;  // the vertex of A deepest in this side of B
-			for (int aver = 1; aver < verticesA.length; aver++) {
-				if (distancesA[aver][bside] < distancesA[deepestAVer][bside]) {
-					deepestAVer = aver;
-				}
-			}
-			if (distancesA[deepestAVer][bside] > distancesA[leastDeepAVer][leastDeepBSide]) {
-				leastDeepAVer = deepestAVer;
-				leastDeepBSide = bside;
-			}
-			
-		}
-		
-		
-		int deepestBVer = 0;  // the vertex of B deepest in this side of A
-		for (int bver = 1; bver < verticesA.length; bver++) {
-			if (distancesB[bver][0] < distancesB[deepestBVer][0]) {
-				deepestBVer = bver;
-			}
-		}
-		int leastDeepBVer = deepestBVer;
-		int leastDeepASide = 0;
-		for (int aside = 1; aside < normalsA.length; aside++) {
-			deepestBVer = 0;  // the vertex of B deepest in this side of A
-			for (int bver = 1; bver < verticesA.length; bver++) {
-				if (distancesB[bver][aside] < distancesB[deepestBVer][aside]) {
-					deepestBVer = bver;
-				}
-			}
-			
-			if (distancesB[deepestBVer][aside] > distancesB[leastDeepBVer][leastDeepASide]) {
-				leastDeepBVer = deepestBVer;
-				leastDeepASide = aside;
-			}	
-		}
-		if (distancesB[leastDeepBVer][leastDeepASide] > 0 || distancesA[leastDeepAVer][leastDeepBSide] > 0) {
-			return null;
-		}
-		float[][] distances;
-		
-		int ver;
-		int side;
-		Vector2f[] normals;
-		Vector2f[] vertices;
-		if (distancesB[leastDeepBVer][leastDeepASide] > distancesA[leastDeepAVer][leastDeepBSide]) {
-			distances = distancesB;
-			ver = leastDeepBVer;
-			vertices = verticesB;
-			side = leastDeepASide;
-			normals = normalsA;
-		} else {
-			distances = distancesA;
-			ver = leastDeepAVer;
-			vertices = verticesA;
-			side = leastDeepBSide;
-			normals = normalsB;
-		}
-		
-		
-		// below assumes A vertex penetrated B side.
-		CollisionInfo cInfo = new CollisionInfo();
-		cInfo.depth = -distances[ver][side];
-		cInfo.normal = new Vector2f(normals[side]);
-		cInfo.normal.scale(-1);
-		cInfo.positionA = new Vector2f(vertices[ver]);
-		cInfo.positionB = new Vector2f(vertices[ver]);
-		cInfo.positionB.sumScale(cInfo.normal, -cInfo.depth);
-		
-		
-		
-		
-		
-		
-		if (vertices == verticesB) {
-			cInfo.normal.scale(-1);
-			Vector2f t = cInfo.positionA;
-			cInfo.positionA = cInfo.positionB;
-			cInfo.positionB = t;
-			
-		}
-		// END shit code
-		*/
-		CollisionInfo c = getCollision(verticesA, verticesB, normalsB);
+		CollisionInfo c = getCollision(verticesA, verticesB, b.getNormals());
 		if (c != null) {
-			CollisionInfo d = getCollision(verticesB, verticesA, normalsA);
+			CollisionInfo d = getCollision(verticesB, verticesA, a.getNormals());
 			if (d == null) {
 				return null;
 			}
@@ -463,12 +202,7 @@ public class PhysicsObject {
 				c.positionB = t;
 			}
 		}
-		
-		
-		
 		return c;
-		
-			
 	}
 	
 
@@ -482,7 +216,6 @@ public class PhysicsObject {
 	 * @return a collision, or null if there is no collision.
 	 */
 	private static CollisionInfo getCollision(Vector2f[] verA, Vector2f[] verB, Vector2f[] normalB) {
-		
 		float shallowestDistance = Float.NEGATIVE_INFINITY;
 		int shallowestSide = -1;
 		int shallowestVer = -1;
@@ -506,7 +239,6 @@ public class PhysicsObject {
 				shallowestSide = side;
 				shallowestVer = deepestVer;
 			}
-			
 		}
 		
 		CollisionInfo c = new CollisionInfo();

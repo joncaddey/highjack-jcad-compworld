@@ -53,7 +53,7 @@ public class Demo9 implements GLEventListener {
 		objects = new ArrayList<PhysicsObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		PhysicsObject obj = new Triangle(2);
+		PhysicsObject obj = PhyPolygon.getEqTriangle(2);
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.x = 0;
@@ -63,12 +63,18 @@ public class Demo9 implements GLEventListener {
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
-		for (int y = 0; y < 7; y++)
+		
+		//obj = new Pair(1);
+		
+		
+		
+		// Add various shapes
+		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
 				//if (Math.random() < .3) 
-					obj = new Triangle((float)(Math.sqrt(mass)));
+					obj = PhyPolygon.getSquare((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
@@ -79,6 +85,9 @@ public class Demo9 implements GLEventListener {
 //				obj.angularVelocity = .5f;
 				attachObject(obj);
 			}
+		}
+		// end various shapes */
+			
 		attachObject(new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0)));
 		attachObject(new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1)));
 		attachObject(new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0)));
