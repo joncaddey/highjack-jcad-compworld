@@ -28,6 +28,9 @@ public class PhysicsObject {
 		position.sumScale(acceleration, timePeriod * timePeriod / 2);
 		velocity.sumScale(acceleration, timePeriod);
 		orientation += angularVelocity * timePeriod;
+		if (this instanceof PhyPolygon) {
+			System.out.println(this.position);
+		}
 		clearCaches();
 	}
 	
@@ -57,7 +60,7 @@ public class PhysicsObject {
 			if (other instanceof HalfSpace) {
 				CollisionInfo cInfo = getCollision((HalfSpace)other, (Circle)this);
 				if (cInfo != null)
-					cInfo.normal.scale(-1);
+					cInfo.reverse();
 				return cInfo;
 			} else if (other instanceof Circle) {
 				return getCollision((Circle)this, (Circle)other);
@@ -68,19 +71,19 @@ public class PhysicsObject {
 			if (other instanceof HalfSpace) {
 				CollisionInfo cInfo = getCollision((HalfSpace)other, (PhyPolygon)this);
 				if (cInfo != null)
-					cInfo.normal.scale(-1);
+					cInfo.reverse();
 				return cInfo;
 			} else if (other instanceof Circle) {
 				CollisionInfo cInfo = getCollision((Circle)other, (PhyPolygon)this);
 				if (cInfo != null)
-					cInfo.normal.scale(-1);
+					cInfo.reverse();
 				return cInfo;
 			} else if (other instanceof PhyPolygon) {
 				return getCollision((PhyPolygon)this, (PhyPolygon)other);
 			}
-		} else if (this instanceof PhyCompositeObject) {
-			if (!(other instanceof PhyCompositeObject)) {
-				return getCollision((PhyCompositeObject) this, (PhysicsObject) other);
+		} else if (this instanceof PhyComposite) {
+			if (!(other instanceof PhyComposite)) {
+				return getCollision((PhyComposite) this, (PhysicsObject) other);
 			}
 		}
 		return null;
@@ -96,12 +99,10 @@ public class PhysicsObject {
 	
 	
 	
-	private static CollisionInfo getCollision(PhysicsObject a, PhyCompositeObject b) {
+	private static CollisionInfo getCollision(PhysicsObject a, PhyComposite b) {
 		
 		CollisionInfo winner = null;
 		for (PhysicsObject o : b.objects){
-			//o.position = b.position;
-			o.orientation = b.orientation;
 			CollisionInfo c = a.getCollision(o);
 			winner = c;
 //			if (c != null && (winner == null || c.depth > winner.depth)){
@@ -110,7 +111,7 @@ public class PhysicsObject {
 		}
 		return winner;
 	}
-	private static CollisionInfo getCollision(PhyCompositeObject a, PhysicsObject b) {
+	private static CollisionInfo getCollision(PhyComposite a, PhysicsObject b) {
 		CollisionInfo winner = getCollision(b, a);
 		if (winner != null) {
 			winner.normal.scale(-1);
@@ -177,7 +178,7 @@ public class PhysicsObject {
 		Vector2f tmp = new Vector2f(b.position);
 		tmp.sumScale(a.position, -1); // reaches from A center to B center
 		float distance = tmp.length() - a.radius - b.radius; // negative overlap along tmp
-		if (distance >= 0)
+		if (distance >= 0 || tmp.length() == 0)
 			return null;
 		CollisionInfo cInfo = new CollisionInfo();
 		cInfo.depth = -distance; // length of overlap
@@ -252,10 +253,7 @@ public class PhysicsObject {
 			}
 			if (d != null && d.depth < c.depth) {
 				c = d;
-				c.normal.scale(-1);
-				Vector2f t = c.positionA;
-				c.positionA = c.positionB;
-				c.positionB = t;
+				c.reverse();
 			}
 		}
 		return c;
