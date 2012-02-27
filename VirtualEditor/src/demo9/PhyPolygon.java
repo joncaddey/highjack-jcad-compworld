@@ -94,7 +94,7 @@ public class PhyPolygon extends PhysicsObject {
 				vertexCache[i/2] = new Vector2f();
 				vertexCache[i/2].x = (float)(Math.cos(orientation) * tmp.x - Math.sin(orientation) * tmp.y);
 				vertexCache[i/2].y = (float)(Math.sin(orientation) * tmp.x + Math.cos(orientation) * tmp.y);
-				vertexCache[i/2].sum(centerOfMass);
+				//vertexCache[i/2].sum(centerOfMass);
 				vertexCache[i/2].sum(position);
 			}
 		}

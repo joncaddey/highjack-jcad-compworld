@@ -46,4 +46,31 @@ public class Circle extends PhysicsObject {
 		this.blue = blue;
 		renderable = new Renderable();
 	}
+	
+	public Vector2f getCenter() {
+		if (centerOfMass.x == 0 && centerOfMass.y == 0) {
+			return position;
+		}
+		Vector2f r = new Vector2f(position);
+		Vector2f tmp = new Vector2f(centerOfMass);
+		tmp.scale(-1);
+		r.x += (float)(Math.cos(orientation) * tmp.x - Math.sin(orientation) * tmp.y);
+		r.y += (float)(Math.sin(orientation) * tmp.x + Math.cos(orientation) * tmp.y);
+		return r;
+		
+//		if (vertexCache == null) {
+//			vertexCache = new Vector2f[vertices.length / 2];
+//			Vector2f tmp = new Vector2f();
+//			for (int i = 0; i < vertices.length; i += 2) {
+//				tmp.x = vertices[i] * renderable.scale;
+//				tmp.y = vertices[i+1] * renderable.scale;
+//				tmp.sumScale(centerOfMass, -1);
+//				vertexCache[i/2] = new Vector2f();
+//				vertexCache[i/2].x = (float)(Math.cos(orientation) * tmp.x - Math.sin(orientation) * tmp.y);
+//				vertexCache[i/2].y = (float)(Math.sin(orientation) * tmp.x + Math.cos(orientation) * tmp.y);
+//				//vertexCache[i/2].sum(centerOfMass);
+//				vertexCache[i/2].sum(position);
+//			}
+//		}
+	}
 }

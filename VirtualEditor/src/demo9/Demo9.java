@@ -53,43 +53,41 @@ public class Demo9 implements GLEventListener {
 		objects = new ArrayList<PhysicsObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		PhysicsObject obj = PhyPolygon.getRightTriangle(2);
-		//PhysicsObject obj = new Circle(1f);
+		//PhysicsObject obj = PhyPolygon.getSquare(1);
+		PhysicsObject obj = new Circle(.5f);
 		//PhysicsObject obj = PhyComposite.getPair(1);
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
-		obj.position.x = 0;
 		obj.position.y = -4;
-		obj.angularVelocity = 2f;
+		obj.angularVelocity = -20f;
 		//obj.velocity.x = 3;
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
 		
-		obj.centerOfMass.x = 4;
+		obj.centerOfMass.x = .5f;
 		obj.renderable.CoMX = obj.centerOfMass.x;
+		obj.centerOfMass.y = 0;
+		obj.renderable.CoMY = obj.centerOfMass.y;
 		
-		
-		
-		
-		//obj = new Pair(1);
-		
-		obj = PhyPolygon.getRightTriangle(2);
-		///obj = new Circle(1f);
+		obj = PhyPolygon.getSquare(1);
+		//PhysicsObject obj = new Circle(.25f);
 		//PhysicsObject obj = PhyComposite.getPair(1);
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
-		obj.position.x = 0;
-		obj.position.y = -4;
-		obj.angularVelocity = 2f;
-		obj.centerOfMass.x = 1;
-		obj.renderable.CoMX = obj.centerOfMass.x;
+		obj.position.y = -0;
+		obj.angularVelocity = -20f;
 		//obj.velocity.x = 3;
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		//attachObject(obj);
 		
-		/*/ Add various shapes
+		obj.centerOfMass.x = -1f;
+		obj.renderable.CoMX = obj.centerOfMass.x;
+		obj.centerOfMass.y = .5f;
+		obj.renderable.CoMY = obj.centerOfMass.y;
+		
+		// Add various shapes
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
