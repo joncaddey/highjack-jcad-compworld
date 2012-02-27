@@ -5,18 +5,22 @@ package demo9;
 import java.util.List;
 
 
-public class PhyCompositeObject extends PhysicsObject{
+public class PhyComposite extends PhysicsObject{
 
 	public static PhysicsObject getPair(float size) {
-		PhysicsObject o = new Circle(size); //
-		o.position = new Vector2f(0, 0);
+		PhysicsObject[] obs = {new Circle(size), new Circle(size / 2)};
+		obs[0].position = new Vector2f(-size,0);
+		obs[1].position = new Vector2f(size / 2, 0);
+		obs[0].updateRenderable();
+		obs[1].updateRenderable();
 		SceneGraphNode sgn = new SceneGraphNode(true);
-		sgn.addChild(o.renderable);
-		PhyCompositeObject p = new PhyCompositeObject(sgn, new PhysicsObject[]{o}, size, 0, 0, (float)(Math.pow(size, 4) / 18));
+		sgn.addChild(obs[0].renderable);
+		sgn.addChild(obs[1].renderable);
+		PhyComposite p = new PhyComposite(sgn, obs, size, size, 0, (float)(Math.pow(size, 4) / 18));
 		return p;
 	}
 	
-	public PhyCompositeObject(SceneGraphNode renderable, PhysicsObject[] objects, float size, float CoMX, float CoMY, float momentOfInertia) {
+	public PhyComposite(SceneGraphNode renderable, PhysicsObject[] objects, float size, float CoMX, float CoMY, float momentOfInertia) {
 		this.inverseMomentOfInertia = 1f / momentOfInertia;
 		this.renderable = renderable;
 		this.renderable.scale = size;
@@ -25,6 +29,9 @@ public class PhyCompositeObject extends PhysicsObject{
 		this.renderable.CoMX = CoMX;
 		this.renderable.CoMY = CoMY;
 		this.objects = objects;
+		for (PhysicsObject o : objects) {
+			o.inverseMomentOfInertia = this.inverseMomentOfInertia;
+		}
 	}
 	/*/ need a renderable, center of mass, list of phyObjects, moment of inertia, size, 
 	
@@ -40,7 +47,7 @@ public class PhyCompositeObject extends PhysicsObject{
 		r.renderable.CoMY = r.centerOfMass.y;
 		re*/
 	
-	private static CollisionInfo getCollision(HalfSpace a, PhyCompositeObject b) {
+	private static CollisionInfo getCollision(HalfSpace a, PhyComposite b) {
 		return null;
 	}
 }

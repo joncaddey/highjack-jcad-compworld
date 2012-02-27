@@ -14,11 +14,11 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
-	private static final float GRAVITY = 0;
+	private static final float GRAVITY = 10;
 	private static final float SLOW_FACTOR = 10;
 	private static final int MAX_RESOLUTION_REPEATS = 80;
 	
-	private static int resolution_repeats = 10;
+	private static int resolution_repeats = MAX_RESOLUTION_REPEATS;
 	private static JFrame appFrame;
 	private static SceneGraphNode sceneGraphRoot;
 	private static boolean pickNextFrame;
@@ -54,23 +54,42 @@ public class Demo9 implements GLEventListener {
 		sceneGraphRoot = new SceneGraphNode(false);
 		
 		PhysicsObject obj = PhyPolygon.getRightTriangle(2);
-		//PhysicsObject obj = new Circle(.5f);
-		//PhysicsObject obj = PhyCompositeObject.getPair(1);
+		//PhysicsObject obj = new Circle(1f);
+		//PhysicsObject obj = PhyComposite.getPair(1);
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.x = 0;
 		obj.position.y = -4;
-//		obj.angularVelocity = 2f;
-//		obj.velocity.x = 3;
+		obj.angularVelocity = 2f;
+		//obj.velocity.x = 3;
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
 		
+		obj.centerOfMass.x = 4;
+		obj.renderable.CoMX = obj.centerOfMass.x;
+		
+		
+		
+		
 		//obj = new Pair(1);
 		
+		obj = PhyPolygon.getRightTriangle(2);
+		///obj = new Circle(1f);
+		//PhysicsObject obj = PhyComposite.getPair(1);
+		obj.inverseMass = 1f / 20;
+		obj.inverseMomentOfInertia *= obj.inverseMass;
+		obj.position.x = 0;
+		obj.position.y = -4;
+		obj.angularVelocity = 2f;
+		obj.centerOfMass.x = 1;
+		obj.renderable.CoMX = obj.centerOfMass.x;
+		//obj.velocity.x = 3;
+		obj.velocity.y = 16;
+		obj.acceleration.y = -GRAVITY;
+		//attachObject(obj);
 		
-		
-		// Add various shapes
+		/*/ Add various shapes
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
