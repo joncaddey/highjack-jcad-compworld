@@ -5,49 +5,51 @@ package demo9;
 import java.util.List;
 
 
-public class PhyComposite extends PhysicsObject{
+public class PhyComposite extends PhyObject{
 
-	public static PhysicsObject getPair(float size) {
-		PhysicsObject[] obs = {new Circle(size), new Circle(size / 2)};
-		obs[0].position = new Vector2f(-size,0);
-		obs[1].position = new Vector2f(size / 2, 0);
-		obs[0].updateRenderable();
-		obs[1].updateRenderable();
+	public static PhyObject getPair(float size) {
+		PhyObject[] obs = {PhyPolygon.getRightTriangle(size), PhyPolygon.getRightTriangle(size)};//};//, 
+		obs[0].centerOfMass = new Vector2f(-2 * size,0);
+		obs[0].orientation = 90;
+		obs[1].centerOfMass = new Vector2f(2 * size, 0);
 		SceneGraphNode sgn = new SceneGraphNode(true);
-		sgn.addChild(obs[0].renderable);
-		sgn.addChild(obs[1].renderable);
-		PhyComposite p = new PhyComposite(sgn, obs, size, size, 0, (float)(Math.pow(size, 4) / 18));
+		for (PhyObject o : obs) {
+			SceneGraphNode wrapper = new SceneGraphNode(false);
+			//o.renderable.rotation = o.orientation;
+			wrapper.addChild(o.renderable);
+			o.renderable.rotation = o.orientation;
+			wrapper.rotation = 0;
+			wrapper.CoMX = o.centerOfMass.x;
+			o.renderable.CoMX = 0;
+			wrapper.CoMY = o.centerOfMass.y;
+			o.renderable.CoMY = 0;
+			
+			sgn.addChild(wrapper);
+		}
+		PhyComposite p = new PhyComposite(sgn, obs, size, 0, 0, obs[0].inverseMomentOfInertia / 10);
 		return p;
 	}
 	
-	public PhyComposite(SceneGraphNode renderable, PhysicsObject[] objects, float size, float CoMX, float CoMY, float momentOfInertia) {
-		this.inverseMomentOfInertia = 1f / momentOfInertia;
+	public PhyComposite(SceneGraphNode renderable, PhyObject[] objects, float size, float CoMX, float CoMY, float inverseMomentOfInertia) {
+		super();
+		this.inverseMomentOfInertia = inverseMomentOfInertia;
 		this.renderable = renderable;
-		this.renderable.scale = size;
-		centerOfMass.x = CoMX;
-		centerOfMass.y = CoMY;
-		this.renderable.CoMX = CoMX;
-		this.renderable.CoMY = CoMY;
+		//this.renderable.scale = size;
+		velocity = new Vector2f(0, 0);
 		this.objects = objects;
-		for (PhysicsObject o : objects) {
-			o.inverseMomentOfInertia = this.inverseMomentOfInertia;
+		for (PhyObject o : objects) {
+			o.velocity = velocity;
+			o.position = position;
+			o.originalOrientation = o.orientation;
+			//o.inverseMomentOfInertia = this.inverseMomentOfInertia;
 		}
 	}
-	/*/ need a renderable, center of mass, list of phyObjects, moment of inertia, size, 
-	
-	
-	
-	public static PhyPolygon getEqTriangle(final float the_size) {
-		PhyPolygon r = new PhyPolygon(VERTICES_EQ_TRIANGLE, the_size);
-		r.inverseMomentOfInertia = 1 / (float)(Math.pow(the_size, 4) / 18); // TODO math
-		r.renderable = r.new Renderable();
-		r.renderable.scale = the_size;
-		r.centerOfMass.x = r.centerOfMass.y = 0;
-		r.renderable.CoMX = r.centerOfMass.x;
-		r.renderable.CoMY = r.centerOfMass.y;
-		re*/
-	
-	private static CollisionInfo getCollision(HalfSpace a, PhyComposite b) {
-		return null;
+	public void synchChildren() {
+		for (PhyObject o : objects) {
+			o.position = position;
+			o.orientation = orientation;
+			o.clearCaches();
+		}
 	}
+	
 }

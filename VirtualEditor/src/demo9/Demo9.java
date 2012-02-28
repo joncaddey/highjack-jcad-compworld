@@ -14,7 +14,7 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
-	private static final float GRAVITY = 10;
+	private static final float GRAVITY = 0;
 	private static final float SLOW_FACTOR = 10;
 	private static final int MAX_RESOLUTION_REPEATS = 80;
 	
@@ -24,7 +24,7 @@ public class Demo9 implements GLEventListener {
 	private static boolean pickNextFrame;
 	private static Point pickedPoint;
 	private static double left, right, top, bottom;
-	private static ArrayList<PhysicsObject> objects;
+	private static ArrayList<PhyObject> objects;
 	
 	public static void main(String[] args) {
 		GLProfile.initSingleton();
@@ -50,44 +50,43 @@ public class Demo9 implements GLEventListener {
 			}
 		});
 
-		objects = new ArrayList<PhysicsObject>();
+		objects = new ArrayList<PhyObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		//PhysicsObject obj = PhyPolygon.getSquare(1);
-		PhysicsObject obj = new Circle(.5f);
-		//PhysicsObject obj = PhyComposite.getPair(1);
-		obj.inverseMass = 1f / 20;
+		//PhyObject obj = PhyPolygon.getSquare(1);
+		
+		
+		
+		PhyObject obj = PhyComposite.getPair(1f);
+		obj.inverseMass = 1f / 10;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.y = -4;
-		obj.angularVelocity = -20f;
+		obj.angularVelocity = 0f;
 		//obj.velocity.x = 3;
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
 		
-		obj.centerOfMass.x = .5f;
-		obj.renderable.CoMX = obj.centerOfMass.x;
-		obj.centerOfMass.y = 0;
-		obj.renderable.CoMY = obj.centerOfMass.y;
 		
-		obj = PhyPolygon.getSquare(1);
-		//PhysicsObject obj = new Circle(.25f);
-		//PhysicsObject obj = PhyComposite.getPair(1);
+		
+		// another
+		obj = PhyComposite.getPair(1f);
+//		obj.centerOfMass.x = -3 * .5f;
+//		obj.renderable.CoMX = obj.centerOfMass.x;
+//		obj.centerOfMass.y = 0;
+//		obj.renderable.CoMY = obj.centerOfMass.y;
+		
 		obj.inverseMass = 1f / 20;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
-		obj.position.y = -0;
 		obj.angularVelocity = -20f;
-		//obj.velocity.x = 3;
 		obj.velocity.y = 16;
 		obj.acceleration.y = -GRAVITY;
-		//attachObject(obj);
+		attachObject(obj);
+		//*/
 		
-		obj.centerOfMass.x = -1f;
-		obj.renderable.CoMX = obj.centerOfMass.x;
-		obj.centerOfMass.y = .5f;
-		obj.renderable.CoMY = obj.centerOfMass.y;
 		
-		// Add various shapes
+		
+		/*/ Add various shapes
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
@@ -134,13 +133,13 @@ public class Demo9 implements GLEventListener {
 		appFrame.setVisible(true);
 	}
 
-	public void attachObject(PhysicsObject object) {
+	public void attachObject(PhyObject object) {
 		if (object.renderable != null)
 			sceneGraphRoot.addChild(object.renderable);
 		objects.add(object);
 	}
 
-	public void detachObject(PhysicsObject object) {
+	public void detachObject(PhyObject object) {
 		if (object.renderable != null)
 			sceneGraphRoot.removeChild(object.renderable);
 		int index = objects.indexOf(object);
@@ -170,16 +169,16 @@ public class Demo9 implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		for (PhysicsObject object : objects)
+		for (PhyObject object : objects)
 			object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
 		boolean noCollisions = false;
 		int repeat = 0;
 		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
-				PhysicsObject a = objects.get(i);
+				PhyObject a = objects.get(i);
 				for (int j = i + 1; j < objects.size(); j++) {
-					PhysicsObject b = objects.get(j);
+					PhyObject b = objects.get(j);
 					CollisionInfo cInfo = a.getCollision(b);
 					if (cInfo != null) {
 						noCollisions = false;
@@ -197,7 +196,7 @@ public class Demo9 implements GLEventListener {
 			resolution_repeats++;
 		}
 		
-		for (PhysicsObject object : objects){
+		for (PhyObject object : objects){
 			object.updateRenderable();
 		}
 		sceneGraphRoot.render(drawable);
