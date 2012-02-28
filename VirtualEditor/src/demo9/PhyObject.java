@@ -2,7 +2,7 @@ package demo9;
 
 
 
-public class PhysicsObject {
+public class PhyObject {
 	float inverseMass;
 	Vector2f position;
 	Vector2f velocity;
@@ -10,11 +10,12 @@ public class PhysicsObject {
 	Vector2f centerOfMass;
 	float inverseMomentOfInertia;
 	float orientation;
+	float originalOrientation;
 	float angularVelocity;
 	SceneGraphNode renderable;
-	PhysicsObject[] objects;
+	PhyObject[] objects;
 	
-	public PhysicsObject() {
+	public PhyObject() {
 		inverseMass = 1;
 		position = new Vector2f();
 		velocity = new Vector2f();
@@ -28,21 +29,26 @@ public class PhysicsObject {
 		position.sumScale(acceleration, timePeriod * timePeriod / 2);
 		velocity.sumScale(acceleration, timePeriod);
 		orientation += angularVelocity * timePeriod;
+		synchChildren();
 		clearCaches();
 	}
+	
 	
 	public void updateRenderable() {
 		if (renderable != null) {
 			renderable.translateX = position.x;
 			renderable.translateY = position.y;
-			renderable.rotation = (float)(180 * orientation / Math.PI);
+			renderable.rotation = (float)(180 * (orientation) / Math.PI);
 		}
+	}
+	
+	public void synchChildren() {	
 	}
 
 	public void clearCaches() {
 	}
 
-	public CollisionInfo getCollision(PhysicsObject other) {
+	public CollisionInfo getCollision(PhyObject other) {
 		if (inverseMass == 0 && other.inverseMass == 0) {
 			return null;
 		}
@@ -79,8 +85,10 @@ public class PhysicsObject {
 				return getCollision((PhyPolygon)this, (PhyPolygon)other);
 			}
 		} else if (this instanceof PhyComposite) {
-			if (!(other instanceof PhyComposite)) {
-				return getCollision((PhyComposite) this, (PhysicsObject) other);
+			if (other instanceof PhyComposite) {
+				return getCollision((PhyComposite) this, (PhyComposite) other);
+			} else {
+				return getCollision((PhyComposite) this, (PhyObject) other);
 			}
 		}
 		return null;
@@ -96,25 +104,30 @@ public class PhysicsObject {
 	
 	
 	
-	private static CollisionInfo getCollision(PhysicsObject a, PhyComposite b) {
+	private static CollisionInfo getCollision(PhyObject a, PhyComposite b) {
 		
 		CollisionInfo winner = null;
-		for (PhysicsObject o : b.objects){
+		for (PhyObject o : b.objects){
 			CollisionInfo c = a.getCollision(o);
-			winner = c;
-//			if (c != null && (winner == null || c.depth > winner.depth)){
-//				winner = c;
-//			}
+			if (c != null && (winner == null || c.depth > winner.depth)){
+				winner = c;
+			}
 		}
 		return winner;
 	}
-	private static CollisionInfo getCollision(PhyComposite a, PhysicsObject b) {
+	private static CollisionInfo getCollision(PhyComposite a, PhyObject b) {
 		CollisionInfo winner = getCollision(b, a);
-		if (winner != null) {
-			winner.normal.scale(-1);
-			Vector2f tmp = winner.positionA;
-			winner.positionA = winner.positionB;
-			winner.positionB = tmp;
+		CollisionInfo.reverse(winner);
+		return winner;
+	}
+	
+	private static CollisionInfo getCollision(PhyComposite a, PhyComposite b) {
+		CollisionInfo winner = null;
+		for (PhyObject o : a.objects) {
+			CollisionInfo c = getCollision(o, b);
+			if (c != null && (winner == null || c.depth > winner.depth)){
+				winner = c;
+			}
 		}
 		return winner;
 	}
@@ -305,7 +318,7 @@ public class PhysicsObject {
 		return c;
 	}
 	
-	public void resolveCollision(PhysicsObject other, CollisionInfo cInfo) {
+	public void resolveCollision(PhyObject other, CollisionInfo cInfo) {
 		// Calculate the velocity of the collision point on the calling object.
 		Vector2f relativeCollisionPositionA = new Vector2f(cInfo.positionA);
 		relativeCollisionPositionA.sumScale(position, -1);
@@ -354,5 +367,8 @@ public class PhysicsObject {
 		
 		clearCaches();
 		other.clearCaches();
+		
+		synchChildren();
+		other.synchChildren();
 	}
 }

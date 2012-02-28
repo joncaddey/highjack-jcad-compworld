@@ -1,7 +1,7 @@
 package demo9;
 import javax.media.opengl.*;
 
-public class PhyPolygon extends PhysicsObject {
+public class PhyPolygon extends PhyObject {
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
 	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1};
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};

@@ -2,7 +2,7 @@ package demo9;
 import javax.media.opengl.*;
 
 
-public class Circle extends PhysicsObject {
+public class Circle extends PhyObject {
 	private class Renderable extends SceneGraphNode {
 		private static final int POINTS = 20;	
 
