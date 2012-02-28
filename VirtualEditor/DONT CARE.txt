@@ -1,0 +1,17 @@
+Good ideas:
+
+environment options
+gravity any value
+slow factor greater than 1
+collisions on/off (sets the collision repeats to 0)
+remove all shapes (have dialoge to confirm)
+
+launch options
+angle
+power
+launch button (launches selected)
+
+fixes
+set renderable of each object to null in composite
+make circle go in random direction if tmp is 0.
+make rocket pretty.
