@@ -60,7 +60,9 @@ public class PhyObject {
 				return getCollision((HalfSpace)this, (Circle)other);
 			} else if (other instanceof PhyPolygon) {
 				return getCollision((HalfSpace)this, (PhyPolygon)other);
-			}	
+			} else if (other instanceof PhyComposite) {
+				return getCollision((HalfSpace)this, (PhyComposite)other);
+			}
 		} else if (this instanceof Circle) {
 			if (other instanceof HalfSpace) {
 				CollisionInfo cInfo = getCollision((HalfSpace)other, (Circle)this);
@@ -71,6 +73,8 @@ public class PhyObject {
 				return getCollision((Circle)this, (Circle)other);
 			} else if (other instanceof PhyPolygon) {
 				return getCollision((Circle)this, (PhyPolygon)other);
+			} else if (other instanceof PhyComposite) {
+				return getCollision((Circle)this, (PhyComposite)other);
 			}
 		} else if (this instanceof PhyPolygon) {
 			if (other instanceof HalfSpace) {
@@ -85,6 +89,8 @@ public class PhyObject {
 				return cInfo;
 			} else if (other instanceof PhyPolygon) {
 				return getCollision((PhyPolygon)this, (PhyPolygon)other);
+			} else if (other instanceof PhyComposite) {
+				return getCollision((PhyPolygon)this, (PhyComposite)other);
 			}
 		} else if (this instanceof PhyComposite) {
 			if (other instanceof PhyComposite) {

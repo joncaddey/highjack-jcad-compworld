@@ -50,7 +50,7 @@ public class PhyPolygon extends PhyObject {
 		r.inverseMomentOfInertia = 1 / (float)(Math.pow(the_size, 4) / 18); // TODO math
 		r.renderable = r.new Renderable();
 		r.renderable.scale = the_size;
-		r.centerOfMass.x = r.centerOfMass.y = 0;
+		r.centerOfMass.x = r.centerOfMass.y = 0; // TODO
 		r.renderable.CoMX = r.centerOfMass.x;
 		r.renderable.CoMY = r.centerOfMass.y;
 		return r;
@@ -90,6 +90,7 @@ public class PhyPolygon extends PhyObject {
 			for (int i = 0; i < vertices.length; i += 2) {
 				tmp.x = vertices[i] * renderable.scale;
 				tmp.y = vertices[i+1] * renderable.scale;
+				tmp.rotate(originalOrientation);
 				tmp.sumScale(centerOfMass, -1);
 				tmp.rotate(orientation);
 				vertexCache[i/2] = new Vector2f(tmp);
