@@ -4,12 +4,12 @@ import javax.media.opengl.*;
 import main.SceneGraphNode;
 
 
-public class PhyCircle extends PhysicsObject {
+public class PhyCircle extends PhyObject {
 	private class Renderable extends SceneGraphNode {
 		private static final int POINTS = 20;	
 
 		public Renderable() {
-			scale = radius;
+			scale = size;
 		}
 	
 		public void renderGeometry(GLAutoDrawable drawable) {
@@ -31,7 +31,6 @@ public class PhyCircle extends PhysicsObject {
 		}
 	}
 	
-	float radius;
 	float red;
 	float green;
 	float blue;
@@ -42,10 +41,26 @@ public class PhyCircle extends PhysicsObject {
 	
 	public PhyCircle(float radius, float red, float green, float blue) {
 		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(radius, 4) / 4);
-		this.radius = radius;
+		this.size = radius;
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
 		renderable = new Renderable();
+	}
+	
+	public void setSize(float size) {
+		super.setSize(size);
+		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass;
+	}
+	
+	public Vector2f getCenter() {
+		if (centerOfMass.x == 0 && centerOfMass.y == 0) {
+			return position;
+		}
+		Vector2f r = new Vector2f(centerOfMass);
+		r.scale(-1);
+		r.rotate(orientation);
+		r.sum(position);
+		return r;
 	}
 }

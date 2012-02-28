@@ -65,7 +65,15 @@ public class Vector2f {
 		scale(1 / length);
 	}
 	
+	public void rotate(float radians) {
+		float oldX = x;
+		x = (float)(Math.cos(radians) * x - Math.sin(radians) * y);
+		y = (float)(Math.sin(radians) * oldX + Math.cos(radians) * y);
+	}
+	
 	public String toString() {
 		return "(" + x + "," + y + ")";
 	}
+	
+	
 }

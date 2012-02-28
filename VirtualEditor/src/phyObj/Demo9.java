@@ -17,12 +17,17 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
+	private static final float GRAVITY = 10;
+	private static final float SLOW_FACTOR = 1;
+	private static final int MAX_RESOLUTION_REPEATS = 10;
+	
+	private static int resolution_repeats = MAX_RESOLUTION_REPEATS;
 	private static JFrame appFrame;
 	private static SceneGraphNode sceneGraphRoot;
 	private static boolean pickNextFrame;
 	private static Point pickedPoint;
 	private static double left, right, top, bottom;
-	private static ArrayList<PhysicsObject> objects;
+	private static ArrayList<PhyObject> objects;
 	
 	public static void main(String[] args) {
 		GLProfile.initSingleton();
@@ -48,35 +53,45 @@ public class Demo9 implements GLEventListener {
 			}
 		});
 
-		objects = new ArrayList<PhysicsObject>();
+		objects = new ArrayList<PhyObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		PhysicsObject obj = new PhyTriangle(2);
-		obj.inverseMass = 1f / 20;
+		//PhyObject obj = PhyPolygon.getSquare(1);
+		
+		
+		
+		//PhyObject obj = PhyComposite.getRocket(.5f);
+		PhyObject obj = PhyPolygon.getSquare(.5f);
+		obj.inverseMass = 1f / 10;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
-		obj.position.x = 0;
 		obj.position.y = -4;
-//		obj.angularVelocity = 2f;
-//		obj.velocity.x = 3;
+		obj.angularVelocity = 0f;
+		//obj.velocity.x = 3;
 		obj.velocity.y = 16;
-		//obj.acceleration.y = -10;
+		obj.acceleration.y = -GRAVITY;
 		attachObject(obj);
-		for (int y = 0; y < 7; y++)
+		
+		
+		/*/ Add various shapes
+		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
-				//if (Math.random() < .5) 
-				//	obj = new Triangle((float)(Math.sqrt(mass)));
+				if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
+				if (Math.random() < .25) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
+				if (Math.random() < .05) obj = PhyComposite.getRocket((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
 				obj.position.y = 4.5f - y;
 				obj.velocity.x = (float)(2 * Math.random() - 1);
 				obj.velocity.y = (float)(2 * Math.random() - 1);
-				//obj.acceleration.y = -10;
-//				obj.angularVelocity = .5f;
+				obj.acceleration.y = -GRAVITY;
 				attachObject(obj);
 			}
+		}
+		// end various shapes */
+			
 		attachObject(new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0)));
 		attachObject(new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1)));
 		attachObject(new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0)));
@@ -104,13 +119,13 @@ public class Demo9 implements GLEventListener {
 		appFrame.setVisible(true);
 	}
 
-	public void attachObject(PhysicsObject object) {
+	public void attachObject(PhyObject object) {
 		if (object.renderable != null)
 			sceneGraphRoot.addChild(object.renderable);
 		objects.add(object);
 	}
 
-	public void detachObject(PhysicsObject object) {
+	public void detachObject(PhyObject object) {
 		if (object.renderable != null)
 			sceneGraphRoot.removeChild(object.renderable);
 		int index = objects.indexOf(object);
@@ -140,15 +155,16 @@ public class Demo9 implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		for (PhysicsObject object : objects)
-			object.updateState(1f / TARGET_FPS / 10);
+		for (PhyObject object : objects)
+			object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
 		boolean noCollisions = false;
-		for (int repeat = 0; repeat < 10 && !noCollisions; repeat++) {
+		int repeat = 0;
+		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
 			noCollisions = true;		
 			for (int i = 0; i < objects.size(); i++) {
-				PhysicsObject a = objects.get(i);
+				PhyObject a = objects.get(i);
 				for (int j = i + 1; j < objects.size(); j++) {
-					PhysicsObject b = objects.get(j);
+					PhyObject b = objects.get(j);
 					CollisionInfo cInfo = a.getCollision(b);
 					if (cInfo != null) {
 						noCollisions = false;
@@ -156,10 +172,21 @@ public class Demo9 implements GLEventListener {
 					}
 				}
 			}
+			
+			
 		}
-		for (PhysicsObject object : objects)
+		if (repeat < resolution_repeats) {
+			resolution_repeats = repeat + 1;
+		}
+		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS){
+			resolution_repeats++;
+		}
+		
+		for (PhyObject object : objects){
 			object.updateRenderable();
+		}
 		sceneGraphRoot.render(drawable);
+		
 	}
 
 	public void dispose(GLAutoDrawable drawable) {

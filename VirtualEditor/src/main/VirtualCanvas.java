@@ -4,6 +4,7 @@ import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
@@ -16,6 +17,11 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 
+import phyObj.CollisionInfo;
+import phyObj.HalfSpace;
+import phyObj.PhyObject;
+import phyObj.Vector2f;
+
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -26,7 +32,15 @@ import com.jogamp.opengl.util.FPSAnimator;
  *
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
-	private SceneGraphNode my_root;
+	private static final int TARGET_FPS = 30;
+	private static final float GRAVITY = 10;
+	private static final float SLOW_FACTOR = 1;
+	private static final int MAX_RESOLUTION_REPEATS = 50;
+	
+	private int resolution_repeats = MAX_RESOLUTION_REPEATS;
+	
+	private SceneGraphNode sceneGraphRoot;
+	private ArrayList<PhyObject> objects;
 	private boolean pickNextFrame;
 	private Point pickedPoint;
 
@@ -35,7 +49,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	private final GLCanvas my_canvas;
 
 
-	private SceneGraphNode my_selected;
+	private PhyObject my_selected;
 
 	public VirtualCanvas() {
 		GLProfile profile = GLProfile.getDefault();
@@ -50,15 +64,38 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				
 			}
 		});
-		my_root = new SceneGraphNode();
+		sceneGraphRoot = new SceneGraphNode();
+		objects = new ArrayList<PhyObject>();
+		
+		objects.add(new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0)));
+		objects.add(new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1)));
+		objects.add(new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0)));
+		objects.add(new HalfSpace(new Vector2f(0, 5), new Vector2f(0, -1)));
+		// Add independent SceneGraphNode representing all the HalfSpaces.
+		sceneGraphRoot.addChild(new SceneGraphNode(false) {
+			public void renderGeometry(GLAutoDrawable drawable) {
+				GL2 gl = drawable.getGL().getGL2();	
+				gl.glColor3f(1, 1, 1);
+				gl.glBegin(GL.GL_LINE_LOOP);
+				gl.glVertex2f(-5, -5);
+				gl.glVertex2f(5, -5);
+				gl.glVertex2f(5, 5);
+				gl.glVertex2f(-5, 5);
+				gl.glEnd();
+			}
+		});
+		
+		my_selected = null;
 	}
-
-
 	
-	public void addShape(final SceneGraphNode the_shape) {
-		my_root.addChild(the_shape);
+	public void attachObject(final PhyObject object) {
+		if (object.getRenderable() != null) {
+			sceneGraphRoot.addChild(object.getRenderable());
+		}
+		objects.add(object);
+		object.setGravity(new Vector2f(0, -GRAVITY));
 		refresh();
-		my_selected = the_shape;
+		my_selected = object;
 		setChanged();
 		notifyObservers(my_selected);
 		
@@ -68,12 +105,12 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		return my_canvas;
 	}
 
-	public SceneGraphNode getSelected() {
+	public PhyObject getSelected() {
 		return my_selected;
 	}
 	
 	public SceneGraphNode getRoot() {
-		return my_root;
+		return sceneGraphRoot;
 	}
 
 	public void refresh() {
@@ -83,6 +120,8 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	}
 
 	public void display(GLAutoDrawable drawable) {
+//		notifyObservers(my_selected);
+//		setChanged();
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		if (pickNextFrame) {
@@ -95,30 +134,44 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			glu.gluPickMatrix(pickedPoint.x, (double)(viewport[3] - pickedPoint.y), 1, 1, viewport, 0);
 			gl.glOrtho(left, right, bottom, top, -1, 1);
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
-			List<SceneGraphNode> picked = my_root.getPicked(drawable); 
+			System.out.println(sceneGraphRoot.getPicked(drawable));
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
-			
-			
-
-			if(picked.isEmpty()){
-				my_selected = null;
-			}else{
-				my_selected = picked.get(picked.size() - 1);
-			}
-			setChanged();
-			notifyObservers(my_selected);
 		}
-		if (displayListID == -1) {
-			displayListID = 1;
-			gl.glNewList(displayListID, GL2.GL_COMPILE_AND_EXECUTE);
-			my_root.render(drawable);
-			gl.glEndList();
-		} else
-			gl.glCallList(displayListID);
-
+		for (PhyObject object : objects)
+			object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
+		boolean noCollisions = false;
+		int repeat = 0;
+		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
+			noCollisions = true;		
+			for (int i = 0; i < objects.size(); i++) {
+				PhyObject a = objects.get(i);
+				for (int j = i + 1; j < objects.size(); j++) {
+					PhyObject b = objects.get(j);
+					CollisionInfo cInfo = a.getCollision(b);
+					if (cInfo != null) {
+						noCollisions = false;
+						a.resolveCollision(b, cInfo);
+					}
+				}
+			}
+			
+			
+		}
+		if (repeat < resolution_repeats) {
+			resolution_repeats = repeat + 1;
+		}
+		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS){
+			resolution_repeats++;
+		}
+		
+		for (PhyObject object : objects){
+			object.updateRenderable();
+		}
+		sceneGraphRoot.render(drawable);
+		
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
@@ -157,10 +210,9 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	}
 
 	public void remove() {
-		my_root.removeChild(my_selected);
-		my_selected = null;
-		setChanged();
-		notifyObservers();
-		
+//		sceneGraphRoot.removeChild(my_selected); TODO
+//		my_selected = null;
+//		setChanged();
+//		notifyObservers();	
 	}
 }
