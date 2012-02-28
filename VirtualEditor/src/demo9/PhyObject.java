@@ -1,5 +1,7 @@
 package demo9;
 
+import java.util.List;
+
 
 
 public class PhyObject {
@@ -13,7 +15,7 @@ public class PhyObject {
 	float originalOrientation;
 	float angularVelocity;
 	SceneGraphNode renderable;
-	PhyObject[] objects;
+	List<PhyObject> objects;
 	
 	public PhyObject() {
 		inverseMass = 1;
@@ -186,8 +188,10 @@ public class PhyObject {
 	}
 	
 	private static CollisionInfo getCollision(Circle a, Circle b) {
-		Vector2f tmp = new Vector2f(b.position);
 		Vector2f positionA = a.getCenter();
+		Vector2f positionB = b.getCenter();
+		
+		Vector2f tmp = new Vector2f(positionB);
 		tmp.sumScale(positionA, -1); // reaches from A center to B center
 		float distance = tmp.length() - a.radius - b.radius; // negative overlap along tmp
 		if (distance >= 0 || tmp.length() == 0)
@@ -198,7 +202,7 @@ public class PhyObject {
 		cInfo.normal = tmp;
 		cInfo.positionA = new Vector2f(positionA);
 		cInfo.positionA.sumScale(cInfo.normal, a.radius); // where A would kiss B
-		cInfo.positionB = new Vector2f(b.getCenter());
+		cInfo.positionB = new Vector2f(positionB);
 		cInfo.positionB.sumScale(cInfo.normal, -b.radius); // where B would kiss A
 		return cInfo;
 	}

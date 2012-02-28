@@ -86,17 +86,18 @@ public class Demo9 implements GLEventListener {
 		
 		
 		
-		/*/ Add various shapes
+		// Add various shapes
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
 				obj = new Circle((float)(Math.sqrt(mass) * .5));
 				//if (Math.random() < .3) 
-					obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
+					//obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
 				obj.position.y = 4.5f - y;
+				//obj.centerOfMass.x 
 				obj.velocity.x = (float)(2 * Math.random() - 1);
 				obj.velocity.y = (float)(2 * Math.random() - 1);
 				obj.acceleration.y = -GRAVITY;

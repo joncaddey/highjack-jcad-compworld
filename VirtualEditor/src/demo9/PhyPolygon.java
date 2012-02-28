@@ -69,7 +69,7 @@ public class PhyPolygon extends PhyObject {
 	
 	
 	public PhyPolygon(float[] vertices, float size) {
-		
+		super();
 		this.vertices = vertices;
 		this.red = (float) Math.random();
 		this.green = (float) Math.random();
@@ -91,9 +91,8 @@ public class PhyPolygon extends PhyObject {
 				tmp.x = vertices[i] * renderable.scale;
 				tmp.y = vertices[i+1] * renderable.scale;
 				tmp.sumScale(centerOfMass, -1);
-				vertexCache[i/2] = new Vector2f();
-				vertexCache[i/2].x = (float)(Math.cos(orientation) * tmp.x - Math.sin(orientation) * tmp.y);
-				vertexCache[i/2].y = (float)(Math.sin(orientation) * tmp.x + Math.cos(orientation) * tmp.y);
+				tmp.rotate(orientation);
+				vertexCache[i/2] = new Vector2f(tmp);
 				//vertexCache[i/2].sum(centerOfMass);
 				vertexCache[i/2].sum(position);
 			}
