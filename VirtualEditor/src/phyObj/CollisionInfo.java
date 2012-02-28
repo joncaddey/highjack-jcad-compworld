@@ -1,5 +1,4 @@
 package phyObj;
-
 public class CollisionInfo {
 	// where A (calling object) first would have made contact
 	Vector2f positionA;
@@ -12,4 +11,17 @@ public class CollisionInfo {
 	
 	// how far the objects have gone into each other
 	float depth;
+	
+	
+	public void reverse() {
+		normal.scale(-1);
+		Vector2f tmp = positionA;
+		positionA = positionB;
+		positionB = tmp;
+	}
+	public static void reverse(CollisionInfo c) {
+		if (c != null) {
+			c.reverse();
+		}
+	}
 }

@@ -1,5 +1,5 @@
 package phyObj;
-public class HalfSpace extends PhysicsObject {
+public class HalfSpace extends PhyObject {
 	// JON: helpful: http://mathworld.wolfram.com/Point-LineDistance2-Dimensional.html
 	Vector2f normal;
 	// Right-hand side of the plane equation: Ax + By = C

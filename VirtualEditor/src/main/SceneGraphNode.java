@@ -36,9 +36,9 @@ public class SceneGraphNode {
 		GL2 gl = drawable.getGL().getGL2();
 		
 		gl.glPushMatrix();
-		gl.glTranslatef(translateX + CoMX, translateY + CoMY, 0);
+		gl.glTranslatef(translateX, translateY, 0);
 		gl.glRotatef(rotation, 0, 0, 1);
-		//gl.glTranslatef(-CoMX, -CoMY, 0);
+		gl.glTranslatef(-CoMX, -CoMY, 0);
 		gl.glScalef(scale, scale, scale);
 		if (children.size() == 0)
 			renderGeometry(drawable);

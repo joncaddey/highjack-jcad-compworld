@@ -13,6 +13,10 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import phyObj.PhyCircle;
+import phyObj.PhyComposite;
+import phyObj.PhyPolygon;
+
 
 /**
  * 
@@ -89,13 +93,13 @@ public class Window extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				JButton source = (JButton) e.getSource();
 				if(source == triangle_item){
-					my_canvas.addShape(new Triangle());
+					my_canvas.attachObject(PhyPolygon.getEqTriangle(1));
 				} else if (source == circle_item) {
-					my_canvas.addShape(new Circle());
+					my_canvas.attachObject(new PhyCircle(.5f));
 				} else if (source == rectangle_item) {
-					my_canvas.addShape(new Rectangle());
+					my_canvas.attachObject(PhyPolygon.getSquare(1));
 				} else if (source == rocket_item) {
-					my_canvas.addShape(new Rocket());
+					my_canvas.attachObject(PhyComposite.getRocket(1));
 				}
 				my_canvas.getCanvas().repaint();
 

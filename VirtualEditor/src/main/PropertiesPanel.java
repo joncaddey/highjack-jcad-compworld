@@ -16,6 +16,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 
+import phyObj.PhyObject;
+
 /**
  * 
  * @author Steven Cozart Jonathan Caddey
@@ -126,8 +128,8 @@ public class PropertiesPanel extends JPanel implements Observer,
 
 	private void updateSelected() {
 		// this is kind of dirty, simply asking for reference to node itself
-		SceneGraphNode sgn = my_canvas.getSelected();
-		if (sgn == null) {
+		PhyObject obj = my_canvas.getSelected();
+		if (obj == null) {
 			if (my_xField.isEnabled()) {
 				my_xField.setEnabled(false);
 				my_yField.setEnabled(false);
@@ -148,26 +150,30 @@ public class PropertiesPanel extends JPanel implements Observer,
 				my_degreesField.setEnabled(true);
 				my_delteButton.setEnabled(true);
 			}
-			my_xField.setText(String.valueOf(sgn.translateX));
-			my_yField.setText(String.valueOf(sgn.translateY));
-			my_scaleField.setText(String.valueOf(sgn.scale));
-			my_degreesField.setText(String.valueOf(sgn.rotation));
+			if (!my_xField.hasFocus())
+			my_xField.setText(String.valueOf(obj.getPosition().x));
+			my_yField.setText(String.valueOf(obj.getPosition().y));
+			my_scaleField.setText(String.valueOf(obj.getSize()));
+			my_degreesField.setText(String.valueOf(obj.getRotationDegrees()));
 		}
 	}
 
 	private void parseTextFields() {
 		if (my_canvas.getSelected() != null) {
+			PhyObject obj = my_canvas.getSelected();
 			try {
-				my_canvas.getSelected().translateX = Float.parseFloat(my_xField
-						.getText());
-				my_canvas.getSelected().translateY = Float.parseFloat(my_yField
-						.getText());
-				my_canvas.getSelected().scale = Float.parseFloat(my_scaleField
-						.getText());
-				my_canvas.getSelected().rotation = Float
-						.parseFloat(my_degreesField.getText());
+				obj.setPosition(Float.parseFloat(my_xField
+						.getText()), obj.getPosition().y);
+				obj.setPosition(obj.getPosition().x, Float.parseFloat(my_yField
+						.getText()));
+				obj.setSize(Float.parseFloat(my_scaleField
+						.getText()));
+				obj.setRotationDegrees(Float
+						.parseFloat(my_degreesField.getText()));
 			} catch (NumberFormatException the_nfe) {
 				// don't caaare
+			} catch (IllegalArgumentException the_iae) {
+				// still don't
 			}
 			updateSelected();
 			my_canvas.refresh();
