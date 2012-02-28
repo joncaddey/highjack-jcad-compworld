@@ -140,8 +140,9 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		for (PhyObject object : objects)
-			object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
+		if (resolution_repeats > 0)
+			for (PhyObject object : objects)
+				object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
 		boolean noCollisions = false;
 		int repeat = 0;
 		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
@@ -160,10 +161,11 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			
 			
 		}
+		// TODO all this might be bunk.  just use res_rep for pausing.
 		if (repeat < resolution_repeats) {
 			resolution_repeats = repeat + 1;
 		}
-		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS){
+		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS && resolution_repeats > 0){
 			resolution_repeats++;
 		}
 		
