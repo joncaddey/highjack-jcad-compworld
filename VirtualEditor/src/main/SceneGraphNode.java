@@ -67,6 +67,7 @@ public class SceneGraphNode {
 		gl.glPushMatrix();
 		gl.glTranslatef(translateX, translateY, 0);
 		gl.glRotatef(rotation, 0, 0, 1);
+		gl.glTranslatef(-CoMX, -CoMY, 0);
 		gl.glScalef(scale, scale, scale);
 		if (children.size() == 0) {
 			renderGeometry(drawable);
@@ -86,5 +87,9 @@ public class SceneGraphNode {
 		}
 		gl.glPopMatrix();
 		return pickPending;
+	}
+	
+	public void setPickable(boolean the_pickable) {
+		this.pickable = the_pickable;
 	}
 }
