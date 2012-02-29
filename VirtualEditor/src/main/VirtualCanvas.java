@@ -5,6 +5,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Observable;
 
@@ -33,9 +34,11 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private static final int TARGET_FPS = 30;
-	private static final float GRAVITY = 10;
-	private static final float SLOW_FACTOR = 1;
 	private static final int MAX_RESOLUTION_REPEATS = 50;
+	
+	private float my_speed_scale = 1;
+	private float my_gravity = 10;
+	private boolean my_collionToggle = true;
 	
 	private int resolution_repeats = MAX_RESOLUTION_REPEATS;
 	
@@ -44,7 +47,8 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	private boolean pickNextFrame;
 	private Point pickedPoint;
 
-	private double left, right, top, bottom;
+	private float left, right, top, bottom;
+	private HalfSpace leftWall, rightWall, topWall, bottomWall;
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
 
@@ -66,12 +70,16 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		});
 		sceneGraphRoot = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
+		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));
+		bottomWall = new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1));
+		rightWall = new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0));
+		topWall = new HalfSpace(new Vector2f(0, 5), new Vector2f(0, -1));
+		objects.add(rightWall);
+		objects.add(topWall);
+		objects.add(bottomWall);
+		objects.add(leftWall);
 		
-		objects.add(new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0)));
-		objects.add(new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1)));
-		objects.add(new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0)));
-		objects.add(new HalfSpace(new Vector2f(0, 5), new Vector2f(0, -1)));
-		// Add independent SceneGraphNode representing all the HalfSpaces.
+		/*/ Add independent SceneGraphNode representing all the HalfSpaces.
 		sceneGraphRoot.addChild(new SceneGraphNode(false) {
 			public void renderGeometry(GLAutoDrawable drawable) {
 				GL2 gl = drawable.getGL().getGL2();	
@@ -84,6 +92,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				gl.glEnd();
 			}
 		});
+		//*/
 		
 		my_selected = null;
 	}
@@ -93,7 +102,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			sceneGraphRoot.addChild(object.getRenderable());
 		}
 		objects.add(object);
-		object.setGravity(new Vector2f(0, -GRAVITY));
+		object.setGravity(my_gravity);
 		refresh();
 		my_selected = object;
 		setChanged();
@@ -111,6 +120,42 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	
 	public SceneGraphNode getRoot() {
 		return sceneGraphRoot;
+	}
+	
+	public float getGravity() {
+		return my_gravity;
+	}
+	
+	public void setGravity(final float the_gravity) {
+		my_gravity = the_gravity;
+		for (PhyObject o : objects) {
+			if (!(o instanceof HalfSpace)) {
+				o.setGravity(the_gravity);
+			}
+		}
+	}
+	
+	public float getSpeedScale() {
+		return my_speed_scale;
+	}
+	
+	public void setSpeedScale(final float the_speed_scale) {
+		if (the_speed_scale < 0) {
+			throw new IllegalArgumentException("Can't go back in time");
+		}
+		my_speed_scale = the_speed_scale;
+	}
+	
+	public void setCollisions(boolean the_collisions) {
+		my_collionToggle = the_collisions;
+	}
+	
+	public void launch(float power) {
+		if (my_selected != null) {
+			Vector2f tmp = new Vector2f(0, power + my_selected.getVelocity().length());
+			tmp.rotate(my_selected.getRotationRadians());
+			my_selected.setVelocity(tmp);
+		}
 	}
 
 	public void refresh() {
@@ -152,13 +197,17 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		if (resolution_repeats > 0)
+		if (my_speed_scale > 0)
 			for (PhyObject object : objects)
-				object.updateState(1f / TARGET_FPS / SLOW_FACTOR);
+				object.updateState(1f / TARGET_FPS * my_speed_scale);
 		boolean noCollisions = false;
+		
 		int repeat = 0;
+		if (!my_collionToggle) {
+			repeat = resolution_repeats;
+		}
 		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
-			noCollisions = true;		
+			noCollisions = true;
 			for (int i = 0; i < objects.size(); i++) {
 				PhyObject a = objects.get(i);
 				for (int j = i + 1; j < objects.size(); j++) {
@@ -170,14 +219,14 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 					}
 				}
 			}
-			
+
 			
 		}
 		// TODO all this might be bunk.  just use res_rep for pausing.
 		if (repeat < resolution_repeats) {
 			resolution_repeats = repeat + 1;
 		}
-		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS && resolution_repeats > 0){
+		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS){
 			resolution_repeats++;
 		}
 		
@@ -202,19 +251,24 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		final double UNIT = 10;
+		final float UNIT = 10;
 
 		if (width < height) {
 			left = -UNIT / 2;
 			right = UNIT / 2;
-			top = (double) height / width * UNIT / 2;
+			top = (float) height / width * UNIT / 2;
 			bottom = -top;
 		} else {
 			top = UNIT / 2;
 			bottom = -UNIT / 2;
-			right = (double) width / height * UNIT / 2;
+			right = (float) width / height * UNIT / 2;
 			left = -right;
 		}
+		
+		leftWall.setPosition(left, 0);
+		rightWall.setPosition(right, 0);
+		bottomWall.setPosition(0, bottom);
+		topWall.setPosition(0, top);
 
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -228,6 +282,20 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		objects.remove(my_selected);
 		my_selected = null;
 		setChanged();
-		notifyObservers();	
+		notifyObservers();
+	}
+	
+	public void removeAll() {
+		Iterator<PhyObject> it = objects.iterator();
+		while (it.hasNext()) {
+			PhyObject next = it.next();
+			if (!(next instanceof HalfSpace)) {
+				sceneGraphRoot.removeChild(next.getRenderable());
+				it.remove();
+			}
+		}
+		my_selected = null;
+		setChanged();
+		notifyObservers();
 	}
 }

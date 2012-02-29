@@ -24,24 +24,56 @@ public class PhyComposite extends PhyObject{
 	public static PhyObject getRocket(float size) {
 		PhyComposite p = new PhyComposite();
 		//p.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18 / 10);
-		
-		PhyObject head = PhyPolygon.getEqTriangle(1);
-		head.position.y = Triangle.SIN_60 / 3;
-		p.addObject(head);
-		
-		PhyObject body = PhyPolygon.getSquare(BODY_RATIO);
-		body.position.y = -BODY_RATIO / 2;
-		p.addObject(body);
-		
-		PhyObject finLeft = PhyPolygon.getEqTriangle(.3f);
+		float variability = 17f / 255;
+		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.3f);
+		finLeft.red = 113 / 255f + (float)(Math.random() * variability);
+		finLeft.green = 0 / 255f + (float)(Math.random() * variability);
+		finLeft.blue =  151 / 255f + (float)(Math.random() * variability);
 		finLeft.orientation = radians(90);
 		finLeft.position = new Vector2f(-.39f, -.4f);
 		p.addObject(finLeft);
 		
-		PhyObject finRight = PhyPolygon.getEqTriangle(.3f);
+		PhyPolygon finRight = PhyPolygon.getEqTriangle(.3f);
+		finRight.red = finLeft.red;
+		finRight.green = finLeft.green;
+		finRight.blue = finLeft.blue;
 		finRight.orientation = radians(-90);
 		finRight.position = new Vector2f(.39f, -.4f);
 		p.addObject(finRight);
+		
+		PhyPolygon body = PhyPolygon.getSquare(BODY_RATIO);
+		body.red = 84 / 255f + (float)(Math.random() * variability);
+		body.green = 109 / 255f + (float)(Math.random() * variability);
+		body.blue = 142 / 255f + (float)(Math.random() * variability);
+		body.position.y = -BODY_RATIO / 2;
+		p.addObject(body);
+		
+		PhyPolygon head = PhyPolygon.getEqTriangle(1);
+		head.red = 238 / 255f + (float)(Math.random() * variability);
+		head.green = 28 / 255f + (float)(Math.random() * variability);
+		head.blue = 36 / 255f + (float)(Math.random() * variability);
+		head.position.y = Triangle.SIN_60 / 3 - .01f;
+		p.addObject(head);
+		
+		SceneGraphNode flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
+		flame.translateY = -.7f;
+		flame.translateX = -.1f;
+		p.renderable.addChild(flame);
+		
+		flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
+		flame.translateY = -.7f;
+		flame.translateX = .1f;
+		p.renderable.addChild(flame);
+		
+		flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
+		flame.translateY = -.8f;
+		p.renderable.addChild(flame);
 		
 		//p.renderable = new Rocket(true);
 		p.setSize(5);

@@ -12,7 +12,7 @@ public class Rocket extends SceneGraphNode {
 	public Rocket(boolean pickable) {
 		super(pickable);
 		Triangle head = new Triangle(false);
-		head.translateY = Triangle.SIN_60 / 3;
+		head.translateY = Triangle.SIN_60 / 3 - .01f;
 		addChild(head);
 		Rectangle body = new Rectangle(false);
 		body.scale = -BODY_RATIO;
