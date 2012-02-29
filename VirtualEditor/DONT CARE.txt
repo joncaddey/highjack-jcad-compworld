@@ -1,17 +1,12 @@
 Good ideas:
 
-environment options
-gravity any value
-slow factor greater than 1
-collisions on/off (sets the collision repeats to 0)
-remove all shapes (have dialoge to confirm)
+Organize PhyPolygon methods to be their own classes, each of which overrides setSize.  setSize should also recalculate mass.
+SetSize should recalculate mass using a density (default 1).
 
-launch options
-angle
-power
-launch button (launches selected)
+Set Density should be implemented.
 
-fixes
-//set renderable of each object to null in composite
-//make circle go in random direction if tmp is 0.
-make rocket pretty.
+inversemass = 1 / (area * density).  density of 0 is special case where object is immobile.
+inverseMass and inverseMomentOfInertia should be private (unless needed by resolve collision).
+
+
+Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.
