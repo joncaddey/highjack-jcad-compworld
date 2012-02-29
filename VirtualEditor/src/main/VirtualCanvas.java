@@ -152,8 +152,9 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	
 	public void launch(float power) {
 		if (my_selected != null) {
-			Vector2f tmp = new Vector2f(0, power + my_selected.getVelocity().length());
+			Vector2f tmp = new Vector2f(0, power);
 			tmp.rotate(my_selected.getRotationRadians());
+			tmp.sum(my_selected.getVelocity());
 			my_selected.setVelocity(tmp);
 		}
 	}

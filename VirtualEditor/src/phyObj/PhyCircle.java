@@ -35,22 +35,29 @@ public class PhyCircle extends PhyObject {
 	float green;
 	float blue;
 
-	public PhyCircle(float radius) {
-		this(radius, (float)Math.random(), (float)Math.random(), (float)Math.random());
+	public PhyCircle(float diameter) {
+		this(diameter, (float)Math.random(), (float)Math.random(), (float)Math.random());
 	}
 	
-	public PhyCircle(float radius, float red, float green, float blue) {
-		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(radius, 4) / 4);
-		this.size = radius;
+	public PhyCircle(float diameter, float red, float green, float blue) {
+		this.size = diameter / 2;
+		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4);
 		this.red = red;
 		this.green = green;
 		this.blue = blue;
 		renderable = new Renderable();
 	}
 	
-	public void setSize(float size) {
-		super.setSize(size);
+	public void setSize(float diameter) {
+		super.setSize(diameter/2);
 		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass;
+	}
+	
+	/**
+	 * @return the circle's diameter.
+	 */
+	public float getSize() {
+		return size * 2;
 	}
 	
 	public Vector2f getCenter() {

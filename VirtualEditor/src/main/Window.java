@@ -11,6 +11,7 @@ import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.WindowConstants;
 
 import phyObj.PhyCircle;
@@ -92,14 +93,21 @@ public class Window extends JFrame {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				JButton source = (JButton) e.getSource();
+				
+				final float size;
+				if (my_canvas.getSelected() == null) {
+					size = 1;
+				} else {
+					 size = my_canvas.getSelected().getSize();
+				}
 				if(source == triangle_item){
-					my_canvas.attachObject(PhyPolygon.getEqTriangle(1));
+					my_canvas.attachObject(PhyPolygon.getEqTriangle(size));
 				} else if (source == circle_item) {
-					my_canvas.attachObject(new PhyCircle(.5f));
+					my_canvas.attachObject(new PhyCircle(size));
 				} else if (source == rectangle_item) {
-					my_canvas.attachObject(PhyPolygon.getSquare(1));
+					my_canvas.attachObject(PhyPolygon.getSquare(size));
 				} else if (source == rocket_item) {
-					my_canvas.attachObject(PhyComposite.getRocket(1));
+					my_canvas.attachObject(PhyComposite.getRocket(size));
 				}
 				my_canvas.getCanvas().repaint();
 
@@ -118,7 +126,8 @@ public class Window extends JFrame {
 		a_panel.setBorder(BorderFactory.createTitledBorder("Add Shape :)"));
 		JPanel q = new JPanel();
 		q.add(p);
-		this.add(q, BorderLayout.EAST);
+		JScrollPane scroll = new JScrollPane(q, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+		this.add(scroll, BorderLayout.EAST);
 
 	}
 
