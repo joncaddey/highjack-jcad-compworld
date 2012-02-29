@@ -33,7 +33,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private static final int TARGET_FPS = 30;
-	private static final float GRAVITY = 0;
+	private static final float GRAVITY = 10;
 	private static final float SLOW_FACTOR = 1;
 	private static final int MAX_RESOLUTION_REPEATS = 50;
 	
@@ -134,9 +134,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			glu.gluPickMatrix(pickedPoint.x, (double)(viewport[3] - pickedPoint.y), 1, 1, viewport, 0);
 			gl.glOrtho(left, right, bottom, top, -1, 1);
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
-			System.out.println(sceneGraphRoot.getPicked(drawable));
 			List<SceneGraphNode> picked = sceneGraphRoot.getPicked(drawable);
-			System.out.println(picked);
 			
 			if (!picked.isEmpty()) {
 				SceneGraphNode sgn = picked.get(0);
@@ -226,9 +224,10 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	}
 
 	public void remove() {
-//		sceneGraphRoot.removeChild(my_selected); TODO
-//		my_selected = null;
-//		setChanged();
-//		notifyObservers();	
+		sceneGraphRoot.removeChild(my_selected.getRenderable());
+		objects.remove(my_selected);
+		my_selected = null;
+		setChanged();
+		notifyObservers();	
 	}
 }
