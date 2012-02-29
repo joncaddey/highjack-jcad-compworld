@@ -110,7 +110,7 @@ public class PropertiesPanel extends JPanel implements Observer,
 		final JPanel p = new JPanel();
 		p.setBorder(BorderFactory.createTitledBorder("Option"));
 		my_delteButton = new JButton();
-		my_delteButton.setText("Delete");
+		my_delteButton.setText("Remove");
 		my_delteButton.addFocusListener(this);
 		my_delteButton.addActionListener(this);
 		p.add(my_delteButton);
@@ -181,7 +181,12 @@ public class PropertiesPanel extends JPanel implements Observer,
 	}
 
 	@Override
-	public void focusGained(FocusEvent arg0) {
+	public void focusGained(FocusEvent e) {
+		if (e.getSource() instanceof JTextField) {
+			JTextField f = (JTextField) e.getSource();
+			f.setCaretPosition(0);
+			f.moveCaretPosition(f.getText().length());
+		}
 	}
 
 	@Override

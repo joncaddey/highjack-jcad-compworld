@@ -64,6 +64,14 @@ public class PhyObject {
 		position.x = x;
 		position.y = y;
 	}
+	
+	public void setVelocity(Vector2f velocity) {
+		this.velocity = new Vector2f(velocity);
+	}
+	public Vector2f getVelocity() {
+		return new Vector2f(velocity);
+	}
+	
 	public void setSize(float size) throws IllegalArgumentException {
 		if (size <= 0) {
 			throw new IllegalArgumentException("Bad size");
@@ -77,8 +85,8 @@ public class PhyObject {
 		return size;
 	}
 	
-	public void setGravity(Vector2f gravity) {
-		this.acceleration = new Vector2f(gravity);
+	public void setGravity(float gravity) {
+		this.acceleration.y = -gravity;
 	}
 	
 	public void setRotationDegrees(float degrees) {
@@ -86,6 +94,9 @@ public class PhyObject {
 	}
 	public float getRotationDegrees() {
 		return (float)(orientation * 180 / Math.PI);
+	}
+	public float getRotationRadians() {
+		return orientation;
 	}
 
 	public CollisionInfo getCollision(PhyObject other) {

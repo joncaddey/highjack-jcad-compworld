@@ -112,7 +112,7 @@ public class Window extends JFrame {
 		rocket_item.addActionListener(a);
 		
 		p.add(a_panel);
-		p.add(new ViewPanel(my_canvas));
+		p.add(new PhysicsPanel(my_canvas));
 		
 		p.setLayout(new GridLayout(0, 1));
 		a_panel.setBorder(BorderFactory.createTitledBorder("Add Shape :)"));
@@ -120,13 +120,6 @@ public class Window extends JFrame {
 		q.add(p);
 		this.add(q, BorderLayout.EAST);
 
-		
-		
 	}
-	
-	
-	
-	
-	
-	
+
 }
