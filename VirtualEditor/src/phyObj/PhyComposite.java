@@ -43,7 +43,7 @@ public class PhyComposite extends PhyObject{
 		finRight.position = new Vector2f(.39f, -.4f);
 		p.addObject(finRight);
 		
-		p.renderable = new Rocket(true);
+		//p.renderable = new Rocket(true);
 		p.setSize(5);
 
 		p.setSize(size);
@@ -57,11 +57,13 @@ public class PhyComposite extends PhyObject{
 		}
 		
 		// rendering
+		obj.renderable.setPickable(false);
 		obj.renderable.rotation = (float)(obj.orientation * 180 / Math.PI);
 		obj.renderable.CoMX = obj.centerOfMass.x;
 		obj.renderable.CoMY = obj.centerOfMass.y;
 		SceneGraphNode wrapper = new SceneGraphNode(false);
 		wrapper.addChild(obj.renderable);
+		obj.renderable = null;
 		wrapper.CoMX = -obj.position.x;
 		wrapper.CoMY = -obj.position.y;
 		renderable.addChild(wrapper);

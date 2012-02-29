@@ -17,9 +17,9 @@ import com.jogamp.opengl.util.*;
 public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
-	private static final float GRAVITY = 10;
+	private static final float GRAVITY = 0;
 	private static final float SLOW_FACTOR = 1;
-	private static final int MAX_RESOLUTION_REPEATS = 10;
+	private static final int MAX_RESOLUTION_REPEATS = 50;
 	
 	private static int resolution_repeats = MAX_RESOLUTION_REPEATS;
 	private static JFrame appFrame;
@@ -56,12 +56,12 @@ public class Demo9 implements GLEventListener {
 		objects = new ArrayList<PhyObject>();
 		sceneGraphRoot = new SceneGraphNode(false);
 		
-		//PhyObject obj = PhyPolygon.getSquare(1);
+		//PhyObject obj = PhyPolygon.getRightTriangle(1);
 		
 		
 		
-		//PhyObject obj = PhyComposite.getRocket(.5f);
-		PhyObject obj = PhyPolygon.getSquare(.5f);
+		PhyObject obj = PhyComposite.getRocket(1f);
+		//PhyObject obj = PhyPolygon.getRightTriangle(1f);
 		obj.inverseMass = 1f / 10;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.y = -4;
@@ -72,14 +72,14 @@ public class Demo9 implements GLEventListener {
 		attachObject(obj);
 		
 		
-		/*/ Add various shapes
+		// Add various shapes
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
-				obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
-				if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
-				if (Math.random() < .25) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
-				if (Math.random() < .05) obj = PhyComposite.getRocket((float)(Math.sqrt(mass)));
+				//obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
+				//if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
+				if (Math.random() < 1) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
+				//if (Math.random() < .05) obj = PhyComposite.getRocket((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;

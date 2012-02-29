@@ -12,6 +12,6 @@ power
 launch button (launches selected)
 
 fixes
-set renderable of each object to null in composite
-make circle go in random direction if tmp is 0.
+//set renderable of each object to null in composite
+//make circle go in random direction if tmp is 0.
 make rocket pretty.

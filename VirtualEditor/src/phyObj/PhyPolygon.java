@@ -5,7 +5,7 @@ import main.SceneGraphNode;
 
 public class PhyPolygon extends PhyObject {
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
-	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1};
+	private static final float[] VERTICES_RIGHT_TRIANGLE = {-1, 0, 1, 0, 0, .1f};//{0, 0, 1, 0, 0, 1};
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};
 	private static final float[] VERTICES_SQUARE = {0, 0, 1, 0, 1, 1, 0, 1};
 	private Vector2f[] vertexCache;
@@ -41,7 +41,7 @@ public class PhyPolygon extends PhyObject {
 		r.inverseMomentOfInertia = 1 / (float)(Math.pow(the_size, 4) / 18);
 		r.renderable = r.new Renderable();
 		r.renderable.scale = the_size;
-		r.centerOfMass.x = r.centerOfMass.y = the_size / 3;
+		r.centerOfMass.x = r.centerOfMass.y = 0;//the_size / 3;
 		r.renderable.CoMX = r.centerOfMass.x;
 		r.renderable.CoMY = r.centerOfMass.y;
 		return r;

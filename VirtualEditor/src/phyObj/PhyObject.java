@@ -237,14 +237,15 @@ public class PhyObject {
 		
 		Vector2f tmp = new Vector2f(positionB);
 		tmp.sumScale(positionA, -1); // reaches from A center to B center
-		if (tmp.length() == 0) {
-			tmp.sum(new Vector2f(.0001f, .00001f));
-		}
 		float distance = tmp.length() - a.size - b.size; // negative overlap along tmp
 		if (distance >= 0)
 			return null;
 		CollisionInfo cInfo = new CollisionInfo();
 		cInfo.depth = -distance; // length of overlap
+		if (tmp.length() == 0) {
+			tmp.y = 1;
+			tmp.rotate((float)(Math.random() * Math.PI * 2));
+		}
 		tmp.normalize(); // normal from A center to B
 		cInfo.normal = tmp;
 		cInfo.positionA = new Vector2f(positionA);
