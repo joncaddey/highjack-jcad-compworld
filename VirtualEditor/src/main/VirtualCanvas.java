@@ -71,11 +71,11 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				
 			}
 		});
-		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
-			 public void mouseDragged(MouseEvent e) {
-				System.out.println(e.getX());
-			}
-		});
+//		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
+//			 public void mouseDragged(MouseEvent e) {
+//				System.out.println(e.getX());
+//			}
+//		});
 		sceneGraphRoot = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
 		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));
