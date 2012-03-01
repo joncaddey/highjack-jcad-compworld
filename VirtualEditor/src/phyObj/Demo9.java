@@ -76,10 +76,11 @@ public class Demo9 implements GLEventListener {
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
-				//obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
-				//if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
-				if (Math.random() < 1) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
-				//if (Math.random() < .05) obj = PhyComposite.getRocket((float)(Math.sqrt(mass)));
+				obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
+				if (Math.random() < .25) obj = PhyPolygon.getSquare((float)(Math.sqrt(mass)));
+				if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
+				if (Math.random() < .25) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
+				if (Math.random() < .05) obj = PhyComposite.getRocket((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
 				obj.position.x = -4.5f + x;
