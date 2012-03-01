@@ -23,7 +23,7 @@ public class PhyComposite extends PhyObject{
 	
 	public static PhyObject getRocket(float size) {
 		PhyComposite p = new PhyComposite();
-		//p.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18 / 10);
+		
 		float variability = 17f / 255;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.3f);
 		finLeft.density = .1f;
@@ -52,7 +52,7 @@ public class PhyComposite extends PhyObject{
 		p.addObject(body);
 		
 		PhyPolygon head = PhyPolygon.getEqTriangle(1);
-		head.density = 3;
+		head.density = 2;
 		head.red = 238 / 255f + (float)(Math.random() * variability);
 		head.green = 28 / 255f + (float)(Math.random() * variability);
 		head.blue = 36 / 255f + (float)(Math.random() * variability);
@@ -135,10 +135,15 @@ public class PhyComposite extends PhyObject{
 			move.sum(tmp);
 		}
 		move.scale(1 / totalMass);
-		renderable.CoMX -= move.x;
-		renderable.CoMY -= move.y;
+//		renderable.translateX += move.x;
+//		renderable.translateY += move.y;
+		
 		for (Vector2f v : positions) {
 			v.sumScale(move, -1);
+		}
+		for (SceneGraphNode wrapper : renderable.getChildren()) {
+			wrapper.translateX += move.x;
+			wrapper.translateY += move.y;
 		}
 		setSize(scale);
 	}
@@ -171,7 +176,7 @@ public class PhyComposite extends PhyObject{
 		}
 		this.inverseMass = 1 / totalMass;
 		this.inverseMomentOfInertia = 1 / totalMomentOfInertia;
-		this.inverseMomentOfInertia *= this.inverseMass;
+		this.inverseMomentOfInertia *= this.inverseMass / INERTIAL_DAMPENER;
 	}
 	
 	public void synchChildren() {
