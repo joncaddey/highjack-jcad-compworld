@@ -16,6 +16,10 @@ public class SceneGraphNode {
 		this(true);
 	}
 	
+	public List<SceneGraphNode> getChildren() {
+		return children;
+	}
+	
 	public SceneGraphNode(boolean pickable) {
 		scale = 1;
 		children = new LinkedList<SceneGraphNode>();

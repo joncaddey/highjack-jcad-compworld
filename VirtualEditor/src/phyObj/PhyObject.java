@@ -7,6 +7,9 @@ import main.SceneGraphNode;
 
 
 public class PhyObject {
+	
+	// even changing density didn't seem to affect spinning.  this lowers the spinning.
+	static float INERTIAL_DAMPENER = 5;
 	Vector2f position;
 	Vector2f velocity;
 	Vector2f acceleration;

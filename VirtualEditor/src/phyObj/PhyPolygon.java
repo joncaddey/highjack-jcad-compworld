@@ -14,7 +14,7 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area = obj.size * obj.size;
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 6) * obj.inverseMass;
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 6) * obj.inverseMass / INERTIAL_DAMPENER;
 		}
 	};
 	private static final Resizer RIGHT_TRIANGLE_RESIZER = new Resizer() {
@@ -22,7 +22,7 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area = .5f * obj.size * obj.size;
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass / INERTIAL_DAMPENER;
 		}
 	};
 	private static final Resizer EQ_TRIANGLE_RESIZER = new Resizer() {
@@ -30,7 +30,7 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area =  .5f * obj.size * obj.size * SIN_60;
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) * SIN_60 * (.75 + SIN_60 * SIN_60) / 36) * obj.inverseMass;
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) * SIN_60 * (.75 + SIN_60 * SIN_60) / 36) * obj.inverseMass / INERTIAL_DAMPENER;
 		}
 	};
 	
