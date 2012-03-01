@@ -1,12 +1,22 @@
 Good ideas:
 
-Organize PhyPolygon methods to be their own classes, each of which overrides setSize.  setSize should also recalculate mass.
+ setSize should also recalculate mass.
 SetSize should recalculate mass using a density (default 1).
 
 Set Density should be implemented.
 
 inversemass = 1 / (area * density).  density of 0 is special case where object is immobile.
-inverseMass and inverseMomentOfInertia should be private (unless needed by resolve collision).
+
 
 
 Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.
+
+
+LIBRARIES!
+
+
+gluegen.jar
+gluegen-rt.jar
+gluegen-rt-natives-windows-i586.jar
+jogl.all.jar
+jog-all-natives-windows-i585.jar

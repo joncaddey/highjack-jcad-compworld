@@ -7,12 +7,14 @@ import main.SceneGraphNode;
 
 
 public class PhyObject {
-	float inverseMass;
 	Vector2f position;
 	Vector2f velocity;
 	Vector2f acceleration;
 	Vector2f centerOfMass;
 	float size;
+	
+	float density;
+	float inverseMass;
 	float inverseMomentOfInertia;
 	float orientation;
 	float originalOrientation;
@@ -20,13 +22,17 @@ public class PhyObject {
 	SceneGraphNode renderable;
 	List<PhyObject> objects;
 	
+	interface Resizer {
+		void resize(PhyObject obj, float size);
+	}
 	public PhyObject() {
+		density = 1;
 		inverseMass = 1;
 		position = new Vector2f();
 		velocity = new Vector2f();
 		acceleration = new Vector2f();
 		centerOfMass = new Vector2f();
-		// inverseMomentOfInertia needs to be set in subclasses
+		// inverseMomentOfInertia and inverseMass needs to be set in subclasses
 	}
 
 	public void updateState(float timePeriod) {
@@ -72,6 +78,11 @@ public class PhyObject {
 		return new Vector2f(velocity);
 	}
 	
+	/**
+	 * Subclasses modify mass and moment of ineria.
+	 * @param size
+	 * @throws IllegalArgumentException
+	 */
 	public void setSize(float size) throws IllegalArgumentException {
 		if (size <= 0) {
 			throw new IllegalArgumentException("Bad size");
@@ -84,6 +95,7 @@ public class PhyObject {
 	public float getSize() {
 		return size;
 	}
+	
 	
 	public void setGravity(float gravity) {
 		this.acceleration.y = -gravity;

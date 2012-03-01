@@ -8,9 +8,33 @@ public class PhyPolygon extends PhyObject {
 	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1f};//{0, 0, 1, 0, 0, 1};
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};
 	private static final float[] VERTICES_SQUARE = {-.5f, -.5f, .5f, -.5f, .5f, .5f, -.5f, .5f};
+	
+	private static final Resizer SQUARE_RESIZER = new Resizer() {
+		@Override
+		public void resize(PhyObject obj, float size) {
+			obj.inverseMass = 1 / (float) (obj.density * .5 * obj.size * obj.size);
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
+		}
+	};
+	private static final Resizer RIGHT_TRIANGLE_RESIZER = new Resizer() {
+		@Override
+		public void resize(PhyObject obj, float size) {
+			obj.inverseMass = 1 / (float) (obj.density * .5 * obj.size * obj.size);
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
+		}
+	};
+	private static final Resizer EQ_TRIANGLE_RESIZER = new Resizer() {
+		@Override
+		public void resize(PhyObject obj, float size) {
+			obj.inverseMass = 1 / (float) (obj.density * .5 * obj.size * obj.size);
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
+		}
+	};
+	
 	private Vector2f[] vertexCache;
 	private Vector2f[] normalCache;
 	private final float[] vertices;
+	private final Resizer resizer;
 	
 	float red;
 	float green;
@@ -37,8 +61,7 @@ public class PhyPolygon extends PhyObject {
 
 	
 	public static PhyPolygon getRightTriangle(final float the_size) {
-		PhyPolygon r = new PhyPolygon(VERTICES_RIGHT_TRIANGLE, the_size);
-		r.inverseMomentOfInertia = 1 / (float)(Math.pow(the_size, 4) / 18);
+		PhyPolygon r = new PhyPolygon(VERTICES_RIGHT_TRIANGLE, the_size, RIGHT_TRIANGLE_RESIZER);
 		r.renderable = r.new Renderable();
 		r.renderable.scale = the_size;
 		r.centerOfMass.x = r.centerOfMass.y = the_size / 3;
@@ -48,8 +71,7 @@ public class PhyPolygon extends PhyObject {
 	}
 	
 	public static PhyPolygon getEqTriangle(final float the_size) {
-		PhyPolygon r = new PhyPolygon(VERTICES_EQ_TRIANGLE, the_size);
-		r.inverseMomentOfInertia = 1 / (float)(Math.pow(the_size, 4) / 18); // TODO math
+		PhyPolygon r = new PhyPolygon(VERTICES_EQ_TRIANGLE, the_size, EQ_TRIANGLE_RESIZER);
 		r.renderable = r.new Renderable();
 		r.renderable.scale = the_size;
 		r.renderable.CoMX = r.centerOfMass.x;
@@ -58,8 +80,7 @@ public class PhyPolygon extends PhyObject {
 	}
 	
 	public static PhyPolygon getSquare(final float the_size) {
-		PhyPolygon r = new PhyPolygon(VERTICES_SQUARE, the_size);
-		r.inverseMomentOfInertia = 1 / (float)(Math.pow(the_size, 4) / 18); // TODO math
+		PhyPolygon r = new PhyPolygon(VERTICES_SQUARE, the_size, SQUARE_RESIZER);
 		r.renderable = r.new Renderable();
 		r.renderable.scale = the_size;
 		r.renderable.CoMX = r.centerOfMass.x;
@@ -68,18 +89,20 @@ public class PhyPolygon extends PhyObject {
 	}
 	
 	
-	private PhyPolygon(float[] vertices, float size) {
+	private PhyPolygon(float[] vertices, float size, Resizer resizer) {
 		super();
 		this.size = size;
 		this.vertices = vertices;
+		this.resizer = resizer;
 		this.red = (float) Math.random();
 		this.green = (float) Math.random();
 		this.blue = (float) Math.random();
+		resizer.resize(this,size);
 	}
 	
 	public void setSize(float size) {
 		super.setSize(size);
-		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass; // FUCKFUCKFUCK
+		resizer.resize(this, size);
 	}
 	
 	public void clearCaches() {
@@ -98,7 +121,6 @@ public class PhyPolygon extends PhyObject {
 				tmp.sumScale(centerOfMass, -1);
 				tmp.rotate(orientation);
 				vertexCache[i/2] = new Vector2f(tmp);
-				//vertexCache[i/2].sum(centerOfMass);
 				vertexCache[i/2].sum(position);
 			}
 		}
