@@ -1,7 +1,7 @@
 package main;
 import java.util.*;
 import javax.media.opengl.*;
-
+// sup
 public class SceneGraphNode {
 	public float scale;
 	public float rotation;
