@@ -5,6 +5,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.DecimalFormat;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -17,6 +18,7 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 
 import phyObj.PhyObject;
+import phyObj.Vector2f;
 
 /**
  * 
@@ -27,11 +29,13 @@ import phyObj.PhyObject;
 public class PropertiesPanel extends JPanel implements Observer,
 		ActionListener, FocusListener {
 
+	private static final DecimalFormat DF = new DecimalFormat("0.00");
 	private JTextField my_xField;
 	private JTextField my_yField;
 	private JTextField my_scaleField;
 	private JSlider my_scaleSlider;
 	private JTextField my_degreesField;
+	private JTextField currentlyModifying;
 
 	private final VirtualCanvas my_canvas;
 	private JButton my_delteButton;
@@ -150,35 +154,40 @@ public class PropertiesPanel extends JPanel implements Observer,
 				my_degreesField.setEnabled(true);
 				my_delteButton.setEnabled(true);
 			}
-			if (!my_xField.hasFocus())
-			my_xField.setText(String.valueOf(obj.getPosition().x));
-			my_yField.setText(String.valueOf(obj.getPosition().y));
-			my_scaleField.setText(String.valueOf(obj.getSize()));
-			my_degreesField.setText(String.valueOf(obj.getRotationDegrees()));
+			if (currentlyModifying != my_xField) {
+			my_xField.setText(DF.format(obj.getPosition().x));
+			}
+			if (currentlyModifying != my_yField) {
+				my_yField.setText(DF.format(obj.getPosition().y));
+			}
+			if (currentlyModifying != my_scaleField) {
+				my_scaleField.setText(DF.format(obj.getSize() * 100));
+			}
+			if (currentlyModifying != my_degreesField) {
+				my_degreesField.setText(String.valueOf(((int)obj.getRotationDegrees()) % 180));
+			}
+			if (currentlyModifying == null) {
+				final JTextField f;
+				if (my_xField.hasFocus()) {
+					f = my_xField;
+				} else if (my_yField.hasFocus()) {
+					f = my_yField;
+				} else if (my_scaleField.hasFocus()) {
+					f = my_scaleField;
+				} else if(my_degreesField.hasFocus()) {
+					f = my_degreesField;
+				} else f = null;
+				if (f != null) {
+					currentlyModifying = f;
+					f.setCaretPosition(0);
+					f.moveCaretPosition(f.getText().length());
+				}
+			}
 		}
+		
+		
 	}
 
-	private void parseTextFields() {
-		if (my_canvas.getSelected() != null) {
-			PhyObject obj = my_canvas.getSelected();
-			try {
-				obj.setPosition(Float.parseFloat(my_xField
-						.getText()), obj.getPosition().y);
-				obj.setPosition(obj.getPosition().x, Float.parseFloat(my_yField
-						.getText()));
-				obj.setSize(Float.parseFloat(my_scaleField
-						.getText()));
-				obj.setRotationDegrees(Float
-						.parseFloat(my_degreesField.getText()));
-			} catch (NumberFormatException the_nfe) {
-				// don't caaare
-			} catch (IllegalArgumentException the_iae) {
-				// still don't
-			}
-			updateSelected();
-			my_canvas.refresh();
-		}
-	}
 
 	@Override
 	public void focusGained(FocusEvent e) {
@@ -186,22 +195,46 @@ public class PropertiesPanel extends JPanel implements Observer,
 			JTextField f = (JTextField) e.getSource();
 			f.setCaretPosition(0);
 			f.moveCaretPosition(f.getText().length());
+			currentlyModifying = f;
 		}
 	}
 
 	@Override
 	public void focusLost(FocusEvent arg0) {
-		parseTextFields();
-
+		currentlyModifying = null;
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		parseTextFields();
 		if (e.getSource() instanceof JTextField) {
 			JTextField f = (JTextField) e.getSource();
-			f.setCaretPosition(0);
-			f.moveCaretPosition(f.getText().length());
+			
+			PhyObject obj = my_canvas.getSelected();
+			if (obj != null) {
+				try {
+					if (f == my_xField) {
+						obj.setPosition(Float.parseFloat(my_xField
+								.getText()), obj.getPosition().y);
+						obj.setVelocity(new Vector2f(0, 0));
+					} else if (f == my_yField) {
+						obj.setPosition(obj.getPosition().x, Float.parseFloat(my_yField
+.getText()));
+						obj.setVelocity(new Vector2f(0, 0));
+					} else if (f == my_scaleField) {
+						obj.setSize(Float.parseFloat(my_scaleField.getText()) / 100);
+					} else if (f == my_degreesField) {
+					obj.setRotationDegrees(Float.parseFloat(my_degreesField
+							.getText()));
+					obj.setAngularVelocity(0);
+					}
+				} catch (NumberFormatException the_nfe) {
+					// don't caaare
+				} catch (IllegalArgumentException the_iae) {
+					// still don't
+				}
+				my_canvas.refresh();
+				currentlyModifying = null;
+			}
 		} else if (e.getSource() == my_delteButton) {
 			my_canvas.remove();
 		}
