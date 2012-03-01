@@ -12,6 +12,9 @@ public class CollisionInfo {
 	// how far the objects have gone into each other
 	float depth;
 	
+	// whether the collision occured between 2 sides.
+	boolean sideSideCollision;
+	
 	
 	public void reverse() {
 		normal.scale(-1);
