@@ -26,6 +26,7 @@ public class PhyComposite extends PhyObject{
 		//p.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18 / 10);
 		float variability = 17f / 255;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.3f);
+		finLeft.density = .1f;
 		finLeft.red = 113 / 255f + (float)(Math.random() * variability);
 		finLeft.green = 0 / 255f + (float)(Math.random() * variability);
 		finLeft.blue =  151 / 255f + (float)(Math.random() * variability);
@@ -34,6 +35,7 @@ public class PhyComposite extends PhyObject{
 		p.addObject(finLeft);
 		
 		PhyPolygon finRight = PhyPolygon.getEqTriangle(.3f);
+		finRight.density = .1f;
 		finRight.red = finLeft.red;
 		finRight.green = finLeft.green;
 		finRight.blue = finLeft.blue;
@@ -42,6 +44,7 @@ public class PhyComposite extends PhyObject{
 		p.addObject(finRight);
 		
 		PhyPolygon body = PhyPolygon.getSquare(BODY_RATIO);
+		body.density = 1;
 		body.red = 84 / 255f + (float)(Math.random() * variability);
 		body.green = 109 / 255f + (float)(Math.random() * variability);
 		body.blue = 142 / 255f + (float)(Math.random() * variability);
@@ -49,6 +52,7 @@ public class PhyComposite extends PhyObject{
 		p.addObject(body);
 		
 		PhyPolygon head = PhyPolygon.getEqTriangle(1);
+		head.density = 3;
 		head.red = 238 / 255f + (float)(Math.random() * variability);
 		head.green = 28 / 255f + (float)(Math.random() * variability);
 		head.blue = 36 / 255f + (float)(Math.random() * variability);
@@ -76,12 +80,20 @@ public class PhyComposite extends PhyObject{
 		p.renderable.addChild(flame);
 		
 		//p.renderable = new Rocket(true);
-		p.setSize(5);
 
+		p.moveToCenterOfMass();
 		p.setSize(size);
 		return p;
 	}
 	
+	public PhyComposite(){
+		super();
+		size = 1;
+		positions = new ArrayList<Vector2f>();
+		sizes = new ArrayList<Float>();
+		objects = new ArrayList<PhyObject>();
+		renderable = new SceneGraphNode(true);
+	}
 	
 	public void addObject(PhyObject obj) {
 		if (obj instanceof PhyComposite) {
@@ -110,16 +122,29 @@ public class PhyComposite extends PhyObject{
 		sizes.add(obj.size);
 	}
 
-	
+	public void moveToCenterOfMass() {
+		float scale = this.size;
+		setSize(1 / scale);
+		float totalMass = 0;
+		Vector2f move = new Vector2f();
+		for (PhyObject o : objects) {
+			Vector2f tmp = new Vector2f(o.centerOfMass);
+			final float mass = 1 / o.inverseMass;
+			totalMass += mass;
+			tmp.scale(mass);
+			move.sum(tmp);
+		}
+		move.scale(1 / totalMass);
+		renderable.CoMX -= move.x;
+		renderable.CoMY -= move.y;
+		for (Vector2f v : positions) {
+			v.sumScale(move, -1);
+		}
+		setSize(scale);
+	}
 	
 
-	public PhyComposite(){
-		super();
-		positions = new ArrayList<Vector2f>();
-		sizes = new ArrayList<Float>();
-		objects = new ArrayList<PhyObject>();
-		renderable = new SceneGraphNode(true);
-	}
+	
 	
 	
 	
@@ -135,12 +160,11 @@ public class PhyComposite extends PhyObject{
 			tmp.scale(the_size);
 			o.centerOfMass = tmp;
 			
-			// get mass
 			totalMass += 1 / o.inverseMass;
 			
 			//I_z = I_cm + mr^2
-			tmp = new Vector2f(tmp);
-			tmp.sum(new Vector2f(0, size * 1f)); // TODO this is specific to rocket.
+			tmp = new Vector2f(o.centerOfMass);
+			//tmp.sum(new Vector2f(0, size * 1f)); // TODO this is specific to rocket.
 			totalMomentOfInertia += 1 / (o.inverseMomentOfInertia / o.inverseMass)  + o.area * Math.pow(tmp.length(), 2);
 			
 			

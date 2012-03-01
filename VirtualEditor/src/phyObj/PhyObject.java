@@ -27,7 +27,7 @@ public class PhyObject {
 		void resize(PhyObject obj, float size);
 	}
 	public PhyObject() {
-		density = 1;
+		density = 1f;
 		inverseMass = 1;
 		position = new Vector2f();
 		velocity = new Vector2f();
@@ -77,6 +77,9 @@ public class PhyObject {
 	}
 	public Vector2f getVelocity() {
 		return new Vector2f(velocity);
+	}
+	public void setAngularVelocity(float angularVelocity) {
+		this.angularVelocity = angularVelocity;
 	}
 	
 	/**

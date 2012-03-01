@@ -35,6 +35,7 @@ public class PhyCircle extends PhyObject {
 	float green;
 	float blue;
 
+	
 	public PhyCircle(float diameter) {
 		this(diameter, (float)Math.random(), (float)Math.random(), (float)Math.random());
 	}

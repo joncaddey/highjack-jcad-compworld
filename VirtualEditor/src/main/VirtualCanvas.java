@@ -36,7 +36,9 @@ import com.jogamp.opengl.util.FPSAnimator;
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	private static final int MAX_RESOLUTION_REPEATS = 50;
+	private static final int NOTIFY_DELTA =  1;
 	
+	private int notify_delta = NOTIFY_DELTA;
 	private float my_speed_scale = 1;
 	private float my_gravity = 10;
 	private boolean my_collionToggle = true;
@@ -167,13 +169,9 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 
 	public void refresh() {
 		displayListID = -1;
-
-
 	}
 
 	public void display(GLAutoDrawable drawable) {
-//		notifyObservers(my_selected);
-//		setChanged();
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		if (pickNextFrame) {
@@ -207,9 +205,18 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		if (my_speed_scale > 0)
-			for (PhyObject object : objects)
+		//if (my_speed_scale > 0) {
+			for (PhyObject object : objects) {
 				object.updateState(1f / TARGET_FPS * my_speed_scale);
+			}
+			notify_delta--;
+			if (notify_delta < 0) {
+				notifyObservers(my_selected);
+				setChanged();
+				notify_delta = NOTIFY_DELTA;
+			}
+		//}
+		
 		boolean noCollisions = false;
 		
 		int repeat = 0;
