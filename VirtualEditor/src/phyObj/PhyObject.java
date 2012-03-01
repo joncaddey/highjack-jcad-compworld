@@ -239,14 +239,11 @@ public class PhyObject {
 	
 	private static CollisionInfo getCollision(HalfSpace a, PhyPolygon b) {
 		Vector2f[] vertices = b.getVertices();
-		//float DELTA = .0001
 		Vector2f deepestVertex = null;
 		float deepestDistance = Float.MAX_VALUE;
 		for (int i = 0; i < vertices.length; i++) {
 			final float distance = a.normal.dot(vertices[i]) - a.intercept;
-			final float delta = distance - deepestDistance;
-			if (deepestDistance < 0) System.out.println(delta);
-			if (delta < 0) {
+			if (distance < deepestDistance) {
 				deepestDistance = distance;
 				deepestVertex = vertices[i];
 			} else if (distance == deepestDistance) {

@@ -164,7 +164,7 @@ public class PropertiesPanel extends JPanel implements Observer,
 				my_scaleField.setText(DF.format(obj.getSize() * 100));
 			}
 			if (currentlyModifying != my_degreesField) {
-				my_degreesField.setText(String.valueOf(((int)obj.getRotationDegrees()) % 180));
+				my_degreesField.setText(String.valueOf((((int)obj.getRotationDegrees() + 180) % 360 + 360) % 360 - 180));
 			}
 			if (currentlyModifying == null) {
 				final JTextField f;

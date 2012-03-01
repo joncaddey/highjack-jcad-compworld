@@ -84,6 +84,10 @@ public class Window extends JFrame {
 		
 		final JButton  rocket_item = new JButton("Rocket");
 		a_panel.add(rocket_item);
+		
+		final JButton  station_item = new JButton("Station");
+		a_panel.add(station_item);
+		
 		JPanel p = new JPanel();
 		
 		
@@ -108,6 +112,8 @@ public class Window extends JFrame {
 					my_canvas.attachObject(PhyPolygon.getSquare(size));
 				} else if (source == rocket_item) {
 					my_canvas.attachObject(PhyComposite.getRocket(size));
+				} else if (source == station_item) {
+					my_canvas.attachObject(PhyComposite.getStation(size));
 				}
 				my_canvas.getCanvas().repaint();
 
@@ -118,6 +124,7 @@ public class Window extends JFrame {
 		circle_item.addActionListener(a);
 		rectangle_item.addActionListener(a);
 		rocket_item.addActionListener(a);
+		station_item.addActionListener(a);
 		
 		p.add(a_panel);
 		p.add(new PhysicsPanel(my_canvas));

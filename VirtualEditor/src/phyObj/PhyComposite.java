@@ -86,6 +86,31 @@ public class PhyComposite extends PhyObject{
 		return p;
 	}
 	
+	public static PhyObject getStation(float size) {
+		PhyComposite p = new PhyComposite();
+		PhyCircle bouey = new PhyCircle(1);
+		p.addObject(bouey);
+		
+		bouey = new PhyCircle(1);
+		bouey.position.x = 4;
+		p.addObject(bouey);
+		
+		bouey = new PhyCircle(1);
+		bouey.position.x = 2f;
+		bouey.position.y = 4 * Triangle.SIN_60;
+		p.addObject(bouey);
+		
+		PhyCircle center = new PhyCircle(2);
+		center.position.x = 2;
+		center.position.y = 4 * Triangle.SIN_60 * 1 / 3;
+		p.addObject(center);
+		
+		p.moveToCenterOfMass();
+		p.setSize(size);
+		return p;
+		
+	}
+	
 	public PhyComposite(){
 		super();
 		size = 1;
@@ -119,7 +144,7 @@ public class PhyComposite extends PhyObject{
 		obj.centerOfMass.sumScale(obj.position, -1);
 		objects.add(obj);
 		positions.add(new Vector2f(obj.centerOfMass));
-		sizes.add(obj.size);
+		sizes.add(obj.getSize());
 	}
 
 	public void moveToCenterOfMass() {
@@ -135,8 +160,6 @@ public class PhyComposite extends PhyObject{
 			move.sum(tmp);
 		}
 		move.scale(1 / totalMass);
-//		renderable.translateX += move.x;
-//		renderable.translateY += move.y;
 		
 		for (Vector2f v : positions) {
 			v.sumScale(move, -1);
