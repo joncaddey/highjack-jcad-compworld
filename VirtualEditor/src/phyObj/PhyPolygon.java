@@ -12,22 +12,25 @@ public class PhyPolygon extends PhyObject {
 	private static final Resizer SQUARE_RESIZER = new Resizer() {
 		@Override
 		public void resize(PhyObject obj, float size) {
-			obj.inverseMass = 1 / (float) (obj.density * .5 * obj.size * obj.size);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
+			obj.area = obj.size * obj.size;
+			obj.inverseMass = 1 / (float) (obj.density * obj.area);
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 6) * obj.inverseMass;
 		}
 	};
 	private static final Resizer RIGHT_TRIANGLE_RESIZER = new Resizer() {
 		@Override
 		public void resize(PhyObject obj, float size) {
-			obj.inverseMass = 1 / (float) (obj.density * .5 * obj.size * obj.size);
+			obj.area = .5f * obj.size * obj.size;
+			obj.inverseMass = 1 / (float) (obj.density * obj.area);
 			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
 		}
 	};
 	private static final Resizer EQ_TRIANGLE_RESIZER = new Resizer() {
 		@Override
 		public void resize(PhyObject obj, float size) {
-			obj.inverseMass = 1 / (float) (obj.density * .5 * obj.size * obj.size);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
+			obj.area =  .5f * obj.size * obj.size * SIN_60;
+			obj.inverseMass = 1 / (float) (obj.density * obj.area);
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) * SIN_60 * (.75 + SIN_60 * SIN_60) / 36) * obj.inverseMass;
 		}
 	};
 	

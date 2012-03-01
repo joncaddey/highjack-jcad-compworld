@@ -41,7 +41,8 @@ public class PhyCircle extends PhyObject {
 	
 	public PhyCircle(float diameter, float red, float green, float blue) {
 		this.size = diameter / 2;
-		inverseMass = 1 / (float)(density * size * size * Math.PI);
+		area = (float) (size * size * Math.PI);
+		float inverseMass = 1 / (density * area);
 		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass;
 		this.red = red;
 		this.green = green;
@@ -51,7 +52,8 @@ public class PhyCircle extends PhyObject {
 	
 	public void setSize(float diameter) {
 		super.setSize(diameter/2);
-		float inverseMass = 1 / (float)(density * size * size * Math.PI);
+		area = (float) (size * size * Math.PI);
+		float inverseMass = 1 / (density * area);
 		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass;
 	}
 	
