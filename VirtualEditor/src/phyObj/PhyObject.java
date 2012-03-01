@@ -239,25 +239,36 @@ public class PhyObject {
 	
 	private static CollisionInfo getCollision(HalfSpace a, PhyPolygon b) {
 		Vector2f[] vertices = b.getVertices();
-		float[] distances = new float[vertices.length];
+		//float DELTA = .0001
+		Vector2f deepestVertex = null;
+		float deepestDistance = Float.MAX_VALUE;
+		for (int i = 0; i < vertices.length; i++) {
+			final float distance = a.normal.dot(vertices[i]) - a.intercept;
+			final float delta = distance - deepestDistance;
+			if (deepestDistance < 0) System.out.println(delta);
+			if (delta < 0) {
+				deepestDistance = distance;
+				deepestVertex = vertices[i];
+			} else if (distance == deepestDistance) {
+				Vector2f mid = new Vector2f(deepestVertex);
+				mid.sumScale(vertices[i], -1);
+				mid.scale(.5f);
+				mid.sum(vertices[i]);
+				deepestVertex = mid;
+			}
+		}
 		
 		
-		for (int i = 0; i < vertices.length; i++)
-			distances[i] = a.normal.dot(vertices[i]) - a.intercept;
 		
-		int minIndex = 0;
-		for (int i = 1; i < distances.length; i++)
-			if (distances[i] < distances[minIndex])
-				minIndex = i;
-		if (distances[minIndex] >= 0)
+		if (deepestDistance >= 0)
 			return null;
 		
 		CollisionInfo cInfo = new CollisionInfo();
-		cInfo.depth = -distances[minIndex];
+		cInfo.depth = -deepestDistance;
 		cInfo.normal = new Vector2f(a.normal);
-		cInfo.positionA = new Vector2f(vertices[minIndex]);
+		cInfo.positionA = new Vector2f(deepestVertex);
 		cInfo.positionA.sumScale(cInfo.normal, cInfo.depth);
-		cInfo.positionB = new Vector2f(vertices[minIndex]);
+		cInfo.positionB = new Vector2f(deepestVertex);
 		return cInfo;
 	}
 	
@@ -346,7 +357,7 @@ public class PhyObject {
 			if (d == null) {
 				return null;
 			}
-			if (d != null && d.depth < c.depth) {
+			if (d != null && (d.depth < c.depth || (d.depth == c.depth && d.sideSideCollision))) {
 				c = d;
 				c.reverse();
 			}
@@ -365,28 +376,43 @@ public class PhyObject {
 	 * @return a collision, or null if there is no collision.
 	 */
 	private static CollisionInfo getCollision(Vector2f[] verA, Vector2f[] verB, Vector2f[] normalB) {
+		boolean sideSide = false;
 		float shallowestDistance = Float.NEGATIVE_INFINITY;
 		int shallowestSide = -1;
-		int shallowestVer = -1;
+		Vector2f shallowestVertex = null;
 		for (int side = 0; side < normalB.length; side++) {
-			int deepestVer = -1;
-			float deepestDistance = 1;
+			Vector2f deepestVertex = null;
+			boolean thisSideSide = false;
+			float deepestDistance = Float.MAX_VALUE;
 			for (int ver = 0; ver < verA.length; ver++) {
 				Vector2f tmp = new Vector2f(verA[ver]);
 				tmp.sumScale(verB[side], -1);
 				float distance = tmp.dot(normalB[side]);
 				if (distance < deepestDistance) {
 					deepestDistance = distance;
-					deepestVer = ver;
+					deepestVertex = verA[ver];
+					thisSideSide = false;
+				} else if (distance == deepestDistance && distance < 0
+						&& verA[ver].isBetween(verB[side], verB[(side + 1)
+								% verB.length])
+						&& deepestVertex.isBetween(verB[side], verB[(side + 1)
+								% verB.length])) {
+					Vector2f mid = new Vector2f(deepestVertex);
+					mid.sumScale(verA[ver], -1);
+					mid.scale(.5f);
+					mid.sum(verA[ver]);
+					deepestVertex = mid;
+					thisSideSide = true;
 				}
 			}
-			if (deepestDistance > 0) {
+			if (deepestDistance >= 0) {
 				return null;
 			}
 			if (deepestDistance > shallowestDistance) {
 				shallowestDistance = deepestDistance;
 				shallowestSide = side;
-				shallowestVer = deepestVer;
+				shallowestVertex = deepestVertex;
+				sideSide = thisSideSide;
 			}
 		}
 		
@@ -394,9 +420,10 @@ public class PhyObject {
 		c.depth = -shallowestDistance * 1f;
 		c.normal = new Vector2f(normalB[shallowestSide]);
 		c.normal.scale(-1);
-		c.positionA = new Vector2f(verA[shallowestVer]);
-		c.positionB = new Vector2f(verA[shallowestVer]);
+		c.positionA = new Vector2f(shallowestVertex);
+		c.positionB = new Vector2f(shallowestVertex);
 		c.positionB.sumScale(c.normal, -c.depth);
+		c.sideSideCollision = sideSide;
 		return c;
 	}
 	
