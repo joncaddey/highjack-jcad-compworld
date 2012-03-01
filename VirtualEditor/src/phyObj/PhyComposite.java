@@ -123,16 +123,31 @@ public class PhyComposite extends PhyObject{
 	
 	
 	
-	public void setSize(float the_size) {
+	public final void setSize(float the_size) {
 		super.setSize(the_size);
-		inverseMomentOfInertia = the_size / (float)(Math.PI * Math.pow(the_size, 4) / 4) * inverseMass; // FUCKFUCKFUCK
+		float totalMomentOfInertia = 0;
+		float totalMass = 0;
 		for (int i = 0; i < objects.size(); i++) {
-			objects.get(i).size = sizes.get(i) * the_size;
+			final PhyObject o = objects.get(i);
+			// scale appropriately based on original scale and positions
+			o.setSize(sizes.get(i) * the_size);
 			Vector2f tmp = new Vector2f(positions.get(i));
 			tmp.scale(the_size);
-			objects.get(i).centerOfMass = tmp;
+			o.centerOfMass = tmp;
+			
+			// get mass
+			totalMass += 1 / o.inverseMass;
+			
+			//I_z = I_cm + mr^2
+			tmp = new Vector2f(tmp);
+			tmp.sum(new Vector2f(0, size * 1f)); // TODO this is specific to rocket.
+			totalMomentOfInertia += 1 / (o.inverseMomentOfInertia / o.inverseMass)  + o.area * Math.pow(tmp.length(), 2);
+			
+			
 		}
-		
+		this.inverseMass = 1 / totalMass;
+		this.inverseMomentOfInertia = 1 / totalMomentOfInertia;
+		this.inverseMomentOfInertia *= this.inverseMass;
 	}
 	
 	public void synchChildren() {

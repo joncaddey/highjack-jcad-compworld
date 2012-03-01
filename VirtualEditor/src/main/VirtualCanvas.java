@@ -3,6 +3,7 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -68,8 +69,8 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				
 			}
 		});
-		my_canvas.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
+			 public void mouseDragged(MouseEvent e) {
 				System.out.println(e.getX());
 			}
 		});
@@ -187,17 +188,20 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			List<SceneGraphNode> picked = sceneGraphRoot.getPicked(drawable);
 			
-			if (!picked.isEmpty()) {
+			if (picked.isEmpty()) {
+				my_selected = null;
+			} else {
 				SceneGraphNode sgn = picked.get(0);
 				for (PhyObject o : objects) {
 					if (o.getRenderable() != null && o.getRenderable().equals(sgn)) {
 						my_selected = o;
-						setChanged();
-						notifyObservers(my_selected);
 						break;
 					}
 				}
 			}
+			setChanged();
+			notifyObservers(my_selected);
+			
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
 			gl.glMatrixMode(GL2.GL_MODELVIEW);

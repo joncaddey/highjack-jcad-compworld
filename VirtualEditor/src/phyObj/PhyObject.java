@@ -14,6 +14,7 @@ public class PhyObject {
 	float size;
 	
 	float density;
+	float area;
 	float inverseMass;
 	float inverseMomentOfInertia;
 	float orientation;
@@ -79,7 +80,7 @@ public class PhyObject {
 	}
 	
 	/**
-	 * Subclasses modify mass and moment of ineria.
+	 * Subclasses modify mass, moment of ineria, and area.
 	 * @param size
 	 * @throws IllegalArgumentException
 	 */
