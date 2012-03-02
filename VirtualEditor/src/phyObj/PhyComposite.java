@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+
 import main.Rocket;
 import main.SceneGraphNode;
 import main.Triangle;
@@ -52,7 +56,7 @@ public class PhyComposite extends PhyObject{
 		p.addObject(body);
 		
 		PhyPolygon head = PhyPolygon.getEqTriangle(1);
-		head.density = 2;
+		head.density = 3;
 		head.red = 238 / 255f + (float)(Math.random() * variability);
 		head.green = 28 / 255f + (float)(Math.random() * variability);
 		head.blue = 36 / 255f + (float)(Math.random() * variability);
@@ -87,26 +91,26 @@ public class PhyComposite extends PhyObject{
 	}
 	
 	public static PhyObject getStation(float size) {
+		
 		PhyComposite p = new PhyComposite();
-		PhyCircle bouey = new PhyCircle(1);
-		p.addObject(bouey);
 		
-		bouey = new PhyCircle(1);
-		bouey.position.x = 4;
-		p.addObject(bouey);
+		final int boueys = 3;
 		
-		bouey = new PhyCircle(1);
-		bouey.position.x = 2f;
-		bouey.position.y = 4 * Triangle.SIN_60;
-		p.addObject(bouey);
+		for (int i = 0; i < boueys; i++) {
+			PhyCircle bouey = new PhyCircle(1);
+			bouey.centerOfMass.y = 2;
+			bouey.orientation = (float)(i * 2 * Math.PI / boueys + Math.PI);
+			p.addObject(bouey);
+		}
 		
-		PhyCircle center = new PhyCircle(2);
-		center.position.x = 2;
-		center.position.y = 4 * Triangle.SIN_60 * 1 / 3;
+		
+		PhyCircle center = new PhyCircle(.1f);
 		p.addObject(center);
 		
 		p.moveToCenterOfMass();
 		p.setSize(size);
+		
+		
 		return p;
 		
 	}
