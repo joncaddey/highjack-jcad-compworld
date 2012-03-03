@@ -6,5 +6,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogol32"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jog"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogl"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/jogle-2.0-II"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
