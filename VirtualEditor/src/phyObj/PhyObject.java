@@ -183,8 +183,20 @@ public class PhyObject {
 		CollisionInfo winner = null;
 		for (PhyObject o : b.objects){
 			CollisionInfo c = a.getCollision(o);
-			if (c != null && (winner == null || c.depth > winner.depth)){
-				winner = c;
+//			if (c != null && (winner == null || c.depth > winner.depth)){
+//				winner = c;
+//			}
+			if (c != null) {
+				if (winner == null) {
+					winner = c;
+				} else if (c.depth > winner.depth) {
+					winner = c;
+				} else if (c.depth == winner.depth) {
+					CollisionInfo d = getSideSideCollision(winner.positionB, c.positionB, b.position);
+					c.positionB = d.positionA;
+					c.sideSideCollision = d.sideSideCollision;
+					winner = c;
+				}
 			}
 		}
 		return winner;
@@ -197,6 +209,7 @@ public class PhyObject {
 	
 	private static CollisionInfo getCollision(PhyComposite a, PhyComposite b) {
 		CollisionInfo winner = null;
+		boolean sideSide = false;
 		for (PhyObject o : a.objects) {
 			CollisionInfo c = getCollision(o, b);
 			if (c != null && (winner == null || c.depth > winner.depth)){
@@ -245,14 +258,7 @@ public class PhyObject {
 				deepestDistance = distance;
 				deepestVertex = vertices[i];
 			} else if (distance == deepestDistance && deepestDistance < 0) {
-				final Vector2f deepestToNext = new Vector2f(vertices[i]);
-				deepestToNext.sumScale(deepestVertex, -1);
-				final Vector2f deepestToNextNorm = new Vector2f(deepestToNext);
-				deepestToNextNorm.normalize();
-				// -deepestVertex is the vector to CoM, since CoM is always 0,0.
-				deepestToNextNorm.scale(-deepestVertex.dot(deepestToNextNorm));
-				deepestToNextNorm.sum(deepestVertex);
-				deepestVertex = deepestToNextNorm;
+				deepestVertex = getSideSideCollision(deepestVertex, vertices[i], b.position).positionA;
 			}
 		}
 		
@@ -318,7 +324,7 @@ public class PhyObject {
 		float left = side.dot(vertices[maxIndex]);
 		float right = side.dot(vertices[nextIndex]);
 		float center = side.dot(positionA);
-		if ((left <= center && center <= right) || (right <= center && center <= left)) {
+		if (isBetween(left, center, right)) {
 			// circle to side collision
 			CollisionInfo cInfo = new CollisionInfo();
 			cInfo.depth = -distances[maxIndex];
@@ -349,9 +355,9 @@ public class PhyObject {
 		Vector2f[] verticesA = a.getVertices();
 		Vector2f[] verticesB = b.getVertices();
 		
-		CollisionInfo c = getCollision(verticesA, verticesB, b.getNormals());
+		CollisionInfo c = getCollision(verticesA, verticesB, b.getNormals(), b.position);
 		if (c != null) {
-			CollisionInfo d = getCollision(verticesB, verticesA, a.getNormals());
+			CollisionInfo d = getCollision(verticesB, verticesA, a.getNormals(), b.position);
 			if (d == null) {
 				return null;
 			}
@@ -373,7 +379,7 @@ public class PhyObject {
 	 * @param normalB normals of the edges of a convex polygon.
 	 * @return a collision, or null if there is no collision.
 	 */
-	private static CollisionInfo getCollision(Vector2f[] verA, Vector2f[] verB, Vector2f[] normalB) {
+	private static CollisionInfo getCollision(Vector2f[] verA, Vector2f[] verB, Vector2f[] normalB, Vector2f positionB) {
 		boolean sideSide = false;
 		float shallowestDistance = Float.NEGATIVE_INFINITY;
 		int shallowestSide = -1;
@@ -390,20 +396,13 @@ public class PhyObject {
 					deepestDistance = distance;
 					deepestVertex = verA[ver];
 					thisSideSide = false;
-				} else if (distance == deepestDistance && distance < 0
-						&& verA[ver].isBetween(verB[side], verB[(side + 1)
-								% verB.length])
-						&& deepestVertex.isBetween(verB[side], verB[(side + 1)
-								% verB.length])) {				
-					final Vector2f deepestToNext = new Vector2f(verA[ver]);
-					deepestToNext.sumScale(deepestVertex, -1);
-					final Vector2f deepestToNextNorm = new Vector2f(deepestToNext);
-					deepestToNextNorm.normalize();
-					// -deepestVertex is the vector to CoM, since CoM is always 0,0.
-					deepestToNextNorm.scale(-deepestVertex.dot(deepestToNextNorm));
-					deepestToNextNorm.sum(deepestVertex);
-					deepestVertex = deepestToNextNorm;
-					thisSideSide = true;
+				} else if (distance == deepestDistance && distance < 0) {
+					Vector2f sideNorm = new Vector2f(-normalB[side].y, normalB[side].x);
+					float left = verB[side].dot(sideNorm);
+					float right = verB[(side + 1) % verB.length].dot(sideNorm);
+					if (isBetween(left, deepestVertex.dot(sideNorm), right) && isBetween(left, verA[ver].dot(sideNorm), right)) {
+						deepestVertex = getSideSideCollision(deepestVertex, verA[ver], positionB).positionA;
+					}
 				}
 			}
 			if (deepestDistance >= 0) {
@@ -426,6 +425,39 @@ public class PhyObject {
 		c.positionB.sumScale(c.normal, -c.depth);
 		c.sideSideCollision = sideSide;
 		return c;
+	}
+	
+	/**
+	 * Assuming deepestVertex and equalDepthVertex form the edge of an object, and that the two vertices are of 
+	 * equal penetration depth in the side of another object, returns a CollisionInfo whose positionA is the point
+	 * where the two edges would first meet.  This does not check whether the two vertices are actually in between
+	 * whatever the vertices of the other edge are, nor does it check that the returned vertex is in between the given
+	 * vertices
+	 * 
+	 * @param deepestVertex the first vertex of the edge of the penetrating object.
+	 * @param equalDepthVertex the second vertex of the edge of the penetrating object.
+	 * @param position the center of the penetrating object
+	 * @return a CollisionInfo whose positionA is the point where the two edges would first meet, and whose
+	 * sideSideCollision indicates whether the edges truly collided and one of the vertices just collided with
+	 * the other edge.
+	 */
+	// TODO make it check the second case.
+	private static CollisionInfo getSideSideCollision(Vector2f deepestVertex, Vector2f equalDepthVertex, Vector2f position) {
+		final Vector2f deepestToNextNorm = new Vector2f(equalDepthVertex);
+		deepestToNextNorm.sumScale(deepestVertex, -1);
+		deepestToNextNorm.normalize();
+		final Vector2f deepestToCOM = new Vector2f(position);
+		deepestToCOM.sumScale(deepestVertex, -1);
+		deepestToNextNorm.scale(deepestToCOM.dot(deepestToNextNorm));
+		deepestToNextNorm.sum(deepestVertex);
+		CollisionInfo c = new CollisionInfo();
+		c.positionA = new Vector2f(deepestToNextNorm);
+		c.sideSideCollision = true;
+		return c;
+	}
+	
+	private static boolean isBetween(float left, float x, float right) {
+		return (left <= x && x <= right) || (right <= x && x <= left);
 	}
 	
 	public void resolveCollision(PhyObject other, CollisionInfo cInfo) {

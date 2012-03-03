@@ -71,16 +71,8 @@ public class Vector2f {
 		y = (float)(Math.sin(radians) * oldX + Math.cos(radians) * y);
 	}
 	
-	public boolean isBetween(Vector2f a, Vector2f b) {
-		if (a.x != b.x){
-			boolean value = (a.x >= x && x >= b.x) || (b.x >= x && x >= a.x);
-			return value;
-		} else if (a.y != b.y) {
-			return (a.y >= y && y >= b.y) || (b.y >= y && y >= a.y);
-		} else {
-			return y == a.y && x == a.x;
-		}
-	}
+	
+	
 	
 	public String toString() {
 		return "(" + x + "," + y + ")";
