@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.GridLayout;
+import java.awt.JobAttributes;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -41,12 +42,14 @@ public class PhysicsPanel extends JPanel implements ActionListener, FocusListene
 
 		p.add(new JLabel("Gravity:"));
 		gravityField = new JTextField(3);
+		gravityField.setToolTipText("Input must be a integer (negative or postive); press enter to activate");
 		gravityField.setText(String.valueOf((int) my_canvas.getGravity()));
 		gravityField.addActionListener(this);
 		p.add(gravityField);
 
 		p.add(new JLabel("Time:"));
 		speedField = new JTextField(3);
+		speedField.setToolTipText("Input must be a postive integer; press enter to activate");
 		speedField.setText(String.valueOf(my_canvas.getSpeedScale()));
 		speedField.addActionListener(this);
 		p.add(speedField);
@@ -115,6 +118,7 @@ public class PhysicsPanel extends JPanel implements ActionListener, FocusListene
 					my_power = Integer.parseInt(powerField.getText());
 					my_canvas.launch((float)my_power);
 				} catch(NumberFormatException ee) {
+					JOptionPane.showMessageDialog(null,  "The power must be a integer", "Number Format",JOptionPane.INFORMATION_MESSAGE  );
 				}
 				powerField.setText(String.valueOf(my_power));
 				
@@ -132,6 +136,13 @@ public class PhysicsPanel extends JPanel implements ActionListener, FocusListene
 			} else if (source == collisionBox) {
 				my_canvas.setCollisions(collisionBox.isSelected());
 			} else if (source == launchButton) {
+				try {
+					my_power = Integer.parseInt(powerField.getText());
+					my_canvas.launch((float)my_power);
+				} catch(NumberFormatException ee) {
+					JOptionPane.showMessageDialog(null,  "The power must be a integer", "Number Format",JOptionPane.INFORMATION_MESSAGE  );
+				}
+				powerField.setText(String.valueOf(my_power));
 				my_canvas.launch((float)my_power);
 			}
 		}
