@@ -19,7 +19,7 @@ public class Demo9 implements GLEventListener {
 	
 	private static final float GRAVITY = 10;
 	private static final float SLOW_FACTOR = 1;
-	private static final int MAX_RESOLUTION_REPEATS = 50;
+	private static final int MAX_RESOLUTION_REPEATS =80;
 	
 	private static int resolution_repeats = MAX_RESOLUTION_REPEATS;
 	private static JFrame appFrame;

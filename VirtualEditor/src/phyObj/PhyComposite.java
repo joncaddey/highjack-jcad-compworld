@@ -66,6 +66,12 @@ public class PhyComposite extends PhyObject{
 		SceneGraphNode flame = new Triangle(false);
 		flame.rotation = 180;
 		flame.scale = .25f;
+		flame.translateY = -.8f;
+		p.renderable.addChild(flame);
+		
+		flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
 		flame.translateY = -.7f;
 		flame.translateX = -.1f;
 		p.renderable.addChild(flame);
@@ -75,12 +81,6 @@ public class PhyComposite extends PhyObject{
 		flame.scale = .25f;
 		flame.translateY = -.7f;
 		flame.translateX = .1f;
-		p.renderable.addChild(flame);
-		
-		flame = new Triangle(false);
-		flame.rotation = 180;
-		flame.scale = .25f;
-		flame.translateY = -.8f;
 		p.renderable.addChild(flame);
 		
 		//p.renderable = new Rocket(true);
@@ -203,7 +203,7 @@ public class PhyComposite extends PhyObject{
 		}
 		this.inverseMass = 1 / totalMass;
 		this.inverseMomentOfInertia = 1 / totalMomentOfInertia;
-		this.inverseMomentOfInertia *= this.inverseMass / INERTIAL_DAMPENER;
+		this.inverseMomentOfInertia *= this.inverseMass;
 	}
 	
 	public void synchChildren() {
