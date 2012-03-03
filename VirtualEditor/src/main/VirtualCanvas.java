@@ -35,7 +35,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private static final int TARGET_FPS = 30;
-	private static final int MAX_RESOLUTION_REPEATS = 10;
+	private static final int RESOLUTION_REPEATS = 10;
 	private static final int NOTIFY_DELTA =  1;
 	
 	private int notify_delta = NOTIFY_DELTA;
@@ -43,7 +43,6 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	private float my_gravity = 10;
 	private boolean my_collionToggle = true;
 	
-	private int resolution_repeats = MAX_RESOLUTION_REPEATS;
 	
 	private SceneGraphNode sceneGraphRoot;
 	private ArrayList<PhyObject> objects;
@@ -221,9 +220,9 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		
 		int repeat = 0;
 		if (!my_collionToggle) {
-			repeat = resolution_repeats;
+			repeat = RESOLUTION_REPEATS;
 		}
-		for (; repeat < resolution_repeats && !noCollisions; repeat++) {
+		for (; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
 			noCollisions = true;
 			for (int i = 0; i < objects.size(); i++) {
 				PhyObject a = objects.get(i);
@@ -238,13 +237,6 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			}
 
 			
-		}
-		// TODO all this might be bunk.  just use res_rep for pausing.
-		if (repeat < resolution_repeats) {
-			resolution_repeats = repeat + 1;
-		}
-		if (repeat == resolution_repeats && resolution_repeats < MAX_RESOLUTION_REPEATS){
-			resolution_repeats++;
 		}
 		
 		for (PhyObject object : objects){

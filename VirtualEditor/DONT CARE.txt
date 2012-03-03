@@ -1,25 +1,16 @@
 Good ideas:
 
-possibly fix phypolygon halfspace to work on rhombuses.  oh gosh why.
 
-fix rocket halfspace.  should be like rectangle, but doesn't behave that way.
 
 do we need right-triangles?
 
 
-fix composite halfspace, like station.
 
-why not one resizer for phypolygon, which calculates center of mass, area, etc?  slower.
 
 
 Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.
 
-
-LIBRARIES!
-
-
-gluegen.jar
-gluegen-rt.jar
-gluegen-rt-natives-windows-i586.jar
-jogl.all.jar
-jog-all-natives-windows-i585.jar
+DON'T CARE
+possibly fix phypolygon halfspace to work on rhombuses.  oh gosh why.
+fix composite halfspace, like station.
+why not one resizer for phypolygon, which calculates center of mass, area, etc? 

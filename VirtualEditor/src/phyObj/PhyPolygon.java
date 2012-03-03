@@ -5,8 +5,6 @@ import main.SceneGraphNode;
 
 public class PhyPolygon extends PhyObject {
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
-	//private static final float[] VERTICES_RIGHT_TRIANGLE = {-1f/3, -1f/3, 2f/3, -1f/3, -1f/3, 2f/3};
-	//private static final float[] VERTICES_RIGHT_TRIANGLE = {-1f/3, 4f/3, 2f/3, 4f/3, -1f/3, 7f/3};
 	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1f};
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};
 	private static final float[] VERTICES_SQUARE = {-.5f, -.5f, .5f, -.5f, .5f, .5f, -.5f, .5f};
@@ -16,7 +14,7 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area = obj.size * obj.size;
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 6) * obj.inverseMass / INERTIAL_DAMPENER;
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 6) * obj.inverseMass;
 		}
 	};
 	private static final Resizer RIGHT_TRIANGLE_RESIZER = new Resizer() {
@@ -30,7 +28,7 @@ public class PhyPolygon extends PhyObject {
 				obj.renderable.CoMY = obj.centerOfMass.y;
 			}
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass / INERTIAL_DAMPENER;
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass;
 		}
 	};
 	private static final Resizer EQ_TRIANGLE_RESIZER = new Resizer() {
@@ -38,7 +36,7 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area =  .5f * obj.size * obj.size * SIN_60;
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
-			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) * SIN_60 * (.75 + SIN_60 * SIN_60) / 36) * obj.inverseMass / INERTIAL_DAMPENER;
+			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) * SIN_60 * (.75 + SIN_60 * SIN_60) / 36) * obj.inverseMass;
 		}
 	};
 	

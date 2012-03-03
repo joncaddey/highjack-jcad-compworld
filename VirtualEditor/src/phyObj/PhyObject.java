@@ -8,8 +8,6 @@ import main.SceneGraphNode;
 
 public class PhyObject {
 	
-	// even changing density didn't seem to affect spinning.  this lowers the spinning.
-	static float INERTIAL_DAMPENER = 1;
 	Vector2f position;
 	Vector2f velocity;
 	Vector2f acceleration;
@@ -396,14 +394,7 @@ public class PhyObject {
 						&& verA[ver].isBetween(verB[side], verB[(side + 1)
 								% verB.length])
 						&& deepestVertex.isBetween(verB[side], verB[(side + 1)
-								% verB.length])) {
-//					Vector2f mid = new Vector2f(deepestVertex);
-//					mid.sumScale(verA[ver], -1);
-//					mid.scale(.5f);
-//					mid.sum(verA[ver]);
-//					deepestVertex = mid;
-//					thisSideSide = true;
-					
+								% verB.length])) {				
 					final Vector2f deepestToNext = new Vector2f(verA[ver]);
 					deepestToNext.sumScale(deepestVertex, -1);
 					final Vector2f deepestToNextNorm = new Vector2f(deepestToNext);
