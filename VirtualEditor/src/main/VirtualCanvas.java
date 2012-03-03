@@ -35,7 +35,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private static final int TARGET_FPS = 30;
-	private static final int MAX_RESOLUTION_REPEATS = 50;
+	private static final int MAX_RESOLUTION_REPEATS = 10;
 	private static final int NOTIFY_DELTA =  1;
 	
 	private int notify_delta = NOTIFY_DELTA;

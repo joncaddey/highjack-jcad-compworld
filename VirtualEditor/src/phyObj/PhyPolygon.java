@@ -21,6 +21,11 @@ public class PhyPolygon extends PhyObject {
 		@Override
 		public void resize(PhyObject obj, float size) {
 			obj.area = .5f * obj.size * obj.size;
+			obj.centerOfMass.x = obj.centerOfMass.y = obj.size / 3;
+			if (obj.renderable != null) {
+				obj.renderable.CoMX = obj.centerOfMass.x;
+				obj.renderable.CoMY = obj.centerOfMass.y;
+			}
 			obj.inverseMass = 1 / (float) (obj.density * obj.area);
 			obj.inverseMomentOfInertia = 1 / (float)(Math.pow(size, 4) / 18) * obj.inverseMass / INERTIAL_DAMPENER;
 		}
