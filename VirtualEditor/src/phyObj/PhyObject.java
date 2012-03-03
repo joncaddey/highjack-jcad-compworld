@@ -249,17 +249,12 @@ public class PhyObject {
 			} else if (distance == deepestDistance && deepestDistance < 0) {
 				final Vector2f deepestToNext = new Vector2f(vertices[i]);
 				deepestToNext.sumScale(deepestVertex, -1);
-				
 				final Vector2f deepestToNextNorm = new Vector2f(deepestToNext);
 				deepestToNextNorm.normalize();
-				
-				final Vector2f deepestToCOM = new Vector2f(b.centerOfMass);
-				deepestToCOM.sumScale(deepestVertex, -1);
-				
-				deepestToNextNorm.scale(deepestToCOM.dot(deepestToNextNorm));
+				// -deepestVertex is the vector to CoM, since CoM is always 0,0.
+				deepestToNextNorm.scale(-deepestVertex.dot(deepestToNextNorm));
 				deepestToNextNorm.sum(deepestVertex);
 				deepestVertex = deepestToNextNorm;
-				
 			}
 		}
 		
@@ -408,6 +403,16 @@ public class PhyObject {
 //					mid.sum(verA[ver]);
 //					deepestVertex = mid;
 //					thisSideSide = true;
+					
+					final Vector2f deepestToNext = new Vector2f(verA[ver]);
+					deepestToNext.sumScale(deepestVertex, -1);
+					final Vector2f deepestToNextNorm = new Vector2f(deepestToNext);
+					deepestToNextNorm.normalize();
+					// -deepestVertex is the vector to CoM, since CoM is always 0,0.
+					deepestToNextNorm.scale(-deepestVertex.dot(deepestToNextNorm));
+					deepestToNextNorm.sum(deepestVertex);
+					deepestVertex = deepestToNextNorm;
+					thisSideSide = true;
 				}
 			}
 			if (deepestDistance >= 0) {
@@ -433,37 +438,38 @@ public class PhyObject {
 	}
 	
 	public void resolveCollision(PhyObject other, CollisionInfo cInfo) {
+		
+		
 		// Calculate the velocity of the collision point on the calling object.
 		Vector2f relativeCollisionPositionA = new Vector2f(cInfo.positionA);
 		relativeCollisionPositionA.sumScale(position, -1);
-		Vector2f tmp = new Vector2f(centerOfMass);
-		tmp.rotate(orientation);
-		relativeCollisionPositionA.sumScale(tmp, -1);
 		Vector2f linearVelocityA = new Vector2f(-relativeCollisionPositionA.y, relativeCollisionPositionA.x);
 		linearVelocityA.scale(angularVelocity);
 		linearVelocityA.sum(velocity);
-		// Calculate the velocity of the collision point on the other object.
+		
+		// Calculate the velocity of the collision point on the other object.	
 		Vector2f relativeCollisionPositionB = new Vector2f(cInfo.positionB);
 		relativeCollisionPositionB.sumScale(other.position, -1);
-		tmp = new Vector2f(other.centerOfMass);
-		tmp.rotate(other.orientation);
-		relativeCollisionPositionB.sumScale(tmp, -1);
 		Vector2f linearVelocityB = new Vector2f(-relativeCollisionPositionB.y, relativeCollisionPositionB.x);
 		linearVelocityB.scale(other.angularVelocity);
 		linearVelocityB.sum(other.velocity);
+		
 		// Calculate the relative velocity between the calling object and
 		// other object, as if the calling object were stationary and only
 		// the other object were moving.
 		Vector2f relativeVelocity = new Vector2f(linearVelocityB);
 		relativeVelocity.sumScale(linearVelocityA, -1);
+		
 		// Calculate the component of the relative velocity that lays along
 		// the collision normal.
 		float compRelVelAlongNormal = relativeVelocity.dot(cInfo.normal);
+		
 		// Calculate the resulting impulse per unit mass.
 		float impulse = (float)(1.7 * compRelVelAlongNormal / (
 				inverseMass + other.inverseMass + 
 				Math.pow(relativeCollisionPositionA.cross(cInfo.normal), 2) * inverseMomentOfInertia +
 				Math.pow(relativeCollisionPositionB.cross(cInfo.normal), 2) * other.inverseMomentOfInertia));
+		
 		// Adjust the linear and angular velocities of each object in proportion
 		// to their effective masses.
 		velocity.sumScale(cInfo.normal, impulse * inverseMass);
@@ -476,6 +482,7 @@ public class PhyObject {
 				inverseMass + other.inverseMass + 
 				Math.pow(relativeCollisionPositionA.cross(cInfo.normal), 2) * inverseMomentOfInertia +
 				Math.pow(relativeCollisionPositionB.cross(cInfo.normal), 2) * other.inverseMomentOfInertia));
+		
 		// Adjust the position and orientation  of each object in proportion
 		// to their effective masses to remove overlap.
 		position.sumScale(cInfo.normal, -depth * inverseMass);

@@ -5,7 +5,9 @@ import main.SceneGraphNode;
 
 public class PhyPolygon extends PhyObject {
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
-	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1f};//{0, 0, 1, 0, 0, 1};
+	//private static final float[] VERTICES_RIGHT_TRIANGLE = {-1f/3, -1f/3, 2f/3, -1f/3, -1f/3, 2f/3};
+	//private static final float[] VERTICES_RIGHT_TRIANGLE = {-1f/3, 4f/3, 2f/3, 4f/3, -1f/3, 7f/3};
+	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1f};
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};
 	private static final float[] VERTICES_SQUARE = {-.5f, -.5f, .5f, -.5f, .5f, .5f, -.5f, .5f};
 	
@@ -22,6 +24,7 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area = .5f * obj.size * obj.size;
 			obj.centerOfMass.x = obj.centerOfMass.y = obj.size / 3;
+			//obj.centerOfMass.y = obj.size * 5/3f;
 			if (obj.renderable != null) {
 				obj.renderable.CoMX = obj.centerOfMass.x;
 				obj.renderable.CoMY = obj.centerOfMass.y;
@@ -71,28 +74,21 @@ public class PhyPolygon extends PhyObject {
 	public static PhyPolygon getRightTriangle(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_RIGHT_TRIANGLE, the_size, RIGHT_TRIANGLE_RESIZER);
 		r.renderable = r.new Renderable();
-		r.renderable.scale = the_size;
-		r.centerOfMass.x = r.centerOfMass.y = the_size / 3;
-		r.renderable.CoMX = r.centerOfMass.x;
-		r.renderable.CoMY = r.centerOfMass.y;
+		r.setSize(the_size);
 		return r;
 	}
 	
 	public static PhyPolygon getEqTriangle(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_EQ_TRIANGLE, the_size, EQ_TRIANGLE_RESIZER);
 		r.renderable = r.new Renderable();
-		r.renderable.scale = the_size;
-		r.renderable.CoMX = r.centerOfMass.x;
-		r.renderable.CoMY = r.centerOfMass.y;
+		r.setSize(the_size);
 		return r;
 	}
 	
 	public static PhyPolygon getSquare(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_SQUARE, the_size, SQUARE_RESIZER);
 		r.renderable = r.new Renderable();
-		r.renderable.scale = the_size;
-		r.renderable.CoMX = r.centerOfMass.x;
-		r.renderable.CoMY = r.centerOfMass.y;
+		r.setSize(the_size);
 		return r;
 	}
 	
