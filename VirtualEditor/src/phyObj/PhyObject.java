@@ -9,7 +9,7 @@ import main.SceneGraphNode;
 public class PhyObject {
 	
 	// even changing density didn't seem to affect spinning.  this lowers the spinning.
-	static float INERTIAL_DAMPENER = 5;
+	static float INERTIAL_DAMPENER = 1;
 	Vector2f position;
 	Vector2f velocity;
 	Vector2f acceleration;
@@ -86,7 +86,7 @@ public class PhyObject {
 	}
 	
 	/**
-	 * Subclasses modify mass, moment of ineria, and area.
+	 * Subclasses modify mass, moment of ineria, center of mass, and area as appropriate.
 	 * @param size
 	 * @throws IllegalArgumentException
 	 */
@@ -246,12 +246,20 @@ public class PhyObject {
 			if (distance < deepestDistance) {
 				deepestDistance = distance;
 				deepestVertex = vertices[i];
-			} else if (distance == deepestDistance) {
-				Vector2f mid = new Vector2f(deepestVertex);
-				mid.sumScale(vertices[i], -1);
-				mid.scale(.5f);
-				mid.sum(vertices[i]);
-				deepestVertex = mid;
+			} else if (distance == deepestDistance && deepestDistance < 0) {
+				final Vector2f deepestToNext = new Vector2f(vertices[i]);
+				deepestToNext.sumScale(deepestVertex, -1);
+				
+				final Vector2f deepestToNextNorm = new Vector2f(deepestToNext);
+				deepestToNextNorm.normalize();
+				
+				final Vector2f deepestToCOM = new Vector2f(b.centerOfMass);
+				deepestToCOM.sumScale(deepestVertex, -1);
+				
+				deepestToNextNorm.scale(deepestToCOM.dot(deepestToNextNorm));
+				deepestToNextNorm.sum(deepestVertex);
+				deepestVertex = deepestToNextNorm;
+				
 			}
 		}
 		
@@ -394,12 +402,12 @@ public class PhyObject {
 								% verB.length])
 						&& deepestVertex.isBetween(verB[side], verB[(side + 1)
 								% verB.length])) {
-					Vector2f mid = new Vector2f(deepestVertex);
-					mid.sumScale(verA[ver], -1);
-					mid.scale(.5f);
-					mid.sum(verA[ver]);
-					deepestVertex = mid;
-					thisSideSide = true;
+//					Vector2f mid = new Vector2f(deepestVertex);
+//					mid.sumScale(verA[ver], -1);
+//					mid.scale(.5f);
+//					mid.sum(verA[ver]);
+//					deepestVertex = mid;
+//					thisSideSide = true;
 				}
 			}
 			if (deepestDistance >= 0) {
@@ -428,14 +436,18 @@ public class PhyObject {
 		// Calculate the velocity of the collision point on the calling object.
 		Vector2f relativeCollisionPositionA = new Vector2f(cInfo.positionA);
 		relativeCollisionPositionA.sumScale(position, -1);
-		//relativeCollisionPositionA.sumScale(centerOfMass, -1);
+		Vector2f tmp = new Vector2f(centerOfMass);
+		tmp.rotate(orientation);
+		relativeCollisionPositionA.sumScale(tmp, -1);
 		Vector2f linearVelocityA = new Vector2f(-relativeCollisionPositionA.y, relativeCollisionPositionA.x);
 		linearVelocityA.scale(angularVelocity);
 		linearVelocityA.sum(velocity);
 		// Calculate the velocity of the collision point on the other object.
 		Vector2f relativeCollisionPositionB = new Vector2f(cInfo.positionB);
 		relativeCollisionPositionB.sumScale(other.position, -1);
-		//relativeCollisionPositionB.sumScale(other.centerOfMass, -1);
+		tmp = new Vector2f(other.centerOfMass);
+		tmp.rotate(other.orientation);
+		relativeCollisionPositionB.sumScale(tmp, -1);
 		Vector2f linearVelocityB = new Vector2f(-relativeCollisionPositionB.y, relativeCollisionPositionB.x);
 		linearVelocityB.scale(other.angularVelocity);
 		linearVelocityB.sum(other.velocity);

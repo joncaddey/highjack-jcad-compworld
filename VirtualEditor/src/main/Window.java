@@ -105,7 +105,7 @@ public class Window extends JFrame {
 					 size = my_canvas.getSelected().getSize();
 				}
 				if(source == triangle_item){
-					my_canvas.attachObject(PhyPolygon.getEqTriangle(size));
+					my_canvas.attachObject(PhyPolygon.getRightTriangle(size));
 				} else if (source == circle_item) {
 					my_canvas.attachObject(new PhyCircle(size));
 				} else if (source == rectangle_item) {

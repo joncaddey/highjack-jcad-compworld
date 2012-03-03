@@ -1,12 +1,15 @@
 Good ideas:
 
- setSize should also recalculate mass.
-SetSize should recalculate mass using a density (default 1).
+possibly fix phypolygon halfspace to work on rhombuses.  oh gosh why.
 
-Set Density should be implemented.
+fix rocket halfspace.  should be like rectangle, but doesn't behave that way.
 
-inversemass = 1 / (area * density).  density of 0 is special case where object is immobile.
+do we need right-triangles?
 
+
+fix composite halfspace, like station.
+
+why not one resizer for phypolygon, which calculates center of mass, area, etc?  slower.
 
 
 Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.
