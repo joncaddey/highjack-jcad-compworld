@@ -441,18 +441,22 @@ public class PhyObject {
 	 * sideSideCollision indicates whether the edges truly collided and one of the vertices just collided with
 	 * the other edge.
 	 */
-	// TODO make it check the second case.
+	// TODO make it check the second case
 	private static CollisionInfo getSideSideCollision(Vector2f deepestVertex, Vector2f equalDepthVertex, Vector2f position) {
+		CollisionInfo c = new CollisionInfo();
 		final Vector2f deepestToNextNorm = new Vector2f(equalDepthVertex);
 		deepestToNextNorm.sumScale(deepestVertex, -1);
-		deepestToNextNorm.normalize();
-		final Vector2f deepestToCOM = new Vector2f(position);
-		deepestToCOM.sumScale(deepestVertex, -1);
-		deepestToNextNorm.scale(deepestToCOM.dot(deepestToNextNorm));
-		deepestToNextNorm.sum(deepestVertex);
-		CollisionInfo c = new CollisionInfo();
-		c.positionA = new Vector2f(deepestToNextNorm);
-		c.sideSideCollision = true;
+		if (deepestToNextNorm.length() == 0) {
+			c.positionA = new Vector2f(deepestVertex);
+		} else {
+			deepestToNextNorm.normalize();
+			final Vector2f deepestToCOM = new Vector2f(position);
+			deepestToCOM.sumScale(deepestVertex, -1);
+			deepestToNextNorm.scale(deepestToCOM.dot(deepestToNextNorm));
+			deepestToNextNorm.sum(deepestVertex);
+			c.positionA = new Vector2f(deepestToNextNorm);
+			c.sideSideCollision = true;
+		}
 		return c;
 	}
 	

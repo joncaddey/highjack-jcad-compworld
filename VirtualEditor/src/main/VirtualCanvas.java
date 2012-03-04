@@ -34,20 +34,23 @@ import com.jogamp.opengl.util.FPSAnimator;
  *
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
-	private static final int TARGET_FPS = 30;
-	private static final int RESOLUTION_REPEATS = 10;
+	private static final int TARGET_FPS = 45;
+	private static final int RESOLUTION_REPEATS = 30;
 	private static final int NOTIFY_DELTA =  1;
 	
+	// relating to physics
 	private int notify_delta = NOTIFY_DELTA;
 	private float my_speed_scale = 1;
 	private float my_gravity = 10;
 	private boolean my_collionToggle = true;
 	
-	
+	// relating to clicking
 	private SceneGraphNode sceneGraphRoot;
 	private ArrayList<PhyObject> objects;
 	private boolean pickNextFrame;
 	private Point pickedPoint;
+	
+	
 
 	private float left, right, top, bottom;
 	private HalfSpace leftWall, rightWall, topWall, bottomWall;
@@ -70,11 +73,21 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				
 			}
 		});
-//		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
-//			 public void mouseDragged(MouseEvent e) {
-//				System.out.println(e.getX());
-//			}
-//		});
+		my_canvas.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent the_e) {
+				
+			}
+			@Override
+			public void mouseReleased(MouseEvent the_e) {
+				System.out.println(pixelToWorld(new Point(the_e.getX(), the_e.getY())));
+			}
+		});
+		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
+			 public void mouseDragged(MouseEvent e) {
+				System.out.println(pixelToWorld(new Point(e.getX(), e.getY())));
+			}
+		});
 		sceneGraphRoot = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
 		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));
@@ -102,6 +115,14 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		//*/
 		
 		my_selected = null;
+	}
+	
+	private Vector2f pixelToWorld(Point pixel) {
+		// pixel * world / pixel = world
+		Vector2f r = new Vector2f(pixel.x, pixel.y);
+		r.x = r.x * (right - left) / this.my_canvas.getWidth() - right;
+		r.y = r.y * (bottom - top) / this.my_canvas.getHeight() + top;
+		return r;
 	}
 	
 	public void attachObject(final PhyObject object) {
