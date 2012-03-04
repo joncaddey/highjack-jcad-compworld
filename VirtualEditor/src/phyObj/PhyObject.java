@@ -320,11 +320,9 @@ public class PhyObject {
 		
 		// our code
 		int nextIndex = (maxIndex + 1) % vertices.length;
-		Vector2f side = new Vector2f(-normals[maxIndex].y, normals[maxIndex].x);
-		float left = side.dot(vertices[maxIndex]);
-		float right = side.dot(vertices[nextIndex]);
-		float center = side.dot(positionA);
-		if (isBetween(left, center, right)) {
+		if (isBetween(normals[maxIndex].cross(vertices[maxIndex]),
+				normals[maxIndex].cross(positionA),
+				normals[maxIndex].cross(vertices[nextIndex]))) {
 			// circle to side collision
 			CollisionInfo cInfo = new CollisionInfo();
 			cInfo.depth = -distances[maxIndex];
@@ -397,10 +395,9 @@ public class PhyObject {
 					deepestVertex = verA[ver];
 					thisSideSide = false;
 				} else if (distance == deepestDistance && distance < 0) {
-					Vector2f sideNorm = new Vector2f(-normalB[side].y, normalB[side].x);
-					float left = verB[side].dot(sideNorm);
-					float right = verB[(side + 1) % verB.length].dot(sideNorm);
-					if (isBetween(left, deepestVertex.dot(sideNorm), right) && isBetween(left, verA[ver].dot(sideNorm), right)) {
+					float left = verB[side].cross(normalB[side]);
+					float right = verB[(side + 1) % verB.length].cross(normalB[side]);
+					if (isBetween(left, deepestVertex.cross(normalB[side]), right) && isBetween(left, verA[ver].cross(normalB[side]), right)) {
 						deepestVertex = getSideSideCollision(deepestVertex, verA[ver], positionB).positionA;
 					}
 				}
@@ -504,6 +501,17 @@ public class PhyObject {
 		angularVelocity += relativeCollisionPositionA.cross(cInfo.normal) * impulse * inverseMomentOfInertia;
 		other.angularVelocity -= relativeCollisionPositionB.cross(cInfo.normal) * impulse * other.inverseMomentOfInertia;
 
+		
+		
+		// our code
+		// Calculate the component of the relative velocity that lays perpendicular to the collision normal
+		
+		
+		
+		
+		// end our code
+		
+		
 		// Calculate the amount of object overlap per unit mass.
 		float depth = (float)(cInfo.depth / (
 				inverseMass + other.inverseMass + 

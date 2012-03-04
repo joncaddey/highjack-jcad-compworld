@@ -34,7 +34,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  *
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
-	private static final int TARGET_FPS = 45;
+	private static final int TARGET_FPS = 30;
 	private static final int RESOLUTION_REPEATS = 30;
 	private static final int NOTIFY_DELTA =  1;
 	
@@ -73,21 +73,21 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				
 			}
 		});
-		my_canvas.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mousePressed(MouseEvent the_e) {
-				
-			}
-			@Override
-			public void mouseReleased(MouseEvent the_e) {
-				System.out.println(pixelToWorld(new Point(the_e.getX(), the_e.getY())));
-			}
-		});
-		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
-			 public void mouseDragged(MouseEvent e) {
-				System.out.println(pixelToWorld(new Point(e.getX(), e.getY())));
-			}
-		});
+//		my_canvas.addMouseListener(new MouseAdapter() {
+//			@Override
+//			public void mousePressed(MouseEvent the_e) {
+//				
+//			}
+//			@Override
+//			public void mouseReleased(MouseEvent the_e) {
+//				System.out.println(pixelToWorld(new Point(the_e.getX(), the_e.getY())));
+//			}
+//		});
+//		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
+//			 public void mouseDragged(MouseEvent e) {
+//				System.out.println(pixelToWorld(new Point(e.getX(), e.getY())));
+//			}
+//		});
 		sceneGraphRoot = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
 		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));

@@ -130,7 +130,7 @@ public class Window extends JFrame {
 		p.add(new PhysicsPanel(my_canvas));
 		
 		p.setLayout(new GridLayout(0, 1));
-		a_panel.setBorder(BorderFactory.createTitledBorder("Add Shape :)"));
+		a_panel.setBorder(BorderFactory.createTitledBorder("Add Shape"));
 		JPanel q = new JPanel();
 		q.add(p);
 		JScrollPane scroll = new JScrollPane(q, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);

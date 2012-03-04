@@ -18,7 +18,7 @@ public class Demo9 implements GLEventListener {
 	private static final int TARGET_FPS = 30;
 	
 	private static final float GRAVITY = 10;
-	private static final float SLOW_FACTOR = 1;
+	private static final float SLOW_FACTOR = 10;
 	private static final int MAX_RESOLUTION_REPEATS =80;
 	
 	private static int resolution_repeats = MAX_RESOLUTION_REPEATS;
@@ -60,8 +60,8 @@ public class Demo9 implements GLEventListener {
 		
 		
 		
-		PhyObject obj = PhyComposite.getRocket(1f);
-		//PhyObject obj = PhyPolygon.getRightTriangle(1f);
+		//PhyObject obj = PhyComposite.getRocket(1f);
+		PhyObject obj = PhyPolygon.getRightTriangle(1f);
 		obj.inverseMass = 1f / 10;
 		obj.inverseMomentOfInertia *= obj.inverseMass;
 		obj.position.y = -4;
@@ -76,10 +76,10 @@ public class Demo9 implements GLEventListener {
 		for (int y = 0; y < 7; y++) {
 			for (int x = 0; x < 10; x++) {
 				float mass = (float)(.7 * Math.random() + .1);
-				obj = new PhyCircle((float)(Math.sqrt(mass) * .5));
-				if (Math.random() < .25) obj = PhyPolygon.getSquare((float)(Math.sqrt(mass)));
-				if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
-				if (Math.random() < 1) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
+				obj = new PhyCircle((float)(Math.sqrt(mass)));
+				//if (Math.random() < .25) obj = PhyPolygon.getSquare((float)(Math.sqrt(mass)));
+				//if (Math.random() < .25) obj = PhyPolygon.getEqTriangle((float)(Math.sqrt(mass)));
+				//if (Math.random() < 1) obj = PhyPolygon.getRightTriangle((float)(Math.sqrt(mass)));
 				//if (Math.random() < .05) obj = PhyComposite.getRocket((float)(Math.sqrt(mass)));
 				obj.inverseMass = 1 / mass;
 				obj.inverseMomentOfInertia *= obj.inverseMass;
