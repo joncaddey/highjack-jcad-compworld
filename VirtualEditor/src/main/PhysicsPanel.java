@@ -36,7 +36,7 @@ public class PhysicsPanel extends JPanel implements ActionListener, FocusListene
 	public PhysicsPanel(VirtualCanvas the_canvas) {
 		my_canvas = the_canvas;
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		setBorder(BorderFactory.createTitledBorder("Physics"));
+		setBorder(BorderFactory.createTitledBorder("Physics :)"));
 		JPanel p = new JPanel();
 		p.setLayout(new GridLayout(0, 2));
 

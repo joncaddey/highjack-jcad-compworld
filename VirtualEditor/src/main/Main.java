@@ -15,7 +15,7 @@ public class Main {
 	}
 	
 	public void start() {
-		new Window("Highjacad's Virtual Editor 9001", my_canvas);
+		new Window("Highjacad's Physics Simulator 9001", my_canvas);
 				
 
 
