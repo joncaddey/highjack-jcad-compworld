@@ -28,7 +28,7 @@ import phyObj.Vector2f;
 @SuppressWarnings("serial")
 public class PropertiesPanel extends JPanel implements Observer,
 		ActionListener, FocusListener {
-
+	private static final float MAX_SIZE = 10000;
 	private static final DecimalFormat DF = new DecimalFormat("0.00");
 	private JTextField my_xField;
 	private JTextField my_yField;
@@ -213,19 +213,24 @@ public class PropertiesPanel extends JPanel implements Observer,
 			if (obj != null) {
 				try {
 					if (f == my_xField) {
-						obj.setPosition(Float.parseFloat(my_xField
-								.getText()), obj.getPosition().y);
+						obj.setPosition(Float.parseFloat(my_xField.getText()),
+								obj.getPosition().y);
 						obj.setVelocity(new Vector2f(0, 0));
 					} else if (f == my_yField) {
-						obj.setPosition(obj.getPosition().x, Float.parseFloat(my_yField
-.getText()));
+						obj.setPosition(obj.getPosition().x,
+								Float.parseFloat(my_yField.getText()));
 						obj.setVelocity(new Vector2f(0, 0));
 					} else if (f == my_scaleField) {
-						obj.setSize(Float.parseFloat(my_scaleField.getText()) / 100);
+						float size = Float.parseFloat(my_scaleField.getText());
+						if (size > MAX_SIZE) {
+							size = MAX_SIZE;
+						}
+						obj.setSize((size) / 100);
+						
 					} else if (f == my_degreesField) {
-					obj.setRotationDegrees(Float.parseFloat(my_degreesField
-							.getText()));
-					obj.setAngularVelocity(0);
+						obj.setRotationDegrees(Float.parseFloat(my_degreesField
+								.getText()));
+						obj.setAngularVelocity(0);
 					}
 				} catch (NumberFormatException the_nfe) {
 					// don't caaare

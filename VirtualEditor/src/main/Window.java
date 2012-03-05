@@ -64,6 +64,8 @@ public class Window extends JFrame {
 		this.pack();
 		this.setMinimumSize(new Dimension(getWidth(), 256));
 		this.setLocationRelativeTo(null);
+		if (Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH))
+			this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);
 	}
 
@@ -76,8 +78,11 @@ public class Window extends JFrame {
 		final JButton circle_item = new JButton("Circle");
 		a_panel.add(circle_item);
 		
-		final JButton triangle_item = new JButton("Triangle");
-		a_panel.add(triangle_item);
+		final JButton right_triangle_item = new JButton("Right Triangle");
+		a_panel.add(right_triangle_item);
+		
+		final JButton eq_triangle_item = new JButton("Eq. Triangle");
+		a_panel.add(eq_triangle_item);
 		
 		final JButton rectangle_item = new JButton("Rectangle");
 		a_panel.add(rectangle_item);
@@ -104,8 +109,10 @@ public class Window extends JFrame {
 				} else {
 					 size = my_canvas.getSelected().getSize();
 				}
-				if(source == triangle_item){
+				if(source == right_triangle_item){
 					my_canvas.attachObject(PhyPolygon.getRightTriangle(size));
+				} else if (source == eq_triangle_item) {
+					my_canvas.attachObject(PhyPolygon.getEqTriangle(size));
 				} else if (source == circle_item) {
 					my_canvas.attachObject(new PhyCircle(size));
 				} else if (source == rectangle_item) {
@@ -120,7 +127,8 @@ public class Window extends JFrame {
 			}
 		};
 		
-		triangle_item.addActionListener(a);
+		right_triangle_item.addActionListener(a);
+		eq_triangle_item.addActionListener(a);
 		circle_item.addActionListener(a);
 		rectangle_item.addActionListener(a);
 		rocket_item.addActionListener(a);

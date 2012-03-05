@@ -25,7 +25,7 @@ public class PhyCircle extends PhyObject {
 	public void setSize(float diameter) {
 		super.setSize(diameter/2);
 		area = (float) (size * size * Math.PI);
-		float inverseMass = 1 / (density * area);
+		inverseMass = 1 / (density * area);
 		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass;
 	}
 	
