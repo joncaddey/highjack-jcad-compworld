@@ -438,7 +438,7 @@ public class PhyObject {
 	 * sideSideCollision indicates whether the edges truly collided and one of the vertices just collided with
 	 * the other edge.
 	 */
-	// TODO make it check the second case
+	// the second case would be necessary for objects with edges over which the CoM may not lie, like rhombuses.
 	private static CollisionInfo getSideSideCollision(Vector2f deepestVertex, Vector2f equalDepthVertex, Vector2f position) {
 		CollisionInfo c = new CollisionInfo();
 		final Vector2f deepestToNextNorm = new Vector2f(equalDepthVertex);

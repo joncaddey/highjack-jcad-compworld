@@ -91,8 +91,6 @@ public class PhyComposite extends PhyObject{
 		flame.setRGBf(1, .6f, 0);
 		p.renderable.addChild(flame);
 		
-		//p.renderable = new Rocket(true);
-
 		p.moveToCenterOfMass();
 		p.setSize(size);
 		return p;
@@ -112,7 +110,7 @@ public class PhyComposite extends PhyObject{
 			
 			PhyCircle bouey = new PhyCircle(1);
 			bouey.centerOfMass.y = 2;
-			bouey.density = 100;
+			bouey.density = 10;
 			bouey.orientation = (float)(i * 2 * Math.PI / boueys + Math.PI);
 			bouey.renderable.setRGBi(47, 54, 153);
 			p.addObject(bouey);
@@ -224,9 +222,8 @@ public class PhyComposite extends PhyObject{
 			
 			totalMass += 1 / o.inverseMass;
 			
-			//I_z = I_cm + mr^2
+			//I_z = I_cm + Ar^2
 			tmp = new Vector2f(o.centerOfMass);
-			//tmp.sum(new Vector2f(0, size * 1f)); // TODO this is specific to rocket.
 			totalMomentOfInertia += 1 / (o.inverseMomentOfInertia / o.inverseMass)  + o.area * Math.pow(tmp.length(), 2);
 			
 			

@@ -1,4 +1,5 @@
 package main;
+
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -27,36 +28,37 @@ import phyObj.Vector2f;
 import com.jogamp.common.nio.Buffers;
 import com.jogamp.opengl.util.FPSAnimator;
 
-
 /**
  * 
  * @author Steven Cozart Jonathan Caddey
- *
+ * 
  */
 public class VirtualCanvas extends Observable implements GLEventListener {
-	private static final int TARGET_FPS = 30;
-	private static final int RESOLUTION_REPEATS = 45;
-	private static final int NOTIFY_DELTA =  1;
-	
+	private static final int TARGET_FPS = 45;
+	private static final int RESOLUTION_REPEATS = 40;
+
+	/**
+	 * Frames skipped between notifying observers the whereabouts of the
+	 * selected object.
+	 */
+	private static final int NOTIFY_DELTA = 1;
+
 	// relating to physics
 	private int notify_delta = NOTIFY_DELTA;
 	private float my_speed_scale = 1;
 	private float my_gravity = 10;
 	private boolean my_collionToggle = true;
-	
+
 	// relating to clicking
 	private SceneGraphNode sceneGraphRoot;
 	private ArrayList<PhyObject> objects;
 	private boolean pickNextFrame;
 	private Point pickedPoint;
-	
-	
 
 	private float left, right, top, bottom;
 	private HalfSpace leftWall, rightWall, topWall, bottomWall;
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
-
 
 	private PhyObject my_selected;
 
@@ -70,24 +72,25 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 
 				pickNextFrame = true;
 				pickedPoint = new Point(e.getX(), e.getY());
-				
+
 			}
 		});
-//		my_canvas.addMouseListener(new MouseAdapter() {
-//			@Override
-//			public void mousePressed(MouseEvent the_e) {
-//				
-//			}
-//			@Override
-//			public void mouseReleased(MouseEvent the_e) {
-//				System.out.println(pixelToWorld(new Point(the_e.getX(), the_e.getY())));
-//			}
-//		});
-//		my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
-//			 public void mouseDragged(MouseEvent e) {
-//				System.out.println(pixelToWorld(new Point(e.getX(), e.getY())));
-//			}
-//		});
+		// my_canvas.addMouseListener(new MouseAdapter() {
+		// @Override
+		// public void mousePressed(MouseEvent the_e) {
+		//
+		// }
+		// @Override
+		// public void mouseReleased(MouseEvent the_e) {
+		// System.out.println(pixelToWorld(new Point(the_e.getX(),
+		// the_e.getY())));
+		// }
+		// });
+		// my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
+		// public void mouseDragged(MouseEvent e) {
+		// System.out.println(pixelToWorld(new Point(e.getX(), e.getY())));
+		// }
+		// });
 		sceneGraphRoot = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
 		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));
@@ -98,25 +101,19 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		objects.add(topWall);
 		objects.add(bottomWall);
 		objects.add(leftWall);
-		
-		/*/ Add independent SceneGraphNode representing all the HalfSpaces.
-		sceneGraphRoot.addChild(new SceneGraphNode(false) {
-			public void renderGeometry(GLAutoDrawable drawable) {
-				GL2 gl = drawable.getGL().getGL2();	
-				gl.glColor3f(1, 1, 1);
-				gl.glBegin(GL.GL_LINE_LOOP);
-				gl.glVertex2f(-5, -5);
-				gl.glVertex2f(5, -5);
-				gl.glVertex2f(5, 5);
-				gl.glVertex2f(-5, 5);
-				gl.glEnd();
-			}
-		});
-		//*/
-		
+
+		/*
+		 * / Add independent SceneGraphNode representing all the HalfSpaces.
+		 * sceneGraphRoot.addChild(new SceneGraphNode(false) { public void
+		 * renderGeometry(GLAutoDrawable drawable) { GL2 gl =
+		 * drawable.getGL().getGL2(); gl.glColor3f(1, 1, 1);
+		 * gl.glBegin(GL.GL_LINE_LOOP); gl.glVertex2f(-5, -5); gl.glVertex2f(5,
+		 * -5); gl.glVertex2f(5, 5); gl.glVertex2f(-5, 5); gl.glEnd(); } }); //
+		 */
+
 		my_selected = null;
 	}
-	
+
 	private Vector2f pixelToWorld(Point pixel) {
 		// pixel * world / pixel = world
 		Vector2f r = new Vector2f(pixel.x, pixel.y);
@@ -124,7 +121,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		r.y = r.y * (bottom - top) / this.my_canvas.getHeight() + top;
 		return r;
 	}
-	
+
 	public void attachObject(final PhyObject object) {
 		if (object.getRenderable() != null) {
 			sceneGraphRoot.addChild(object.getRenderable());
@@ -135,7 +132,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		my_selected = object;
 		setChanged();
 		notifyObservers(my_selected);
-		
+
 	}
 
 	public Component getCanvas() {
@@ -145,15 +142,15 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 	public PhyObject getSelected() {
 		return my_selected;
 	}
-	
+
 	public SceneGraphNode getRoot() {
 		return sceneGraphRoot;
 	}
-	
+
 	public float getGravity() {
 		return my_gravity;
 	}
-	
+
 	public void setGravity(final float the_gravity) {
 		my_gravity = the_gravity;
 		for (PhyObject o : objects) {
@@ -162,22 +159,22 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			}
 		}
 	}
-	
+
 	public float getSpeedScale() {
 		return my_speed_scale;
 	}
-	
+
 	public void setSpeedScale(final float the_speed_scale) {
 		if (the_speed_scale < 0) {
 			throw new IllegalArgumentException("Can't go back in time");
 		}
 		my_speed_scale = the_speed_scale;
 	}
-	
+
 	public void setCollisions(boolean the_collisions) {
 		my_collionToggle = the_collisions;
 	}
-	
+
 	public void launch(float power) {
 		if (my_selected != null) {
 			Vector2f tmp = new Vector2f(0, power);
@@ -201,17 +198,19 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPushMatrix();
 			gl.glLoadIdentity();
-			glu.gluPickMatrix(pickedPoint.x, (double)(viewport[3] - pickedPoint.y), 1, 1, viewport, 0);
+			glu.gluPickMatrix(pickedPoint.x,
+					(double) (viewport[3] - pickedPoint.y), 1, 1, viewport, 0);
 			gl.glOrtho(left, right, bottom, top, -1, 1);
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			List<SceneGraphNode> picked = sceneGraphRoot.getPicked(drawable);
-			
+
 			if (picked.isEmpty()) {
 				my_selected = null;
 			} else {
 				SceneGraphNode sgn = picked.get(0);
 				for (PhyObject o : objects) {
-					if (o.getRenderable() != null && o.getRenderable().equals(sgn)) {
+					if (o.getRenderable() != null
+							&& o.getRenderable().equals(sgn)) {
 						my_selected = o;
 						break;
 					}
@@ -219,26 +218,26 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			}
 			setChanged();
 			notifyObservers(my_selected);
-			
+
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		//if (my_speed_scale > 0) {
-			for (PhyObject object : objects) {
-				object.updateState(1f / TARGET_FPS * my_speed_scale);
-			}
-			notify_delta--;
-			if (notify_delta < 0) {
-				notifyObservers(my_selected);
-				setChanged();
-				notify_delta = NOTIFY_DELTA;
-			}
-		//}
-		
+		// if (my_speed_scale > 0) {
+		for (PhyObject object : objects) {
+			object.updateState(1f / TARGET_FPS * my_speed_scale);
+		}
+		notify_delta--;
+		if (notify_delta < 0) {
+			notifyObservers(my_selected);
+			setChanged();
+			notify_delta = NOTIFY_DELTA;
+		}
+		// }
+
 		boolean noCollisions = false;
-		
+
 		int repeat = 0;
 		if (!my_collionToggle) {
 			repeat = RESOLUTION_REPEATS;
@@ -257,14 +256,13 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 				}
 			}
 
-			
 		}
-		
-		for (PhyObject object : objects){
+
+		for (PhyObject object : objects) {
 			object.updateRenderable();
 		}
 		sceneGraphRoot.render(drawable);
-		
+
 	}
 
 	public void dispose(GLAutoDrawable drawable) {
@@ -294,7 +292,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			right = (float) width / height * UNIT / 2;
 			left = -right;
 		}
-		
+
 		leftWall.setPosition(left, 0);
 		rightWall.setPosition(right, 0);
 		bottomWall.setPosition(0, bottom);
@@ -314,7 +312,7 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		setChanged();
 		notifyObservers();
 	}
-	
+
 	public void removeAll() {
 		Iterator<PhyObject> it = objects.iterator();
 		while (it.hasNext()) {

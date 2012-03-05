@@ -1,11 +1,24 @@
-Good ideas:
+CONFIRM
 
-
-
-do we need right-triangles?
+is the boundary thing going to be alright?
 
 
 are you SURE you have the correct moments of inertia?
+
+
+README
+
+rocket has flames, which are non-physical.  the center of mass is affected by its head being more dense.
+station is incredibly massive, but its dome is above the world so it has no collision detection.
+
+increasing size increases mass
+
+the world bounds are always the edge of the screen to help with experimentation
+
+
+
+
+
 
 
 Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.
