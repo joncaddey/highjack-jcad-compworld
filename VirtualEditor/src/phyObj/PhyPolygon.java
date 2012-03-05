@@ -1,7 +1,9 @@
 package phyObj;
 import javax.media.opengl.*;
 
+import main.Rectangle;
 import main.SceneGraphNode;
+import main.Triangle;
 
 public class PhyPolygon extends PhyObject {
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
@@ -45,60 +47,33 @@ public class PhyPolygon extends PhyObject {
 	private final float[] vertices;
 	private final Resizer resizer;
 	
-	float red;
-	float green;
-	float blue;
-	
-	private class Renderable extends SceneGraphNode {
-		public void renderGeometry(GLAutoDrawable drawable) {
-			GL2 gl = drawable.getGL().getGL2();
-
-			gl.glColor3f(red, green, blue);
-			gl.glBegin(GL.GL_TRIANGLES);
-			for (int i = 0; i < vertices.length; i += 2) {
-				gl.glVertex2f(vertices[i], vertices[i+1]);
-			}
-			gl.glEnd();
-			
-			gl.glBegin(GL.GL_TRIANGLES);
-			for (int i = 4; i < vertices.length + 2; i += 2) {
-				gl.glVertex2f(vertices[i % vertices.length], vertices[i % vertices.length +1]);
-			}
-			gl.glEnd();
-		}
-	}
-
-	
 	public static PhyPolygon getRightTriangle(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_RIGHT_TRIANGLE, the_size, RIGHT_TRIANGLE_RESIZER);
-		r.renderable = r.new Renderable();
+		r.renderable = new Triangle(true, VERTICES_RIGHT_TRIANGLE);
 		r.setSize(the_size);
 		return r;
 	}
 	
 	public static PhyPolygon getEqTriangle(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_EQ_TRIANGLE, the_size, EQ_TRIANGLE_RESIZER);
-		r.renderable = r.new Renderable();
+		r.renderable = new Triangle(true, VERTICES_EQ_TRIANGLE);
 		r.setSize(the_size);
 		return r;
 	}
 	
 	public static PhyPolygon getSquare(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_SQUARE, the_size, SQUARE_RESIZER);
-		r.renderable = r.new Renderable();
+		r.renderable = new Rectangle(true);
 		r.setSize(the_size);
 		return r;
 	}
 	
 	
-	private PhyPolygon(float[] vertices, float size, Resizer resizer) {
+	protected PhyPolygon(float[] vertices, float size, Resizer resizer) {
 		super();
 		this.size = size;
 		this.vertices = vertices;
 		this.resizer = resizer;
-		this.red = (float) Math.random();
-		this.green = (float) Math.random();
-		this.blue = (float) Math.random();
 		resizer.resize(this,size);
 	}
 	

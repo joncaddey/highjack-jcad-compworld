@@ -10,6 +10,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 
+import main.Circle;
 import main.Rocket;
 import main.SceneGraphNode;
 import main.Triangle;
@@ -28,38 +29,42 @@ public class PhyComposite extends PhyObject{
 	public static PhyObject getRocket(float size) {
 		PhyComposite p = new PhyComposite();
 		
-		float variability = 17f / 255;
+		int variability = 20;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.3f);
 		finLeft.density = .1f;
-		finLeft.red = 113 / 255f + (float)(Math.random() * variability);
-		finLeft.green = 0 / 255f + (float)(Math.random() * variability);
-		finLeft.blue =  151 / 255f + (float)(Math.random() * variability);
+		finLeft.renderable.setRGBi(
+				93 + (int)(Math.random() * variability),
+				0 + (int)(Math.random() * variability),
+				131 + (int)(Math.random() * variability));
 		finLeft.orientation = radians(90);
 		finLeft.position = new Vector2f(-.39f, -.4f);
-		p.addObject(finLeft);
+		// added after finRight
 		
 		PhyPolygon finRight = PhyPolygon.getEqTriangle(.3f);
 		finRight.density = .1f;
-		finRight.red = finLeft.red;
-		finRight.green = finLeft.green;
-		finRight.blue = finLeft.blue;
+		finRight.renderable.red = finLeft.renderable.red;
+		finRight.renderable.green = finLeft.renderable.green;
+		finRight.renderable.blue = finLeft.renderable.blue;
 		finRight.orientation = radians(-90);
 		finRight.position = new Vector2f(.39f, -.4f);
+		p.addObject(finLeft);
 		p.addObject(finRight);
 		
 		PhyPolygon body = PhyPolygon.getSquare(BODY_RATIO);
 		body.density = 1;
-		body.red = 84 / 255f + (float)(Math.random() * variability);
-		body.green = 109 / 255f + (float)(Math.random() * variability);
-		body.blue = 142 / 255f + (float)(Math.random() * variability);
+		body.renderable.setRGBi(
+				64 + (int)(Math.random() * variability),
+				89 + (int)(Math.random() * variability),
+				122 + (int)(Math.random() * variability));
 		body.position.y = -BODY_RATIO / 2;
 		p.addObject(body);
 		
 		PhyPolygon head = PhyPolygon.getEqTriangle(1);
 		head.density = 3;
-		head.red = 238 / 255f + (float)(Math.random() * variability);
-		head.green = 28 / 255f + (float)(Math.random() * variability);
-		head.blue = 36 / 255f + (float)(Math.random() * variability);
+		head.renderable.setRGBi(
+				218 + (int)(Math.random() * variability),
+				8 + (int)(Math.random() * variability),
+				16 + (int)(Math.random() * variability));
 		head.position.y = Triangle.SIN_60 / 3 - .01f;
 		p.addObject(head);
 		
@@ -67,6 +72,7 @@ public class PhyComposite extends PhyObject{
 		flame.rotation = 180;
 		flame.scale = .25f;
 		flame.translateY = -.8f;
+		flame.setRGBf(1, .6f, 0);
 		p.renderable.addChild(flame);
 		
 		flame = new Triangle(false);
@@ -74,6 +80,7 @@ public class PhyComposite extends PhyObject{
 		flame.scale = .25f;
 		flame.translateY = -.7f;
 		flame.translateX = -.1f;
+		flame.setRGBf(1, .6f, 0);
 		p.renderable.addChild(flame);
 		
 		flame = new Triangle(false);
@@ -81,6 +88,7 @@ public class PhyComposite extends PhyObject{
 		flame.scale = .25f;
 		flame.translateY = -.7f;
 		flame.translateX = .1f;
+		flame.setRGBf(1, .6f, 0);
 		p.renderable.addChild(flame);
 		
 		//p.renderable = new Rocket(true);
@@ -91,21 +99,43 @@ public class PhyComposite extends PhyObject{
 	}
 	
 	public static PhyObject getStation(float size) {
-		
+		final float[] armVertices = {-.5f, 0, .5f, 0, 0, 1.7f}; 
 		PhyComposite p = new PhyComposite();
 		
 		final int boueys = 3;
 		
 		for (int i = 0; i < boueys; i++) {
+			Triangle arm = new Triangle(false, armVertices);
+			arm.setRGBi(64, 180, 120);
+			arm.rotation = (float)(i * 2 * 180 / boueys);
+			arm.CoMY = -.58f;
+			
 			PhyCircle bouey = new PhyCircle(1);
 			bouey.centerOfMass.y = 2;
+			bouey.density = 100;
 			bouey.orientation = (float)(i * 2 * Math.PI / boueys + Math.PI);
+			bouey.renderable.setRGBi(47, 54, 153);
 			p.addObject(bouey);
+			p.renderable.addChild(arm);
+			
+			Circle dome = new Circle(false);
+			dome.rotation = (float)(i * 2 * 180 / boueys + 180);
+			dome.CoMY = 1.96f;
+			dome.scale = .32f;
+			dome.setRGBi(84, 109, 142);
+			p.renderable.addChild(dome);
 		}
 		
+		Circle center = new Circle(false);
+		center.scale = 1.1f;
+		center.setRGBi(111, 49, 152);
+		p.renderable.addChild(center);
 		
-		PhyCircle center = new PhyCircle(.1f);
-		p.addObject(center);
+		
+		Circle dome = new Circle(false);
+		dome.scale = .9f;
+		dome.setRGBi(153, 217, 234);
+		p.renderable.addChild(dome);
 		
 		p.moveToCenterOfMass();
 		p.setSize(size);
