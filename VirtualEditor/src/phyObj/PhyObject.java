@@ -24,7 +24,7 @@ public class PhyObject {
 	SceneGraphNode renderable;
 	List<PhyObject> objects;
 	
-	interface Resizer {
+	protected interface Resizer {
 		void resize(PhyObject obj, float size);
 	}
 	public PhyObject() {

@@ -5,7 +5,7 @@ Good ideas:
 do we need right-triangles?
 
 
-
+are you SURE you have the correct moments of inertia?
 
 
 Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.

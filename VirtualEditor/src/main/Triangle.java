@@ -15,22 +15,31 @@ public class Triangle extends SceneGraphNode {
 
 	private final float[] vertices;
 	public Triangle() {
-		this(true);
+		this(true, VERTICES_EQ_TRIANGLE);
 	}
 	
 	public Triangle(boolean pickable) {
+		this(pickable, VERTICES_EQ_TRIANGLE);
+	}
+	
+	/**
+	 * 
+	 * @param pickable
+	 * @param vertices an array copy is not used.  Must be 6.
+	 */
+	public Triangle(boolean pickable, float[] vertices) {
 		super(pickable);
-		vertices = VERTICES_EQ_TRIANGLE;
+		this.vertices = vertices;
 	}
 	
 	public void renderGeometry(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glBegin(GL.GL_TRIANGLES);
-		gl.glColor3f(1, .8f, 0);
+		gl.glColor3f(Math.min(1, red + .2f), Math.min(1, green + .2f), Math.min(1, blue + .2f));
 		gl.glVertex2f(vertices[0], vertices[1]);
-		gl.glColor3f(1, .7f, 0);
+		gl.glColor3f(Math.min(1, red + .1f), Math.min(1, green + .1f), Math.min(1, blue + .1f));
 		gl.glVertex2f(vertices[2], vertices[3]);
-		gl.glColor3f(1, .6f, 0);
+		gl.glColor3f(red, green, blue);
 		gl.glVertex2f(vertices[4], vertices[5]);
 		gl.glEnd();
 	}

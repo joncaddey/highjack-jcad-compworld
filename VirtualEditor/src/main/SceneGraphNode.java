@@ -12,6 +12,8 @@ public class SceneGraphNode {
 	private List<SceneGraphNode> children;
 	private boolean pickable;
 	
+	public float red, blue, green;
+	
 	public SceneGraphNode() {
 		this(true);
 	}
@@ -23,6 +25,9 @@ public class SceneGraphNode {
 	public SceneGraphNode(boolean pickable) {
 		scale = 1;
 		children = new LinkedList<SceneGraphNode>();
+		red = (float) Math.random();
+		green = (float) Math.random();
+		blue = (float) Math.random();
 		this.pickable = pickable;
 	}
 	
@@ -96,4 +101,15 @@ public class SceneGraphNode {
 	public void setPickable(boolean the_pickable) {
 		this.pickable = the_pickable;
 	}
+	
+	public void setRGBf(float r, float g, float b) {
+		red = r;
+		green = g;
+		blue = b;
+	}
+	
+	public void setRGBi(int r, int g, int b) {
+		setRGBf(r / 256f, g / 256f, b / 256f);
+	}
+	
 }
