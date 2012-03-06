@@ -84,7 +84,7 @@ public class PhyObject {
 	}
 	
 	/**
-	 * Subclasses modify mass, moment of ineria, center of mass, and area as appropriate.
+	 * Subclasses modify mass, moment of inertia, center of mass, and area as appropriate.
 	 * @param size
 	 * @throws IllegalArgumentException
 	 */
@@ -183,9 +183,6 @@ public class PhyObject {
 		CollisionInfo winner = null;
 		for (PhyObject o : b.objects){
 			CollisionInfo c = a.getCollision(o);
-//			if (c != null && (winner == null || c.depth > winner.depth)){
-//				winner = c;
-//			}
 			if (c != null) {
 				if (winner == null) {
 					winner = c;
