@@ -82,6 +82,9 @@ public class PhyObject {
 	public void setAngularVelocity(float angularVelocity) {
 		this.angularVelocity = angularVelocity;
 	}
+	public float getAngularVelocity() {
+		return this.angularVelocity;
+	}
 	
 	/**
 	 * Subclasses modify mass, moment of inertia, center of mass, and area as appropriate.
