@@ -2,6 +2,8 @@ package main;
 
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
@@ -36,6 +38,9 @@ import com.jogamp.opengl.util.FPSAnimator;
 public class VirtualCanvas extends Observable implements GLEventListener {
 	private static final int TARGET_FPS = 45;
 	private static final int RESOLUTION_REPEATS = 40;
+	
+	private static final int SIDE_THRUST = 2;
+	public static final int FORWARD_THRUST = 4;
 
 	/**
 	 * Frames skipped between notifying observers the whereabouts of the
@@ -110,6 +115,28 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		 * gl.glBegin(GL.GL_LINE_LOOP); gl.glVertex2f(-5, -5); gl.glVertex2f(5,
 		 * -5); gl.glVertex2f(5, 5); gl.glVertex2f(-5, 5); gl.glEnd(); } }); //
 		 */
+		
+		my_canvas.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent the_e) {
+				int code = the_e.getKeyCode();
+				if (my_selected == null) return;
+				switch (code) {
+					case KeyEvent.VK_UP:
+						launch(FORWARD_THRUST);
+					break;
+					case KeyEvent.VK_LEFT:
+						my_selected.setAngularVelocity(my_selected.getAngularVelocity() + SIDE_THRUST);
+					break;
+					case KeyEvent.VK_RIGHT:
+						my_selected.setAngularVelocity(my_selected.getAngularVelocity() - SIDE_THRUST);
+					break;
+					case KeyEvent.VK_DOWN:
+						launch(-.2f * FORWARD_THRUST);
+					break;
+				}
+			}
+		});
 
 		my_selected = null;
 	}
