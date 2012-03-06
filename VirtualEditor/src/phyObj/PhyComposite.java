@@ -122,6 +122,8 @@ public class PhyComposite extends PhyObject{
 			dome.scale = .32f;
 			dome.setRGBi(84, 109, 142);
 			p.renderable.addChild(dome);
+			
+			p.setSize(size);
 		}
 		
 		Circle center = new Circle(false);

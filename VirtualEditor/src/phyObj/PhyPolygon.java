@@ -24,7 +24,6 @@ public class PhyPolygon extends PhyObject {
 		public void resize(PhyObject obj, float size) {
 			obj.area = .5f * obj.size * obj.size;
 			obj.centerOfMass.x = obj.centerOfMass.y = obj.size / 3;
-			//obj.centerOfMass.y = obj.size * 5/3f;
 			if (obj.renderable != null) {
 				obj.renderable.CoMX = obj.centerOfMass.x;
 				obj.renderable.CoMY = obj.centerOfMass.y;
