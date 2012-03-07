@@ -502,7 +502,8 @@ public class PhyObject {
 		other.angularVelocity -= relativeCollisionPositionB.cross(cInfo.normal) * impulse * other.inverseMomentOfInertia;
 
 		// Calculate the amount of object overlap per unit mass.
-		float depth = (float)(cInfo.depth / (
+		// TODO added that constant in the front.  legit?
+		float depth = 1.4f * (float)(cInfo.depth / (
 				inverseMass + other.inverseMass + 
 				Math.pow(relativeCollisionPositionA.cross(cInfo.normal), 2) * inverseMomentOfInertia +
 				Math.pow(relativeCollisionPositionB.cross(cInfo.normal), 2) * other.inverseMomentOfInertia));
