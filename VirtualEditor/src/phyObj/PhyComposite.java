@@ -24,9 +24,85 @@ public class PhyComposite extends PhyObject{
 	private final ArrayList<Float> sizes;
 	
 	
-	
-	
 	public static PhyObject getRocket(float size) {
+		PhyComposite p = new PhyComposite();
+		
+		int variability = 20;
+		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.5f);
+		finLeft.density = .1f;
+		finLeft.renderable.setRGBi(
+				93 + (int)(Math.random() * variability),
+				0 + (int)(Math.random() * variability),
+				131 + (int)(Math.random() * variability));
+		finLeft.orientation = radians(90);
+		finLeft.position = new Vector2f(-.39f, -.3f);
+		// added after finRight
+		
+		PhyPolygon finRight = PhyPolygon.getEqTriangle(.5f);
+		finRight.density = .1f;
+		finRight.renderable.red = finLeft.renderable.red;
+		finRight.renderable.green = finLeft.renderable.green;
+		finRight.renderable.blue = finLeft.renderable.blue;
+		finRight.orientation = radians(-90);
+		finRight.position = new Vector2f(.39f, -.3f);
+		p.addObject(finLeft);
+		p.addObject(finRight);
+		
+		PhyPolygon body = PhyPolygon.getSquare(BODY_RATIO);
+		body.density = 1;
+		body.renderable.setRGBi(
+				218 + (int)(Math.random() * variability),
+				8 + (int)(Math.random() * variability),
+				16 + (int)(Math.random() * variability));
+		body.position.y = -BODY_RATIO / 2;
+		p.addObject(body);
+		
+		PhyPolygon head = PhyPolygon.getEqTriangle(1.1f);
+		head.density = 3;
+		head.renderable.setRGBi(
+				218 + (int)(Math.random() * variability),
+				8 + (int)(Math.random() * variability),
+				16 + (int)(Math.random() * variability));
+		head.position.y = Triangle.SIN_60 / 3 - 0f;
+		p.addObject(head);
+		
+		SceneGraphNode flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
+		flame.translateY = -.8f;
+		flame.setRGBf(1, .6f, 0);
+		p.renderable.addChild(flame);
+		
+		flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
+		flame.translateY = -.7f;
+		flame.translateX = -.1f;
+		flame.setRGBf(1, .6f, 0);
+		p.renderable.addChild(flame);
+		
+		flame = new Triangle(false);
+		flame.rotation = 180;
+		flame.scale = .25f;
+		flame.translateY = -.7f;
+		flame.translateX = .1f;
+		flame.setRGBf(1, .6f, 0);
+		p.renderable.addChild(flame);
+		
+		
+		Triangle glass = new Triangle(false);
+		glass.scale = .55f;
+		glass.translateY = .1f;
+		glass.setRGBi(15, 21, 23);
+		p.renderable.addChild(glass);
+		
+		
+		p.moveToCenterOfMass();
+		p.setSize(size);
+		return p;
+	}
+	
+	public static PhyObject getOldRocket(float size) {
 		PhyComposite p = new PhyComposite();
 		
 		int variability = 20;
