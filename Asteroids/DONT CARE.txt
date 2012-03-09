@@ -1,0 +1,29 @@
+TODO, in approximate order.
+
+Get ship to fly around, ability to tune controls.
+
+Get ship to mirror to other end when out of bounds.
+
+Get ship to fire bullets.
+
+Spawn primative asteroids.
+
+Make asteroids mirror to other end when out of bounds.
+
+Tune asteroid hp as well as gun damage for levels.
+
+Get asteroids to go to other networks.
+
+Get ship to fire fancy bullets (first salvo is special with more pushing power, upon holding button same damage but less power.)
+
+Get composite asteroids (out of squares, triangles)
+
+Get ship to fire bomb (clears screen)
+
+Get ship to fire missile, which destroys asteroid of less than 10% hp and does chain reaction explosion based on destroyed asteroids max health to nearby asteroids.
+
+OR
+
+Make powerups.  Maybe powerup can be destroyed like a bomb.
+
+Make asteroids out of arbitrary triangles.
