@@ -43,107 +43,13 @@ public class Window extends JFrame {
 		Image icon = Toolkit.getDefaultToolkit().createImage(
 		"src/hulk.jpg");
 		this.setIconImage(icon);
-	
 		this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+		this.add(my_canvas.getCanvas());
 		
-		
-		//Creates a new jMenu bar
-		addShapesPanel();
-		
-	
-		//sets up panesl
-		JPanel properties = new PropertiesPanel(my_canvas);
-		JPanel panel = new JPanel();
-		panel.setLayout(new BorderLayout());
-		panel.add(my_canvas.getCanvas(), BorderLayout.CENTER);
-		panel.add(properties, BorderLayout.SOUTH);
-		this.add(panel);
-		
-		
-		
-		this.pack();
-		this.setMinimumSize(new Dimension(getWidth(), 256));
+		this.setMinimumSize(new Dimension(256, 256));
 		this.setLocationRelativeTo(null);
 		if (Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH))
 			this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);
 	}
-
-	
-	
-	private void addShapesPanel(){
-		JPanel a_panel = new JPanel();
-		a_panel.setLayout(new GridLayout(0,1));
-		
-		final JButton circle_item = new JButton("Circle");
-		a_panel.add(circle_item);
-		
-		final JButton right_triangle_item = new JButton("Right Triangle");
-		a_panel.add(right_triangle_item);
-		
-		final JButton eq_triangle_item = new JButton("Eq. Triangle");
-		a_panel.add(eq_triangle_item);
-		
-		final JButton rectangle_item = new JButton("Rectangle");
-		a_panel.add(rectangle_item);
-		
-		final JButton  rocket_item = new JButton("Rocket");
-		a_panel.add(rocket_item);
-		
-		final JButton  station_item = new JButton("Station");
-		a_panel.add(station_item);
-		
-		JPanel p = new JPanel();
-		
-		
-		
-		ActionListener a = new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				JButton source = (JButton) e.getSource();
-				
-				final float size;
-				if (my_canvas.getSelected() == null) {
-					size = 1;
-				} else {
-					 size = my_canvas.getSelected().getSize();
-				}
-				if(source == right_triangle_item){
-					my_canvas.attachObject(PhyPolygon.getRightTriangle(size));
-				} else if (source == eq_triangle_item) {
-					my_canvas.attachObject(PhyPolygon.getEqTriangle(size));
-				} else if (source == circle_item) {
-					my_canvas.attachObject(new PhyCircle(size));
-				} else if (source == rectangle_item) {
-					my_canvas.attachObject(PhyPolygon.getSquare(size));
-				} else if (source == rocket_item) {
-					my_canvas.attachObject(PhyComposite.getRocket(size));
-				} else if (source == station_item) {
-					my_canvas.attachObject(PhyComposite.getStation(size));
-				}
-				my_canvas.getCanvas().repaint();
-
-			}
-		};
-		
-		right_triangle_item.addActionListener(a);
-		eq_triangle_item.addActionListener(a);
-		circle_item.addActionListener(a);
-		rectangle_item.addActionListener(a);
-		rocket_item.addActionListener(a);
-		station_item.addActionListener(a);
-		
-		p.add(a_panel);
-		p.add(new PhysicsPanel(my_canvas));
-		
-		p.setLayout(new GridLayout(0, 1));
-		a_panel.setBorder(BorderFactory.createTitledBorder("Add Shape"));
-		JPanel q = new JPanel();
-		q.add(p);
-		JScrollPane scroll = new JScrollPane(q, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-		this.add(scroll, BorderLayout.EAST);
-
-	}
-
 }

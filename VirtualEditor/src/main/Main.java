@@ -15,10 +15,7 @@ public class Main {
 	}
 	
 	public void start() {
-		new Window("Highjacad's Physics Simulator 9001", my_canvas);
-				
-
-
+		new Window("Highjacad's Asteroids", my_canvas);
 	}
 	public static void main(String args[]) {
 		
