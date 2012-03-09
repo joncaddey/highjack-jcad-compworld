@@ -24,6 +24,7 @@ import javax.media.opengl.glu.GLU;
 
 import phyObj.CollisionInfo;
 import phyObj.HalfSpace;
+import phyObj.PhyComposite;
 import phyObj.PhyObject;
 import phyObj.Vector2f;
 
@@ -35,24 +36,14 @@ import com.jogamp.opengl.util.FPSAnimator;
  * @author Steven Cozart Jonathan Caddey
  * 
  */
-public class VirtualCanvas extends Observable implements GLEventListener {
+public class VirtualCanvas implements GLEventListener {
 	private static final int TARGET_FPS = 45;
 	private static final int RESOLUTION_REPEATS = 40;
 	
 	private static final int SIDE_THRUST = 2;
 	public static final int FORWARD_THRUST = 4;
 
-	/**
-	 * Frames skipped between notifying observers the whereabouts of the
-	 * selected object.
-	 */
-	private static final int NOTIFY_DELTA = 1;
 
-	// relating to physics
-	private int notify_delta = NOTIFY_DELTA;
-	private float my_speed_scale = 1;
-	private float my_gravity = 10;
-	private boolean my_collionToggle = true;
 
 	// relating to clicking
 	private SceneGraphNode sceneGraphRoot;
@@ -120,10 +111,8 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			@Override
 			public void keyPressed(KeyEvent the_e) {
 				int code = the_e.getKeyCode();
-				if (my_selected == null) return;
 				switch (code) {
 					case KeyEvent.VK_UP:
-						launch(FORWARD_THRUST);
 					break;
 					case KeyEvent.VK_LEFT:
 						my_selected.setAngularVelocity(my_selected.getAngularVelocity() + SIDE_THRUST);
@@ -132,13 +121,14 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 						my_selected.setAngularVelocity(my_selected.getAngularVelocity() - SIDE_THRUST);
 					break;
 					case KeyEvent.VK_DOWN:
-						launch(-.2f * FORWARD_THRUST);
 					break;
 				}
 			}
 		});
+		PhyObject rocket = PhyComposite.getRocket(1);
+		attachObject(rocket);
+		my_selected = rocket;
 
-		my_selected = null;
 	}
 
 	private Vector2f pixelToWorld(Point pixel) {
@@ -154,11 +144,6 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 			sceneGraphRoot.addChild(object.getRenderable());
 		}
 		objects.add(object);
-		object.setGravity(my_gravity);
-		refresh();
-		my_selected = object;
-		setChanged();
-		notifyObservers(my_selected);
 
 	}
 
@@ -166,54 +151,11 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		return my_canvas;
 	}
 
-	public PhyObject getSelected() {
-		return my_selected;
-	}
 
 	public SceneGraphNode getRoot() {
 		return sceneGraphRoot;
 	}
 
-	public float getGravity() {
-		return my_gravity;
-	}
-
-	public void setGravity(final float the_gravity) {
-		my_gravity = the_gravity;
-		for (PhyObject o : objects) {
-			if (!(o instanceof HalfSpace)) {
-				o.setGravity(the_gravity);
-			}
-		}
-	}
-
-	public float getSpeedScale() {
-		return my_speed_scale;
-	}
-
-	public void setSpeedScale(final float the_speed_scale) {
-		if (the_speed_scale < 0) {
-			throw new IllegalArgumentException("Can't go back in time");
-		}
-		my_speed_scale = the_speed_scale;
-	}
-
-	public void setCollisions(boolean the_collisions) {
-		my_collionToggle = the_collisions;
-	}
-
-	public void launch(float power) {
-		if (my_selected != null) {
-			Vector2f tmp = new Vector2f(0, power);
-			tmp.rotate(my_selected.getRotationRadians());
-			tmp.sum(my_selected.getVelocity());
-			my_selected.setVelocity(tmp);
-		}
-	}
-
-	public void refresh() {
-		displayListID = -1;
-	}
 
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
@@ -243,33 +185,19 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 					}
 				}
 			}
-			setChanged();
-			notifyObservers(my_selected);
 
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			pickNextFrame = false;
 		}
-		// if (my_speed_scale > 0) {
 		for (PhyObject object : objects) {
-			object.updateState(1f / TARGET_FPS * my_speed_scale);
+			object.updateState(1f / TARGET_FPS);
 		}
-		notify_delta--;
-		if (notify_delta < 0) {
-			notifyObservers(my_selected);
-			setChanged();
-			notify_delta = NOTIFY_DELTA;
-		}
-		// }
 
 		boolean noCollisions = false;
 
-		int repeat = 0;
-		if (!my_collionToggle) {
-			repeat = RESOLUTION_REPEATS;
-		}
-		for (; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
+		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
 			noCollisions = true;
 			for (int i = 0; i < objects.size(); i++) {
 				PhyObject a = objects.get(i);
@@ -332,25 +260,5 @@ public class VirtualCanvas extends Observable implements GLEventListener {
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 	}
 
-	public void remove() {
-		sceneGraphRoot.removeChild(my_selected.getRenderable());
-		objects.remove(my_selected);
-		my_selected = null;
-		setChanged();
-		notifyObservers();
-	}
 
-	public void removeAll() {
-		Iterator<PhyObject> it = objects.iterator();
-		while (it.hasNext()) {
-			PhyObject next = it.next();
-			if (!(next instanceof HalfSpace)) {
-				sceneGraphRoot.removeChild(next.getRenderable());
-				it.remove();
-			}
-		}
-		my_selected = null;
-		setChanged();
-		notifyObservers();
-	}
 }
