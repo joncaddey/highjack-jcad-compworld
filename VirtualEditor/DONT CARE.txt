@@ -1,29 +1,29 @@
-CONFIRM
+TODO, in approximate order.
 
-is the boundary thing going to be alright?
+Get ship to fly around, ability to tune controls.
 
+Get ship to mirror to other end when out of bounds.
 
-are you SURE you have the correct moments of inertia?
+Get ship to fire bullets.
 
+Spawn primative asteroids.
 
-README
+Make asteroids mirror to other end when out of bounds.
 
-rocket has flames, which are non-physical.  the center of mass is affected by its head being more dense.
-station is incredibly massive, but its dome is above the world so it has no collision detection.
+Tune asteroid hp as well as gun damage for levels.
 
-increasing size increases mass
+Get asteroids to go to other networks.
 
-the world bounds are always the edge of the screen to help with experimentation
+Get ship to fire fancy bullets (first salvo is special with more pushing power, upon holding button same damage but less power.)
 
+Get composite asteroids (out of squares, triangles)
 
+Get ship to fire bomb (clears screen)
 
+Get ship to fire missile, which destroys asteroid of less than 10% hp and does chain reaction explosion based on destroyed asteroids max health to nearby asteroids.
 
+OR
 
+Make powerups.  Maybe powerup can be destroyed like a bomb.
 
-
-Game idea: create a course of very massive objects, try to reach goal as rocket as fast as possible.
-
-DON'T CARE
-possibly fix phypolygon halfspace to work on rhombuses.  oh gosh why.
-fix composite halfspace, like station.
-why not one resizer for phypolygon, which calculates center of mass, area, etc? 
+Make asteroids out of arbitrary triangles.
