@@ -1,10 +1,10 @@
 TODO, in approximate order.
 
-Get ship to fly around, ability to tune controls.
+// Get ship to fly around, ability to tune controls.
 
 Get ship to mirror to other end when out of bounds.
 
-Get ship to fire bullets.
+// Get ship to fire bullets.
 
 Spawn primative asteroids.
 

@@ -1,5 +1,9 @@
 package phyObj;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import main.SceneGraphNode;
 import main.Triangle;
 
@@ -16,10 +20,14 @@ public class Ship extends PhyComposite {
 	
 	
 	
+	
 	private boolean my_forward_toggle;
 	private boolean my_left_toggle;
 	private boolean my_right_toggle;
 	private boolean my_reverse_toggle;
+	private boolean my_bullet_toggle;
+	
+	private List<Bullet> my_bullets = new ArrayList<Bullet>();
 	
 	public Ship() {
 		
@@ -101,6 +109,7 @@ public class Ship extends PhyComposite {
 	
 	@Override
 	public void updateState(final float the_time) {
+		my_bullets.clear();
 		decay();
 		if (my_forward_toggle) {
 			forward();
@@ -114,7 +123,9 @@ public class Ship extends PhyComposite {
 		if (my_reverse_toggle) {
 			reverse();
 		}
-		
+		if (my_bullet_toggle) {
+			fire();
+		}
 		
 		super.updateState(the_time);
 	}
@@ -124,14 +135,24 @@ public class Ship extends PhyComposite {
 	
 	public void toggleLeft(boolean the_on) {
 		my_left_toggle = the_on;
+		if (!my_left_toggle) {
+			right();
+		}
 	}
 	
 	public void toggleRight(boolean the_on) {
 		my_right_toggle = the_on;
+		if (!my_right_toggle) {
+			left();
+		}
 	}
 	
 	public void toggleReverse(boolean the_on) {
 		my_reverse_toggle = the_on;
+	}
+	
+	public void toggleFire(boolean the_on) {
+		my_bullet_toggle = the_on;
 	}
 
 	private void forward() {
@@ -183,5 +204,22 @@ public class Ship extends PhyComposite {
 				velocity.scale((velocity.length() - LINEAR_DECAY) / velocity.length());
 			}
 		//}
+	}
+	
+	
+	
+	private void fire() {
+		Bullet bullet = new Bullet();
+		bullet.position = new Vector2f(0, 1);
+		bullet.position.rotate(orientation);
+		bullet.position.sum(position);
+		bullet.velocity = new Vector2f(0, 10);
+		bullet.velocity.rotate(orientation);
+		my_bullets.add(bullet);
+		
+	}
+	
+	public List<Bullet> getBullets() {
+		return Collections.unmodifiableList(my_bullets);
 	}
 }

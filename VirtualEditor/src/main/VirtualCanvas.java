@@ -22,6 +22,7 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 
+import phyObj.Bullet;
 import phyObj.CollisionInfo;
 import phyObj.HalfSpace;
 import phyObj.PhyComposite;
@@ -49,6 +50,7 @@ public class VirtualCanvas implements GLEventListener {
 	// relating to clicking
 	private SceneGraphNode sceneGraphRoot;
 	private ArrayList<PhyObject> objects;
+	private List<Bullet> my_bullets;
 	private boolean pickNextFrame;
 	private Point pickedPoint;
 
@@ -90,6 +92,8 @@ public class VirtualCanvas implements GLEventListener {
 		// });
 		sceneGraphRoot = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
+		my_bullets = new ArrayList<Bullet>();
+		
 		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));
 		bottomWall = new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1));
 		rightWall = new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0));
@@ -125,6 +129,9 @@ public class VirtualCanvas implements GLEventListener {
 					case KeyEvent.VK_DOWN:
 						my_ship.toggleReverse(true);
 					break;
+					case KeyEvent.VK_SPACE:
+						my_ship.toggleFire(true);
+					break;
 				}
 			}
 			
@@ -142,6 +149,9 @@ public class VirtualCanvas implements GLEventListener {
 					break;
 					case KeyEvent.VK_DOWN:
 						my_ship.toggleReverse(false);
+					break;
+					case KeyEvent.VK_SPACE:
+						my_ship.toggleFire(false);
 					break;
 				}
 			}
@@ -214,9 +224,26 @@ public class VirtualCanvas implements GLEventListener {
 		for (PhyObject object : objects) {
 			object.updateState(1f / TARGET_FPS);
 		}
+		
+		for (Bullet bill : my_ship.getBullets()) {
+			sceneGraphRoot.addChild(bill.getRenderable());
+			my_bullets.add(bill);
+		}
+		Iterator<Bullet> bit = my_bullets.iterator();
+		while (bit.hasNext()) {
+			final Bullet b = bit.next();
+			b.updateState(1f / TARGET_FPS);
+			if (!b.isAlive()) {
+				bit.remove();
+				sceneGraphRoot.removeChild(b.getRenderable());
+			}
+		}
+		
 
 		boolean noCollisions = false;
 
+		
+		
 		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
 			noCollisions = true;
 			for (int i = 0; i < objects.size(); i++) {
@@ -235,6 +262,9 @@ public class VirtualCanvas implements GLEventListener {
 
 		for (PhyObject object : objects) {
 			object.updateRenderable();
+		}
+		for (Bullet b : my_bullets) {
+			b.updateRenderable();
 		}
 		sceneGraphRoot.render(drawable);
 
