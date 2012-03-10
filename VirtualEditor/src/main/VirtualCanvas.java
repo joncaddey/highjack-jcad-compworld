@@ -26,6 +26,7 @@ import phyObj.CollisionInfo;
 import phyObj.HalfSpace;
 import phyObj.PhyComposite;
 import phyObj.PhyObject;
+import phyObj.Ship;
 import phyObj.Vector2f;
 
 import com.jogamp.common.nio.Buffers;
@@ -56,7 +57,7 @@ public class VirtualCanvas implements GLEventListener {
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
 
-	private PhyObject my_selected;
+	private Ship my_ship;
 
 	public VirtualCanvas() {
 		GLProfile profile = GLProfile.getDefault();
@@ -113,21 +114,40 @@ public class VirtualCanvas implements GLEventListener {
 				int code = the_e.getKeyCode();
 				switch (code) {
 					case KeyEvent.VK_UP:
+						my_ship.toggleForward(true);
 					break;
 					case KeyEvent.VK_LEFT:
-						my_selected.setAngularVelocity(my_selected.getAngularVelocity() + SIDE_THRUST);
+						my_ship.toggleLeft(true);
 					break;
 					case KeyEvent.VK_RIGHT:
-						my_selected.setAngularVelocity(my_selected.getAngularVelocity() - SIDE_THRUST);
+						my_ship.toggleRight(true);
 					break;
 					case KeyEvent.VK_DOWN:
+						my_ship.toggleReverse(true);
+					break;
+				}
+			}
+			
+			public void keyReleased(KeyEvent the_e) {
+				int code = the_e.getKeyCode();
+				switch (code) {
+					case KeyEvent.VK_UP:
+						my_ship.toggleForward(false);
+					break;
+					case KeyEvent.VK_LEFT:
+						my_ship.toggleLeft(false);
+					break;
+					case KeyEvent.VK_RIGHT:
+						my_ship.toggleRight(false);
+					break;
+					case KeyEvent.VK_DOWN:
+						my_ship.toggleReverse(false);
 					break;
 				}
 			}
 		});
-		PhyObject rocket = PhyComposite.getRocket(1);
-		attachObject(rocket);
-		my_selected = rocket;
+		my_ship = new Ship();
+		attachObject(my_ship);
 
 	}
 
@@ -173,18 +193,18 @@ public class VirtualCanvas implements GLEventListener {
 			gl.glMatrixMode(GL2.GL_MODELVIEW);
 			List<SceneGraphNode> picked = sceneGraphRoot.getPicked(drawable);
 
-			if (picked.isEmpty()) {
-				my_selected = null;
-			} else {
-				SceneGraphNode sgn = picked.get(0);
-				for (PhyObject o : objects) {
-					if (o.getRenderable() != null
-							&& o.getRenderable().equals(sgn)) {
-						my_selected = o;
-						break;
-					}
-				}
-			}
+//			if (picked.isEmpty()) {
+//				my_selected = null;
+//			} else {
+//				SceneGraphNode sgn = picked.get(0);
+//				for (PhyObject o : objects) {
+//					if (o.getRenderable() != null
+//							&& o.getRenderable().equals(sgn)) {
+//						my_selected = o;
+//						break;
+//					}
+//				}
+//			}
 
 			gl.glMatrixMode(GL2.GL_PROJECTION);
 			gl.glPopMatrix();
