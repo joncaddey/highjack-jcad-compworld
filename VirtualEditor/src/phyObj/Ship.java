@@ -13,7 +13,7 @@ public class Ship extends PhyComposite {
 	private static final float LINEAR_DECAY = .7f;
 	
 	private static final float FORWARD_THRUST = LINEAR_DECAY + 1f;
-	private static final float MAX_VELOCITY = 8f;
+	private static final float MAX_VELOCITY = 15f;
 	
 	private static final float ANGULAR_THRUST = ANGULAR_DECAY + 1.5f;
 	private static final float MAX_ANGULAR_VELOCITY = 15;
@@ -110,6 +110,8 @@ public class Ship extends PhyComposite {
 	@Override
 	public void updateState(final float the_time) {
 		my_bullets.clear();
+		if (my_reload_time > 0) my_reload_time--;
+		if (my_heat > 0) my_heat--;
 		decay();
 		if (my_forward_toggle) {
 			forward();
@@ -153,6 +155,10 @@ public class Ship extends PhyComposite {
 	
 	public void toggleFire(boolean the_on) {
 		my_bullet_toggle = the_on;
+		if (!my_bullet_toggle) {
+			my_heat += 1;
+			my_reload_time = 0; // this is to encourage breaking your keyboard
+		}
 	}
 
 	private void forward() {
@@ -178,7 +184,7 @@ public class Ship extends PhyComposite {
 	}
 
 	private void reverse() {
-		Vector2f temp = new Vector2f(0, -FORWARD_THRUST);
+		Vector2f temp = new Vector2f(0, -FORWARD_THRUST / 2);
 		temp.rotate(orientation);
 		temp.sum(velocity);
 		if(temp.length() < MAX_VELOCITY) {
@@ -207,16 +213,65 @@ public class Ship extends PhyComposite {
 	}
 	
 	
+	// TODO move to appropriate constants when figured out
+	private int my_reload_time = 0;
+	private int my_heat = 0;
 	
 	private void fire() {
+		if (my_reload_time > 0) {
+			return;
+		}
+		
+		if (my_heat < 20) {
+			powerShot();
+			my_heat += 16;
+			reverse();
+			my_reload_time = 10;
+		} else if (my_heat < 100) {
+			weakShot();
+			my_heat += 8;
+			reverse();
+			my_reload_time = 8;
+		}
+		
+		
+	}
+	
+	private void powerShot() {
 		Bullet bullet = new Bullet();
-		bullet.position = new Vector2f(0, 1);
+		bullet.setSize(.5f);
+		bullet.position = new Vector2f(0, .4f);
+		bullet.position.rotate(orientation);
+		bullet.position.sum(position);
+		bullet.velocity = new Vector2f(0, 15);
+		bullet.velocity.rotate(orientation);
+		my_bullets.add(bullet);
+		
+		bullet = new Bullet();
+		bullet.position = new Vector2f(0, .4f);
+		bullet.position.rotate(orientation);
+		bullet.position.sum(position);
+		bullet.velocity = new Vector2f(0, 13);
+		bullet.velocity.rotate(orientation + (float) Math.PI / 30);
+		my_bullets.add(bullet);
+		
+		bullet = new Bullet();
+		bullet.position = new Vector2f(0, .4f);
+		bullet.position.rotate(orientation);
+		bullet.position.sum(position);
+		bullet.velocity = new Vector2f(0, 13);
+		bullet.velocity.rotate(orientation - (float) Math.PI / 30);
+		my_bullets.add(bullet);
+	}
+	
+	private void weakShot() {
+		Bullet bullet = new Bullet();
+		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
 		bullet.velocity = new Vector2f(0, 10);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
-		
 	}
 	
 	public List<Bullet> getBullets() {
