@@ -71,6 +71,9 @@ public class Vector2f {
 		y = (float)(Math.sin(radians) * oldX + Math.cos(radians) * y);
 	}
 	
+	public void setLength(float mag) {
+		scale(mag / length());
+	}
 	
 	
 	

@@ -13,11 +13,13 @@ public class Bullet extends PhyCircle{
 		my_damage = the_damage;
 		my_time = the_time;
 		density = the_density;
+		setSize(the_radius * 2);
+		renderable.setRGBf(1, .6f, .3f);
 	}
 	
 	public Bullet() {
-		this(10, 45, .2f, 1);
-		renderable.setRGBf(1, .6f, .3f);
+		this(10, 45, .2f, .0001f);
+		
 	}
 	
 	@Override

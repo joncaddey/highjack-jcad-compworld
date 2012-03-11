@@ -222,12 +222,12 @@ public class Ship extends PhyComposite {
 			return;
 		}
 		
-		if (my_heat < 20) {
+		if (my_heat < 1) {
 			powerShot();
-			my_heat += 16;
+			my_heat += 11;
 			reverse();
 			my_reload_time = 10;
-		} else if (my_heat < 100) {
+		} else if (my_heat < 50) {
 			weakShot();
 			my_heat += 8;
 			reverse();
@@ -238,8 +238,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void powerShot() {
-		Bullet bullet = new Bullet();
-		bullet.setSize(.5f);
+		Bullet bullet = new Bullet(10, 45, .3f, .1f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
@@ -247,7 +246,7 @@ public class Ship extends PhyComposite {
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 		
-		bullet = new Bullet();
+		bullet = new Bullet(10, 45, .2f, .01f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
@@ -255,7 +254,7 @@ public class Ship extends PhyComposite {
 		bullet.velocity.rotate(orientation + (float) Math.PI / 30);
 		my_bullets.add(bullet);
 		
-		bullet = new Bullet();
+		bullet = new Bullet(10, 45, .2f, .01f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
@@ -265,7 +264,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet();
+		Bullet bullet = new Bullet(10, 45, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);

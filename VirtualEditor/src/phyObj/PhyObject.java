@@ -489,7 +489,7 @@ public class PhyObject {
 		float compRelVelAlongNormal = relativeVelocity.dot(cInfo.normal);
 		
 		// Calculate the resulting impulse per unit mass.
-		float impulse = (float)(1.7 * compRelVelAlongNormal / (
+		float impulse = (float)(1.9 * compRelVelAlongNormal / (
 				inverseMass + other.inverseMass + 
 				Math.pow(relativeCollisionPositionA.cross(cInfo.normal), 2) * inverseMomentOfInertia +
 				Math.pow(relativeCollisionPositionB.cross(cInfo.normal), 2) * other.inverseMomentOfInertia));
