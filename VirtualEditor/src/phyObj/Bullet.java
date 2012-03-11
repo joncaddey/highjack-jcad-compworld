@@ -16,7 +16,8 @@ public class Bullet extends PhyCircle{
 	}
 	
 	public Bullet() {
-		this(10, 45, .5f, 1);
+		this(10, 45, .2f, 1);
+		renderable.setRGBf(1, .6f, .3f);
 	}
 	
 	@Override
