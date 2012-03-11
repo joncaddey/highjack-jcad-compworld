@@ -22,6 +22,7 @@ import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.glu.GLU;
 
+import phyObj.Asteroid;
 import phyObj.Bullet;
 import phyObj.CollisionInfo;
 import phyObj.HalfSpace;
@@ -40,26 +41,26 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas implements GLEventListener {
 	private static final int TARGET_FPS = 45;
-	private static final int RESOLUTION_REPEATS = 40;
+	private static final int RESOLUTION_REPEATS = 1;
 	
-	private static final int SIDE_THRUST = 2;
-	public static final int FORWARD_THRUST = 4;
 
-
+	private static final int BOARD_SIZE = 10;
 
 	// relating to clicking
-	private SceneGraphNode sceneGraphRoot;
-	private ArrayList<PhyObject> objects;
-	private List<Bullet> my_bullets;
+	private SceneGraphNode my_root;
+	private final SceneGraphNode my_asteroid_root;
+	private final SceneGraphNode my_bullet_root;
+	private ArrayList<PhyObject> objects; // TODO refactor out
 	private boolean pickNextFrame;
 	private Point pickedPoint;
 
 	private float left, right, top, bottom;
-	private HalfSpace leftWall, rightWall, topWall, bottomWall;
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
 
 	private Ship my_ship;
+	private final List<Bullet> my_bullets;
+	private final List<Asteroid> my_asteroids;
 
 	public VirtualCanvas() {
 		GLProfile profile = GLProfile.getDefault();
@@ -74,43 +75,33 @@ public class VirtualCanvas implements GLEventListener {
 
 			}
 		});
-		// my_canvas.addMouseListener(new MouseAdapter() {
-		// @Override
-		// public void mousePressed(MouseEvent the_e) {
-		//
-		// }
-		// @Override
-		// public void mouseReleased(MouseEvent the_e) {
-		// System.out.println(pixelToWorld(new Point(the_e.getX(),
-		// the_e.getY())));
-		// }
-		// });
-		// my_canvas.addMouseMotionListener(new MouseMotionAdapter() {
-		// public void mouseDragged(MouseEvent e) {
-		// System.out.println(pixelToWorld(new Point(e.getX(), e.getY())));
-		// }
-		// });
-		sceneGraphRoot = new SceneGraphNode();
+		my_root = new SceneGraphNode();
+		my_asteroid_root = new SceneGraphNode();
+		my_bullet_root = new SceneGraphNode();
 		objects = new ArrayList<PhyObject>();
 		my_bullets = new ArrayList<Bullet>();
+		my_asteroids = new ArrayList<Asteroid>();
+		Asteroid a = new Asteroid();
+		//a.setSize(15);
 		
-		leftWall = new HalfSpace(new Vector2f(-5, 0), new Vector2f(1, 0));
-		bottomWall = new HalfSpace(new Vector2f(0, -5), new Vector2f(0, 1));
-		rightWall = new HalfSpace(new Vector2f(5, 0), new Vector2f(-1, 0));
-		topWall = new HalfSpace(new Vector2f(0, 5), new Vector2f(0, -1));
-		objects.add(rightWall);
-		objects.add(topWall);
-		objects.add(bottomWall);
-		objects.add(leftWall);
+		my_asteroids.add(a);
+		my_root.addChild(a.getRenderable());
+		
 
-		/*
-		 * / Add independent SceneGraphNode representing all the HalfSpaces.
-		 * sceneGraphRoot.addChild(new SceneGraphNode(false) { public void
-		 * renderGeometry(GLAutoDrawable drawable) { GL2 gl =
-		 * drawable.getGL().getGL2(); gl.glColor3f(1, 1, 1);
-		 * gl.glBegin(GL.GL_LINE_LOOP); gl.glVertex2f(-5, -5); gl.glVertex2f(5,
-		 * -5); gl.glVertex2f(5, 5); gl.glVertex2f(-5, 5); gl.glEnd(); } }); //
-		 */
+		
+		// Add independent SceneGraphNode representing all the HalfSpaces.
+		my_root.addChild(new SceneGraphNode(false) {
+			public void renderGeometry(GLAutoDrawable drawable) {
+				GL2 gl = drawable.getGL().getGL2();
+				gl.glColor3f(1, 1, 1);
+				gl.glBegin(GL.GL_LINE_LOOP);
+				gl.glVertex2f(-5, -5);
+				gl.glVertex2f(5, -5);
+				gl.glVertex2f(5, 5);
+				gl.glVertex2f(-5, 5);
+				gl.glEnd();
+			}
+		}); 
 		
 		my_canvas.addKeyListener(new KeyAdapter() {
 			@Override
@@ -162,7 +153,6 @@ public class VirtualCanvas implements GLEventListener {
 	}
 
 	private Vector2f pixelToWorld(Point pixel) {
-		// pixel * world / pixel = world
 		Vector2f r = new Vector2f(pixel.x, pixel.y);
 		r.x = r.x * (right - left) / this.my_canvas.getWidth() - right;
 		r.y = r.y * (bottom - top) / this.my_canvas.getHeight() + top;
@@ -171,7 +161,7 @@ public class VirtualCanvas implements GLEventListener {
 
 	public void attachObject(final PhyObject object) {
 		if (object.getRenderable() != null) {
-			sceneGraphRoot.addChild(object.getRenderable());
+			my_root.addChild(object.getRenderable());
 		}
 		objects.add(object);
 
@@ -183,64 +173,95 @@ public class VirtualCanvas implements GLEventListener {
 
 
 	public SceneGraphNode getRoot() {
-		return sceneGraphRoot;
+		return my_root;
 	}
 
 
 	public void display(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-		if (pickNextFrame) {
-			GLU glu = GLU.createGLU(gl);
-			int viewport[] = new int[4];
-			gl.glGetIntegerv(GL.GL_VIEWPORT, viewport, 0);
-			gl.glMatrixMode(GL2.GL_PROJECTION);
-			gl.glPushMatrix();
-			gl.glLoadIdentity();
-			glu.gluPickMatrix(pickedPoint.x,
-					(double) (viewport[3] - pickedPoint.y), 1, 1, viewport, 0);
-			gl.glOrtho(left, right, bottom, top, -1, 1);
-			gl.glMatrixMode(GL2.GL_MODELVIEW);
-			List<SceneGraphNode> picked = sceneGraphRoot.getPicked(drawable);
-
-//			if (picked.isEmpty()) {
-//				my_selected = null;
-//			} else {
-//				SceneGraphNode sgn = picked.get(0);
-//				for (PhyObject o : objects) {
-//					if (o.getRenderable() != null
-//							&& o.getRenderable().equals(sgn)) {
-//						my_selected = o;
-//						break;
-//					}
-//				}
-//			}
-
-			gl.glMatrixMode(GL2.GL_PROJECTION);
-			gl.glPopMatrix();
-			gl.glMatrixMode(GL2.GL_MODELVIEW);
-			pickNextFrame = false;
-		}
+		final float time = 1f / TARGET_FPS;
+		
+		// update ship
 		for (PhyObject object : objects) {
-			object.updateState(1f / TARGET_FPS);
+			object.updateState(time);
+		}
+		Vector2f position = my_ship.getPosition();
+		float radius = .5f;
+		if (position.x < -BOARD_SIZE / 2 - radius) {
+			my_ship.setPosition(BOARD_SIZE + 2 * radius + position.x, position.y);
+		} else if (position.x > BOARD_SIZE / 2 + radius) {
+			my_ship.setPosition(-BOARD_SIZE - 2 * radius + position.x, position.y);
+		}
+		if (position.y < -BOARD_SIZE / 2 - radius) {
+			my_ship.setPosition(position.x, BOARD_SIZE + 2 * radius + position.y);
+		} else if (position.y > BOARD_SIZE / 2 + radius) {
+			my_ship.setPosition(position.x, -BOARD_SIZE - 2 * radius + position.y);
 		}
 		
+		
+		// add any bullets fired since updating the ships state
 		for (Bullet bill : my_ship.getBullets()) {
-			sceneGraphRoot.addChild(bill.getRenderable());
+			my_bullet_root.addChild(bill.getRenderable());
 			my_bullets.add(bill);
 		}
+		
+		// update asteroids
+		for (Asteroid a : my_asteroids) {
+			a.updateState(time);
+			position = a.getPosition();
+			if (position.x < -BOARD_SIZE / 2) {
+				a.setPosition(BOARD_SIZE + position.x, position.y);
+			} else if (position.x > BOARD_SIZE / 2) {
+				a.setPosition(-BOARD_SIZE + position.x, position.y);
+			}
+			if (position.y < -BOARD_SIZE / 2) {
+				a.setPosition(position.x, BOARD_SIZE + position.y);
+			} else if (position.y > BOARD_SIZE / 2) {
+				a.setPosition(position.x, -BOARD_SIZE + position.y);
+			}
+		}
+		
+		
+		// check for collisions between bullets and asteroids
+		boolean noCollisions = false;
+		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
+			for (Bullet bill : my_bullets) {
+				for (Asteroid a : my_asteroids) {
+					CollisionInfo c = bill.getCollision(a);
+					if (c != null) {
+						noCollisions = false;
+						final float prevSpeed = bill.getVelocity().length();
+						bill.resolveCollision(a, c);
+						final Vector2f velocity = bill.getVelocity();
+						velocity.setLength(prevSpeed);
+						bill.setVelocity(velocity);
+					}
+				}
+			}
+		}
+		
+		// check for collision between ship and asteroids
+		for (Asteroid a : my_asteroids) {
+			CollisionInfo c = my_ship.getCollision(a);
+			if (c != null) {
+				my_ship.resolveCollision(a, c);
+			}
+		}
+		
+		// remove any bullets that need to be removed
 		Iterator<Bullet> bit = my_bullets.iterator();
 		while (bit.hasNext()) {
 			final Bullet b = bit.next();
-			b.updateState(1f / TARGET_FPS);
+			b.updateState(time);
 			if (!b.isAlive()) {
 				bit.remove();
-				sceneGraphRoot.removeChild(b.getRenderable());
+				my_bullet_root.removeChild(b.getRenderable());
 			}
 		}
 		
 
-		boolean noCollisions = false;
+		noCollisions = false;
 
 		
 		
@@ -260,13 +281,20 @@ public class VirtualCanvas implements GLEventListener {
 
 		}
 
+		
+		
 		for (PhyObject object : objects) {
 			object.updateRenderable();
 		}
 		for (Bullet b : my_bullets) {
 			b.updateRenderable();
 		}
-		sceneGraphRoot.render(drawable);
+		for (Asteroid a : my_asteroids) {
+			a.updateRenderable();
+		}
+		my_bullet_root.render(drawable);
+		my_asteroid_root.render(drawable);
+		my_root.render(drawable);
 
 	}
 
@@ -284,24 +312,18 @@ public class VirtualCanvas implements GLEventListener {
 
 	public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 			int height) {
-		final float UNIT = 10;
-
 		if (width < height) {
-			left = -UNIT / 2;
-			right = UNIT / 2;
-			top = (float) height / width * UNIT / 2;
+			left = -BOARD_SIZE / 2;
+			right = -left;
+			top = (float) height / width * BOARD_SIZE / 2;
 			bottom = -top;
 		} else {
-			top = UNIT / 2;
-			bottom = -UNIT / 2;
-			right = (float) width / height * UNIT / 2;
+			top = BOARD_SIZE / 2;
+			bottom = -top;
+			right = (float) width / height * BOARD_SIZE / 2;
 			left = -right;
 		}
 
-		leftWall.setPosition(left, 0);
-		rightWall.setPosition(right, 0);
-		bottomWall.setPosition(0, bottom);
-		topWall.setPosition(0, top);
 
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glMatrixMode(GL2.GL_PROJECTION);
@@ -309,6 +331,8 @@ public class VirtualCanvas implements GLEventListener {
 		gl.glOrtho(left, right, bottom, top, -1, 1);
 		gl.glMatrixMode(GL2.GL_MODELVIEW);
 	}
+	
+	
 
 
 }
