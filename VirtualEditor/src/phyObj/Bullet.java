@@ -7,6 +7,7 @@ public class Bullet extends PhyCircle{
 	 * How much extra time a bullet gets after bouncing.
 	 */
 	private static int BOUNCE_TIME = 100;
+	private static int MAX_TIME = 450;
 	private int my_damage;
 	private int my_time;
 	private int my_bounces;
@@ -18,6 +19,9 @@ public class Bullet extends PhyCircle{
 		my_damage = the_damage;
 		my_bounces = the_bounces;
 		my_time = the_time;
+		if (my_time > MAX_TIME) {
+			my_time = MAX_TIME;
+		}
 		density = the_density;
 		setSize(the_radius * 2);
 		renderable.setRGBf(1, .6f, .3f);
@@ -45,6 +49,9 @@ public class Bullet extends PhyCircle{
 	public void bounce() {
 		my_bounces--;
 		my_time += BOUNCE_TIME;
+		if (my_time > MAX_TIME) {
+			my_time = MAX_TIME;
+		}
 		if (my_bounces < 0) {
 			my_alive = false;
 		}

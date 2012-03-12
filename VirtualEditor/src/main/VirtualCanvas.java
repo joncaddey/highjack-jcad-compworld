@@ -59,6 +59,7 @@ public class VirtualCanvas implements GLEventListener {
 	private Point pickedPoint;
 
 	private float left, right, top, bottom;
+	private float my_field_width, my_field_height;
 	private int displayListID = -1;
 	private final GLCanvas my_canvas;
 
@@ -86,29 +87,22 @@ public class VirtualCanvas implements GLEventListener {
 		objects = new ArrayList<PhyObject>();
 		my_bullets = new ArrayList<Bullet>();
 		my_asteroids = new ArrayList<Asteroid>();
-		for (int i = 0; i < 3; i++) {
-			Asteroid a = new EqTriangleAsteroid(2 * i + 2, 10);
-			a.getObject().setVelocity(new Vector2f(3 * (i - 2), 3));
-			a.getObject().setAngularVelocity((float)Math.PI / 10 * i);
-			my_asteroids.add(a);
-			my_asteroid_root.addChild(a.getRenderable());
-		}
 		
 
 		
 		// Add independent SceneGraphNode representing all the HalfSpaces.
-		my_root.addChild(new SceneGraphNode(false) {
-			public void renderGeometry(GLAutoDrawable drawable) {
-				GL2 gl = drawable.getGL().getGL2();
-				gl.glColor3f(1, 1, 1);
-				gl.glBegin(GL.GL_LINE_LOOP);
-				gl.glVertex2f(-5, -5);
-				gl.glVertex2f(5, -5);
-				gl.glVertex2f(5, 5);
-				gl.glVertex2f(-5, 5);
-				gl.glEnd();
-			}
-		}); 
+//		my_root.addChild(new SceneGraphNode(false) {
+//			public void renderGeometry(GLAutoDrawable drawable) {
+//				GL2 gl = drawable.getGL().getGL2();
+//				gl.glColor3f(1, 1, 1);
+//				gl.glBegin(GL.GL_LINE_LOOP);
+//				gl.glVertex2f(-5, -5);
+//				gl.glVertex2f(5, -5);
+//				gl.glVertex2f(5, 5);
+//				gl.glVertex2f(-5, 5);
+//				gl.glEnd();
+//			}
+//		}); 
 		
 		my_canvas.addKeyListener(new KeyAdapter() {
 			@Override
@@ -182,6 +176,33 @@ public class VirtualCanvas implements GLEventListener {
 	public SceneGraphNode getRoot() {
 		return my_root;
 	}
+	
+	// TODO this is hackey.  Should parameterize it for difficulty.
+	private void addRandomAsteroid() {
+		double type = Math.random();
+		float size = 1 + 4 * (float)Math.random();
+		final Asteroid a;
+		final float hp = 10;
+		if (type <= .3) {
+			a = new EqTriangleAsteroid(size, hp);
+		} else if (type <= .6) {
+			a = new RightTriangleAsteroid(size, hp);
+		} else {
+			a = new SquareAsteroid(size, hp);
+		}
+		final float position1 = (float) Math.random() - .5f;
+		final float position2 = Math.random() < .5 ? -.5f : .5f;
+		if (Math.random() < .5) {
+			a.getObject().setPosition(position1 * (my_field_width + size),  position2 * (my_field_height + size));
+		} else {
+			a.getObject().setPosition(position2 * (my_field_width + size),  position1 * (my_field_height + size));
+		}
+		Vector2f tmp = new Vector2f(0, 1 + (float) Math.random() * 5f);
+		tmp.rotate((float)(Math.random() * 2 * Math.PI));
+		a.getObject().setVelocity(tmp);
+		my_asteroids.add(a);
+		my_asteroid_root.addChild(a.getRenderable());
+	}
 
 
 	public void display(GLAutoDrawable drawable) {
@@ -200,16 +221,16 @@ public class VirtualCanvas implements GLEventListener {
 			object.updateState(time);
 		}
 		Vector2f position = my_ship.getPosition();
-		float radius = .5f;
-		if (position.x < -BOARD_SIZE / 2 - radius) {
-			my_ship.setPosition(BOARD_SIZE + 2 * radius + position.x, position.y);
-		} else if (position.x > BOARD_SIZE / 2 + radius) {
-			my_ship.setPosition(-BOARD_SIZE - 2 * radius + position.x, position.y);
+		float radius = .3f;
+		if (position.x < -my_field_width / 2 - radius) {
+			my_ship.setPosition(my_field_width + 2 * radius + position.x, position.y);
+		} else if (position.x > my_field_width / 2 + radius) {
+			my_ship.setPosition(-my_field_width - 2 * radius + position.x, position.y);
 		}
-		if (position.y < -BOARD_SIZE / 2 - radius) {
-			my_ship.setPosition(position.x, BOARD_SIZE + 2 * radius + position.y);
-		} else if (position.y > BOARD_SIZE / 2 + radius) {
-			my_ship.setPosition(position.x, -BOARD_SIZE - 2 * radius + position.y);
+		if (position.y < -my_field_height / 2 - radius) {
+			my_ship.setPosition(position.x, my_field_height + 2 * radius + position.y);
+		} else if (position.y > my_field_height / 2 + radius) {
+			my_ship.setPosition(position.x, -my_field_height - 2 * radius + position.y);
 		}
 		
 		
@@ -224,15 +245,16 @@ public class VirtualCanvas implements GLEventListener {
 			PhyObject phy = a.getObject();
 			phy.updateState(time);
 			position = phy.getPosition();
-			if (position.x < -BOARD_SIZE / 2) {
-				phy.setPosition(BOARD_SIZE + position.x, position.y);
-			} else if (position.x > BOARD_SIZE / 2) {
-				phy.setPosition(-BOARD_SIZE + position.x, position.y);
+			final float max_size = 5;
+			if (position.x < -(my_field_width + max_size) / 2) {
+				phy.setPosition((my_field_width + max_size) + position.x, position.y);
+			} else if (position.x > (my_field_width + max_size) / 2) {
+				phy.setPosition(-(my_field_width + max_size) + position.x, position.y);
 			}
-			if (position.y < -BOARD_SIZE / 2) {
-				phy.setPosition(position.x, BOARD_SIZE + position.y);
-			} else if (position.y > BOARD_SIZE / 2) {
-				phy.setPosition(position.x, -BOARD_SIZE + position.y);
+			if (position.y < -(my_field_height + max_size) / 2) {
+				phy.setPosition(position.x, (my_field_height + max_size) + position.y);
+			} else if (position.y > (my_field_height + max_size) / 2) {
+				phy.setPosition(position.x, -(my_field_height + max_size) + position.y);
 			}
 		}
 		
@@ -303,6 +325,10 @@ public class VirtualCanvas implements GLEventListener {
 				}
 			}
 		}
+		if (my_asteroids.size() < 14) {
+			addRandomAsteroid();
+			addRandomAsteroid();
+		}
 		
 
 		noCollisions = false;
@@ -367,6 +393,8 @@ public class VirtualCanvas implements GLEventListener {
 			right = (float) width / height * BOARD_SIZE / 2;
 			left = -right;
 		}
+		my_field_width = right - left;
+		my_field_height = top - bottom;
 
 
 		GL2 gl = drawable.getGL().getGL2();

@@ -12,9 +12,7 @@ public class Ship extends PhyComposite {
 	private static final float ANGULAR_DECAY = 1f;
 	private static final float LINEAR_DECAY = .3f;
 	
-	//private static final float FORWARD_THRUST = LINEAR_DECAY + 1f;
-	private static final float FORWARD_THRUST = LINEAR_DECAY + .25f;
-	//private static final float MAX_VELOCITY = 15f;
+	private static final float FORWARD_THRUST = LINEAR_DECAY + .3f; // .25
 	private static final float MAX_VELOCITY = 20f;
 	private static final float ANGULAR_THRUST = ANGULAR_DECAY + 1.5f;
 	private static final float MAX_ANGULAR_VELOCITY = 15;
@@ -163,7 +161,7 @@ public class Ship extends PhyComposite {
 	public void toggleFire(boolean the_on) {
 		my_bullet_toggle = the_on;
 		if (!my_bullet_toggle) {
-			my_heat += 1;
+			my_heat += my_reload_time;
 			my_reload_time = 0; // this is to encourage breaking your keyboard
 		}
 	}
@@ -191,7 +189,7 @@ public class Ship extends PhyComposite {
 	}
 
 	private void reverse() {
-		Vector2f temp = new Vector2f(0, -FORWARD_THRUST / 2);
+		Vector2f temp = new Vector2f(0, -FORWARD_THRUST);
 		temp.rotate(orientation);
 		temp.sum(velocity);
 		if(temp.length() < MAX_VELOCITY) {
@@ -229,16 +227,36 @@ public class Ship extends PhyComposite {
 			return;
 		}
 		
-		if (my_heat < 1) {
+//		if (my_heat < 1) {
+//			powerShot();
+//			my_heat += 11;
+//			reverse();
+//			my_reload_time = 10;
+//		} else if (my_heat < 10) {
+//			my_heat += 8;
+//			my_reload_time = 8;
+//			weakShot();
+//		} else if (my_heat < 50) {
+//			weakShot();
+//			my_heat += 1;
+//			reverse();
+//			my_reload_time = 10;
+//		}
+		
+		if (my_heat < 30) {
 			powerShot();
-			my_heat += 11;
+			my_heat += 14;
 			reverse();
-			my_reload_time = 10;
-		} else if (my_heat < 50) {
+			my_reload_time = 3;
+		} else if (my_heat < 39) {
+			my_heat += 12;
+			my_reload_time = 12;
 			weakShot();
-			my_heat += 8;
+		} else if (my_heat < 120) {
+			weakShot();
+			my_heat += 0;
 			reverse();
-			my_reload_time = 8;
+			my_reload_time = 12;
 		}
 		
 		
@@ -247,7 +265,7 @@ public class Ship extends PhyComposite {
 	private void powerShot() {
 
 		
-		final int bullet_spread = 16;
+		final int bullet_spread = 6;
 		final int max_bullet_spread = 64;
 		for (int i = 0; i < bullet_spread; i++) {
 			Bullet bullet = new Bullet(1, 0, 45, .2f, .5f); // old density .01
@@ -270,7 +288,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(10, 10, 90, .2f, .0001f);
+		Bullet bullet = new Bullet(10, 5, 90, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
