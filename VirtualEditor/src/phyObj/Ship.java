@@ -12,9 +12,10 @@ public class Ship extends PhyComposite {
 	private static final float ANGULAR_DECAY = 1f;
 	private static final float LINEAR_DECAY = .7f;
 	
-	private static final float FORWARD_THRUST = LINEAR_DECAY + 1f;
-	private static final float MAX_VELOCITY = 15f;
-	
+	//private static final float FORWARD_THRUST = LINEAR_DECAY + 1f;
+	private static final float FORWARD_THRUST = LINEAR_DECAY + .25f;
+	//private static final float MAX_VELOCITY = 15f;
+	private static final float MAX_VELOCITY = 20f;
 	private static final float ANGULAR_THRUST = ANGULAR_DECAY + 1.5f;
 	private static final float MAX_ANGULAR_VELOCITY = 15;
 	
@@ -29,6 +30,9 @@ public class Ship extends PhyComposite {
 	
 	private List<Bullet> my_bullets = new ArrayList<Bullet>();
 	
+	/**
+	 * Its a shipssss it poilted by kirck cause he has funny hair. picard no hair
+	 */
 	public Ship() {
 		
 		
@@ -107,6 +111,9 @@ public class Ship extends PhyComposite {
 
 	}
 	
+	/**
+	 * {@inheritDoc}
+	 */
 	@Override
 	public void updateState(final float the_time) {
 		my_bullets.clear();
@@ -238,7 +245,8 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void powerShot() {
-		Bullet bullet = new Bullet(10, 45, .3f, .1f);
+		Bullet bullet = new Bullet(10, 45, .3f, .3f);
+		bullet.renderable.setRGBi(200, 54, 42);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
