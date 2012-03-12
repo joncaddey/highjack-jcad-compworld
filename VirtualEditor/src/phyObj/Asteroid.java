@@ -48,7 +48,7 @@ public abstract class Asteroid {
 	}
 	
 	public List<Asteroid> getFragments() {
-		return getFragments(.05f);
+		return getFragments(.25f);
 	}
 	public abstract List<Asteroid> getFragments(final float the_min_size);
 

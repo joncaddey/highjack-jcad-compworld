@@ -10,7 +10,7 @@ import main.Triangle;
 public class Ship extends PhyComposite {
 
 	private static final float ANGULAR_DECAY = 1f;
-	private static final float LINEAR_DECAY = .7f;
+	private static final float LINEAR_DECAY = .3f;
 	
 	//private static final float FORWARD_THRUST = LINEAR_DECAY + 1f;
 	private static final float FORWARD_THRUST = LINEAR_DECAY + .25f;
@@ -245,34 +245,32 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void powerShot() {
-		Bullet bullet = new Bullet(1, 45, .2f, .01f);
-		bullet.position = new Vector2f(0, .4f);
-		bullet.position.rotate(orientation);
-		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 13);
-		bullet.velocity.rotate(orientation + (float) Math.PI / 30);
-		my_bullets.add(bullet);
+
 		
-		bullet = new Bullet(1, 45, .2f, .01f);
-		bullet.position = new Vector2f(0, .4f);
-		bullet.position.rotate(orientation);
-		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 13);
-		bullet.velocity.rotate(orientation - (float) Math.PI / 30);
-		my_bullets.add(bullet);
+		final int bullet_spread = 16;
+		final int max_bullet_spread = 64;
+		for (int i = 0; i < bullet_spread; i++) {
+			Bullet bullet = new Bullet(1, 0, 45, .2f, .5f); // old density .01
+			bullet.position = new Vector2f(0, .4f);
+			bullet.position.rotate(orientation);
+			bullet.position.sum(position);
+			bullet.velocity = new Vector2f(0, 13);
+			bullet.velocity.rotate(orientation + (float) Math.PI / max_bullet_spread * 2 * (i + .5f - bullet_spread / 2));
+			my_bullets.add(bullet);
+		}
 		
-		bullet = new Bullet(1, 45, .3f, .5f);
+		Bullet bullet = new Bullet(1, 0, 45, .3f, 1f);
 		bullet.renderable.setRGBi(200, 54, 42);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 15);
+		bullet.velocity = new Vector2f(0, 14);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(5, 90, .2f, .0001f);
+		Bullet bullet = new Bullet(10, 10, 90, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);

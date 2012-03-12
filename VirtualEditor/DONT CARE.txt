@@ -1,5 +1,8 @@
 TODO, in approximate order.
 
+Add radius to every phyobject, so it is known how far out of bounds they must go to be off screen (and loop)
+
+and impulse argument to getfragments.
 Spawn primative asteroids.
 
 Tune asteroid hp as well as gun damage for levels.
@@ -32,4 +35,3 @@ add health bar or color to astroids
 
 add cahin reaction eXPLOSIONS
 
-add color changes for health (brighter as it has less health)
