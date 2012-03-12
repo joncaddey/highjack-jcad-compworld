@@ -1,4 +1,5 @@
 package network;
+
 import java.io.Serializable;
 
 public class PeerMessage implements Serializable {

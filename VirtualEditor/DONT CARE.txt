@@ -1,20 +1,10 @@
 TODO, in approximate order.
 
-// Get ship to fly around, ability to tune controls.
-
-Get ship to mirror to other end when out of bounds.
-
-// Get ship to fire bullets.
-
 Spawn primative asteroids.
-
-Make asteroids mirror to other end when out of bounds.
 
 Tune asteroid hp as well as gun damage for levels.
 
 Get asteroids to go to other networks.
-
-Get ship to fire fancy bullets (first salvo is special with more pushing power, upon holding button same damage but less power.)
 
 Get composite asteroids (out of squares, triangles)
 
@@ -27,3 +17,19 @@ OR
 Make powerups.  Maybe powerup can be destroyed like a bomb.
 
 Make asteroids out of arbitrary triangles.
+
+ADD focus
+
+remove thrusters when no thrust is aplied gigity
+
+add exploisions
+
+add sound
+
+add score
+
+add health bar or color to astroids
+
+add cahin reaction eXPLOSIONS
+
+add color changes for health (brighter as it has less health)

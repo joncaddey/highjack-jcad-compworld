@@ -11,7 +11,8 @@ public class Main {
 
 	VirtualCanvas my_canvas;
 	public Main() {
-		my_canvas = new VirtualCanvas(); 
+		my_canvas = new VirtualCanvas();
+		my_canvas.getCanvas().requestFocus();
 	}
 	
 	public void start() {

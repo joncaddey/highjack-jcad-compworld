@@ -66,6 +66,7 @@ public class VirtualCanvas implements GLEventListener {
 		GLProfile profile = GLProfile.getDefault();
 		GLCapabilities capabilities = new GLCapabilities(profile);
 		my_canvas = new GLCanvas(capabilities);
+		my_canvas.setFocusable(true);
 		my_canvas.addGLEventListener(this);
 		my_canvas.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {

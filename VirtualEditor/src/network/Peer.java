@@ -1,4 +1,5 @@
 package network;
+
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -24,7 +25,14 @@ public class Peer {
 	 * The period between invocations of background tasks, e.g., stabilize, fix fingers.
 	 */
 	public static final int BACKGROUND_TASK_PERIOD = 10000;
-	
+	/**
+	 * IP address detection method:
+	 * (1) InetAddress.getLocalHost()
+	 * (2) Querying whatismyip.org
+	 * (3) First peer connection
+	 */
+	private static final int IP_DETECTION = 3;
+
 	private PeerInformation myInfo;
 	private ServerSocket serverSocket;
 	private Thread incomingThread;
@@ -34,7 +42,7 @@ public class Peer {
 	private PeerInformation successor;
 	private PeerInformation predecessor;
 	private int next;
-	
+
 	public Peer() {
 		myInfo = new PeerInformation();
 //		logEnabled = true;
@@ -44,7 +52,7 @@ public class Peer {
 	public boolean createNetwork() {
 		return createNetwork((long)(ID_LIMIT * Math.random()));
 	}
-	
+
 	public boolean createNetwork(long id) {
 		if (serverSocket == null)
 			if (!startServer())
@@ -56,16 +64,16 @@ public class Peer {
 		else
 			System.out.println("Established network @ " + myInfo.id);
 		return true;
-	}	
+	}
 
 	public boolean connectToNetwork(String host) {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT);
 	}
-	
+
 	public boolean connectToNetwork(String host, long id) {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT, id);
 	}
-	
+
 	public boolean connectToNetwork(String host, int port) {
 		try {
 			return connectToNetwork(InetAddress.getByName(host), port);
@@ -74,7 +82,7 @@ public class Peer {
 			return false;
 		}
 	}
-	
+
 	public boolean connectToNetwork(String host, int port, long id) {
 		try {
 			return connectToNetwork(InetAddress.getByName(host), port, id);
@@ -87,11 +95,11 @@ public class Peer {
 	public boolean connectToNetwork(InetAddress host) {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT);
 	}
-	
+
 	public boolean connectToNetwork(InetAddress host, long id) {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT, id);
 	}
-	
+
 	public boolean connectToNetwork(InetAddress host, int port) {
 		return connectToNetwork(host, port, (long)(ID_LIMIT * Math.random()));
 	}
@@ -136,13 +144,14 @@ public class Peer {
 		if (incomingThread != null) {
 			incomingThread.interrupt();
 			incomingThread = null;
-		}	
+		}
 	}
 
 	private boolean startServer() {
 		return startServer(DEFAULT_SERVER_PORT);
 	}
-	
+
+	@SuppressWarnings("unused")
 	private boolean startServer(int port) {
 		while (true) {
 			try {
@@ -155,8 +164,14 @@ public class Peer {
 				return false;
 			}
 			try {
-				myInfo.address = InetAddress.getLocalHost();
-			} catch (UnknownHostException e) {
+				if (IP_DETECTION == 1)
+					myInfo.address = InetAddress.getLocalHost();
+				else if (IP_DETECTION == 2) {
+					URLConnection urlc = new URL("http://whatismyip.org/").openConnection();
+					BufferedReader socketIn = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
+					myInfo.address = InetAddress.getByName(socketIn.readLine());
+				}
+			} catch (IOException e) {
 				System.err.println(e);
 				try {
 					serverSocket.close();
@@ -168,14 +183,14 @@ public class Peer {
 			myInfo.port = port;
 			break;
 		}
-		
-		System.out.println("Listening on " + myInfo.address + ":" + myInfo.port);
-		
+
+		System.out.println("Listening on " + (myInfo.address != null ? myInfo.address : "") + ":" + myInfo.port);
+
 		incomingThread = new Thread() {
 			{
 				setDaemon(true);
 			}
-			
+
 			public void run()  {
 				while (!isInterrupted()) {
 					logMessage("Waiting for peer connection...");
@@ -190,16 +205,27 @@ public class Peer {
 		};
 		incomingThread.start();
 		startPeriodicThread();
-		
+
 		return true;
 	}
 
 	private void processConnection(Socket socket) {
 		try {
+			if (myInfo.address == null) {
+				myInfo.address = socket.getLocalAddress();
+				if (logEnabled)
+					logMessage("Updated local IP to " + myInfo.address);
+				else
+					System.out.println("Updated local IP to " + myInfo.address);
+			}
 			ObjectInputStream socketIn = new ObjectInputStream(socket.getInputStream());
-			processMessage((PeerMessage)socketIn.readObject());
+			PeerMessage mesg = (PeerMessage)socketIn.readObject();
+			if (mesg.sender.address == null)
+				mesg.sender.address = socket.getInetAddress();
+			processMessage(mesg);
 		} catch (Exception e) {
 //			System.err.println(e);
+			// Broken connection expected for precessor alive test
 		}
 	}
 
@@ -250,6 +276,8 @@ public class Peer {
 	}
 
 	private boolean sendMessage(PeerMessage mesg, PeerInformation destination) {
+		if (destination.address == null)	// silently fail when IP_DETECTION == 3 and no other peer has connected
+			return false;
 		logMessage("Sending message " + mesg.type + " to " + destination.id);
 		try {
 			Socket socket = new Socket(destination.address, destination.port);
@@ -274,7 +302,7 @@ public class Peer {
 		if (logEnabled)
 			System.err.println(new Date() + " -- " + text);
 	}
-	
+
 	private void findSuccessor(PeerMessage mesg) {
 		if (successor != null && withinHalfClosed(mesg.idToFindSuccessorOf, myInfo.id, successor.id)) {
 			mesg.type = PeerMessage.Type.SUCCESSOR;
@@ -290,14 +318,14 @@ public class Peer {
 				sendMessage(mesg, predecessor);
 		}
 	}
-	
+
 	private PeerInformation closestPrecedingNode(long id) {
 		for (int i = finger.length - 1; i >= 0; i--)
 			if (finger[i] != null && withinOpen(finger[i].id, myInfo.id, id))
 				return finger[i];
 		return myInfo;
 	}
-	
+
 	private void fixFingers() {
 		PeerMessage mesg = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
 		mesg.idToFindSuccessorOf = (myInfo.id + (1 << next)) % ID_LIMIT;
@@ -313,20 +341,20 @@ public class Peer {
 	private static boolean withinHalfClosed(long id, long start, long end) {
 		return id == end || withinOpen(id, start, end);
 	}
-	
+
 	private static long distance(long start, long end) {
 		long dist = end - start;
 		if (dist < 0)
 			dist += ID_LIMIT;
 		return dist;
 	}
-	
+
 	private void startPeriodicThread() {
 		periodicThread = new Thread() {
 			{
 				setDaemon(true);
 			}
-			
+
 			public void run() {
 				while (!isInterrupted()) {
 					try {
@@ -367,9 +395,9 @@ public class Peer {
 		for (int i = 0; i < finger.length; i++)
 			if (peer.equals(finger[i]))
 				finger[i] = null;
-		logMessage('\n' + internalState());	
+		logMessage('\n' + internalState());
 	}
-	
+
 	private String internalState() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Predecessor: ");
@@ -382,9 +410,9 @@ public class Peer {
 			sb.append(" @ ");
 			sb.append(finger[i] == null ? finger[i] : finger[i].id);
 		}
-		return sb.toString();			
+		return sb.toString();
 	}
-	
+
 	public void sendText(String text, long id) {
 		PeerMessage mesg = new PeerMessage(PeerMessage.Type.PAYLOAD, myInfo);
 		mesg.payload = text;
@@ -396,7 +424,6 @@ public class Peer {
 		if (mesg.idOfPayloadDestination == -1)
 			System.out.println("Peer " + mesg.sender.id + " says, \"" + mesg.payload + "\"");
 		else if (successor != null && withinHalfClosed(mesg.idOfPayloadDestination, myInfo.id, successor.id)) {
-//			mesg.sender = myInfo;
 			mesg.idOfPayloadDestination = -1;
 			sendMessage(mesg, successor);
 		} else {
@@ -407,12 +434,12 @@ public class Peer {
 				sendMessage(mesg, predecessor);
 		}
 	}
-	
+
 	public static void main(String[] args) {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		boolean newNetwork = false;
 		String input = null;
-		
+
 		while (true) {
 			System.out.println("Create a new network or join an existing network?");
 			System.out.println("  1. Create a new network");
@@ -428,14 +455,14 @@ public class Peer {
 			} else if (input.equals("2"))
 				break;
 		}
-		
+
 		long id = -1;
 		while (true) {
 			System.out.println("Desired network ID, 0-" + (Peer.ID_LIMIT-1) + " [random]: ");
 			try {
 				input = in.readLine();
 				if (input.length() == 0)
-					break;				
+					break;
 				id = Long.parseLong(input);
 			} catch (NumberFormatException e) {
 				continue;
@@ -445,7 +472,7 @@ public class Peer {
 			if (id >= -1 && id < Peer.ID_LIMIT)
 				break;
 		}
-		
+
 		Peer peer = new Peer();
 		if (newNetwork) {
 			if (id == -1)
@@ -470,11 +497,13 @@ public class Peer {
 				}
 			} while (id == -1 ? !peer.connectToNetwork(ip, port) : !peer.connectToNetwork(ip, port, id));
 		}
-		
+
 		System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
 		while (true) {
 			try {
 				input = in.readLine();
+				if (input.length() == 0)
+					continue;
 				Scanner sc = new Scanner(input);
 				if (!sc.hasNextLong()) {
 					input = sc.next();
