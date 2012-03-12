@@ -30,7 +30,9 @@ import phyObj.EqTriangleAsteroid;
 import phyObj.HalfSpace;
 import phyObj.PhyComposite;
 import phyObj.PhyObject;
+import phyObj.RightTriangleAsteroid;
 import phyObj.Ship;
+import phyObj.SquareAsteroid;
 import phyObj.Vector2f;
 
 import com.jogamp.common.nio.Buffers;
@@ -43,7 +45,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas implements GLEventListener {
 	private static final int TARGET_FPS = 45;
-	private static final int RESOLUTION_REPEATS = 1;
+	private static final int RESOLUTION_REPEATS = 10;
 	
 
 	private static final int BOARD_SIZE = 10;
@@ -85,8 +87,9 @@ public class VirtualCanvas implements GLEventListener {
 		my_bullets = new ArrayList<Bullet>();
 		my_asteroids = new ArrayList<Asteroid>();
 		for (int i = 0; i < 3; i++) {
-			Asteroid a = new EqTriangleAsteroid(3 * i + 2, 10);
-			a.getObject().setVelocity(new Vector2f(3, 0));
+			Asteroid a = new EqTriangleAsteroid(2 * i + 2, 10);
+			a.getObject().setVelocity(new Vector2f(3 * (i - 2), 3));
+			a.getObject().setAngularVelocity((float)Math.PI / 10 * i);
 			my_asteroids.add(a);
 			my_asteroid_root.addChild(a.getRenderable());
 		}
@@ -252,22 +255,21 @@ public class VirtualCanvas implements GLEventListener {
 		}
 		
 		// check for collisions between bullets and asteroids
-		noCollisions = false;
-		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
-			for (Bullet bill : my_bullets) {
-				for (Asteroid a : my_asteroids) {
-					CollisionInfo c = bill.getCollision(a.getObject());
-					if (c != null) {
-						noCollisions = false;
-						final float prevSpeed = bill.getVelocity().length();
-						bill.resolveCollision(a.getObject(), c);
-						final Vector2f velocity = bill.getVelocity();
-						velocity.setLength(prevSpeed);
-						bill.setVelocity(velocity);
-						a.decrementHP(bill.getDamage());
-					}
+		for (Bullet bill : my_bullets) {
+			for (Asteroid a : my_asteroids) {
+				CollisionInfo c = bill.getCollision(a.getObject());
+				if (c != null) {
+					noCollisions = false;
+					final float prevSpeed = bill.getVelocity().length();
+					bill.resolveCollision(a.getObject(), c);
+					final Vector2f velocity = bill.getVelocity();
+					velocity.setLength(prevSpeed);
+					bill.setVelocity(velocity);
+					a.decrementHP(bill.getDamage());
+					bill.bounce();
 				}
 			}
+
 		}
 		
 		// check for collision between ship and asteroids
