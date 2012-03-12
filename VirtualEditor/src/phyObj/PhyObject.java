@@ -85,6 +85,9 @@ public class PhyObject {
 	public float getAngularVelocity() {
 		return this.angularVelocity;
 	}
+	public float getMass() {
+		return 1f / inverseMass;
+	}
 	
 	/**
 	 * Subclasses modify mass, moment of inertia, center of mass, and area as appropriate.
@@ -519,5 +522,9 @@ public class PhyObject {
 		
 		synchChildren();
 		other.synchChildren();
+	}
+
+	public float getRotation() {
+		return orientation;
 	}
 }
