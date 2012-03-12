@@ -11,6 +11,7 @@ import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Observable;
 
 import javax.media.opengl.GL;
@@ -25,6 +26,7 @@ import javax.media.opengl.glu.GLU;
 import phyObj.Asteroid;
 import phyObj.Bullet;
 import phyObj.CollisionInfo;
+import phyObj.EqTriangleAsteroid;
 import phyObj.HalfSpace;
 import phyObj.PhyComposite;
 import phyObj.PhyObject;
@@ -82,11 +84,12 @@ public class VirtualCanvas implements GLEventListener {
 		objects = new ArrayList<PhyObject>();
 		my_bullets = new ArrayList<Bullet>();
 		my_asteroids = new ArrayList<Asteroid>();
-		Asteroid a = new Asteroid();
-		//a.setSize(15);
-		
-		my_asteroids.add(a);
-		my_root.addChild(a.getRenderable());
+		for (int i = 0; i < 3; i++) {
+			Asteroid a = new EqTriangleAsteroid(3 * i + 2, 10);
+			a.getObject().setVelocity(new Vector2f(3, 0));
+			my_asteroids.add(a);
+			my_asteroid_root.addChild(a.getRenderable());
+		}
 		
 
 		
@@ -183,6 +186,12 @@ public class VirtualCanvas implements GLEventListener {
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		final float time = 1f / TARGET_FPS;
 		
+		// update bullets
+		for (Bullet b : my_bullets) {
+			b.updateState(time);
+		}
+		
+		
 		// update ship
 		for (PhyObject object : objects) {
 			object.updateState(time);
@@ -209,34 +218,53 @@ public class VirtualCanvas implements GLEventListener {
 		
 		// update asteroids
 		for (Asteroid a : my_asteroids) {
-			a.updateState(time);
-			position = a.getPosition();
+			PhyObject phy = a.getObject();
+			phy.updateState(time);
+			position = phy.getPosition();
 			if (position.x < -BOARD_SIZE / 2) {
-				a.setPosition(BOARD_SIZE + position.x, position.y);
+				phy.setPosition(BOARD_SIZE + position.x, position.y);
 			} else if (position.x > BOARD_SIZE / 2) {
-				a.setPosition(-BOARD_SIZE + position.x, position.y);
+				phy.setPosition(-BOARD_SIZE + position.x, position.y);
 			}
 			if (position.y < -BOARD_SIZE / 2) {
-				a.setPosition(position.x, BOARD_SIZE + position.y);
+				phy.setPosition(position.x, BOARD_SIZE + position.y);
 			} else if (position.y > BOARD_SIZE / 2) {
-				a.setPosition(position.x, -BOARD_SIZE + position.y);
+				phy.setPosition(position.x, -BOARD_SIZE + position.y);
 			}
 		}
 		
+		// check for collisions between asteroids and asteroids
+		boolean noCollisions = false;
+		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
+			noCollisions = true;
+			for (int i = 0; i < my_asteroids.size(); i++) {
+				Asteroid a = my_asteroids.get(i);
+				for (int j = i + 1; j < my_asteroids.size(); j++) {
+					Asteroid b = my_asteroids.get(j);
+					CollisionInfo cInfo = a.getObject().getCollision(b.getObject());
+					if (cInfo != null) {
+						noCollisions = false;
+						a.getObject().resolveCollision(b.getObject(), cInfo);
+					}
+				}
+			}
+
+		}
 		
 		// check for collisions between bullets and asteroids
-		boolean noCollisions = false;
+		noCollisions = false;
 		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
 			for (Bullet bill : my_bullets) {
 				for (Asteroid a : my_asteroids) {
-					CollisionInfo c = bill.getCollision(a);
+					CollisionInfo c = bill.getCollision(a.getObject());
 					if (c != null) {
 						noCollisions = false;
 						final float prevSpeed = bill.getVelocity().length();
-						bill.resolveCollision(a, c);
+						bill.resolveCollision(a.getObject(), c);
 						final Vector2f velocity = bill.getVelocity();
 						velocity.setLength(prevSpeed);
 						bill.setVelocity(velocity);
+						a.decrementHP(bill.getDamage());
 					}
 				}
 			}
@@ -244,9 +272,9 @@ public class VirtualCanvas implements GLEventListener {
 		
 		// check for collision between ship and asteroids
 		for (Asteroid a : my_asteroids) {
-			CollisionInfo c = my_ship.getCollision(a);
+			CollisionInfo c = my_ship.getCollision(a.getObject());
 			if (c != null) {
-				my_ship.resolveCollision(a, c);
+				my_ship.resolveCollision(a.getObject(), c);
 			}
 		}
 		
@@ -254,10 +282,23 @@ public class VirtualCanvas implements GLEventListener {
 		Iterator<Bullet> bit = my_bullets.iterator();
 		while (bit.hasNext()) {
 			final Bullet b = bit.next();
-			b.updateState(time);
 			if (!b.isAlive()) {
 				bit.remove();
 				my_bullet_root.removeChild(b.getRenderable());
+			}
+		}
+		
+		// remove any asteroids that need to be removed
+		ListIterator<Asteroid> ait = my_asteroids.listIterator();
+		while (ait.hasNext()) {
+			final Asteroid a = ait.next();
+			if (!a.isAlive()) {
+				ait.remove();
+				my_asteroid_root.removeChild(a.getRenderable());
+				for (Asteroid b : a.getFragments()) {
+					ait.add(b);
+					my_asteroid_root.addChild(b.getRenderable());
+				}
 			}
 		}
 		
@@ -291,7 +332,7 @@ public class VirtualCanvas implements GLEventListener {
 			b.updateRenderable();
 		}
 		for (Asteroid a : my_asteroids) {
-			a.updateRenderable();
+			a.getObject().updateRenderable();
 		}
 		my_bullet_root.render(drawable);
 		my_asteroid_root.render(drawable);

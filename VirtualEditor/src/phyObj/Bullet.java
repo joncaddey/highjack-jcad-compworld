@@ -34,4 +34,8 @@ public class Bullet extends PhyCircle{
 	public boolean isAlive() {
 		return my_alive;
 	}
+	
+	public int getDamage() {
+		return my_damage;
+	}
 }

@@ -245,16 +245,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void powerShot() {
-		Bullet bullet = new Bullet(10, 45, .3f, .3f);
-		bullet.renderable.setRGBi(200, 54, 42);
-		bullet.position = new Vector2f(0, .4f);
-		bullet.position.rotate(orientation);
-		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 15);
-		bullet.velocity.rotate(orientation);
-		my_bullets.add(bullet);
-		
-		bullet = new Bullet(10, 45, .2f, .01f);
+		Bullet bullet = new Bullet(1, 45, .2f, .01f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
@@ -262,17 +253,26 @@ public class Ship extends PhyComposite {
 		bullet.velocity.rotate(orientation + (float) Math.PI / 30);
 		my_bullets.add(bullet);
 		
-		bullet = new Bullet(10, 45, .2f, .01f);
+		bullet = new Bullet(1, 45, .2f, .01f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
 		bullet.velocity = new Vector2f(0, 13);
 		bullet.velocity.rotate(orientation - (float) Math.PI / 30);
 		my_bullets.add(bullet);
+		
+		bullet = new Bullet(1, 45, .3f, .5f);
+		bullet.renderable.setRGBi(200, 54, 42);
+		bullet.position = new Vector2f(0, .4f);
+		bullet.position.rotate(orientation);
+		bullet.position.sum(position);
+		bullet.velocity = new Vector2f(0, 15);
+		bullet.velocity.rotate(orientation);
+		my_bullets.add(bullet);
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(10, 45, .2f, .0001f);
+		Bullet bullet = new Bullet(5, 90, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
