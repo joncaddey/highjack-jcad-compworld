@@ -47,9 +47,9 @@ public class Ship extends PhyComposite {
 		
 		PhyPolygon finRight = PhyPolygon.getEqTriangle(.5f);
 		finRight.density = .1f;
-		finRight.renderable.red = finLeft.renderable.red;
-		finRight.renderable.green = finLeft.renderable.green;
-		finRight.renderable.blue = finLeft.renderable.blue;
+		finRight.renderable.current_red = finLeft.renderable.current_red;
+		finRight.renderable.current_green = finLeft.renderable.current_green;
+		finRight.renderable.current_blue = finLeft.renderable.current_blue;
 		finRight.orientation = radians(-90);
 		finRight.position = new Vector2f(.39f, -.3f);
 		addObject(finLeft);
@@ -161,7 +161,7 @@ public class Ship extends PhyComposite {
 	public void toggleFire(boolean the_on) {
 		my_bullet_toggle = the_on;
 		if (!my_bullet_toggle) {
-			my_heat += my_reload_time;
+			my_heat += my_reload_time / 2;
 			my_reload_time = 0; // this is to encourage breaking your keyboard
 		}
 	}
@@ -248,15 +248,15 @@ public class Ship extends PhyComposite {
 			my_heat += 14;
 			reverse();
 			my_reload_time = 3;
-		} else if (my_heat < 39) {
+		} else if (my_heat < 38) {
 			my_heat += 12;
-			my_reload_time = 12;
+			my_reload_time = 10;
 			weakShot();
-		} else if (my_heat < 120) {
+		} else if (my_heat < 60) {
 			weakShot();
-			my_heat += 0;
+			my_heat += 2;
 			reverse();
-			my_reload_time = 12;
+			my_reload_time = 10;
 		}
 		
 		
@@ -288,7 +288,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(10, 5, 90, .2f, .0001f);
+		Bullet bullet = new Bullet(10, 4, 90, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);

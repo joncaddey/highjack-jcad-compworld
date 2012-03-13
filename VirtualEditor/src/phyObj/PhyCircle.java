@@ -16,9 +16,7 @@ public class PhyCircle extends PhyObject {
 		float inverseMass = 1 / (density * area);
 		inverseMomentOfInertia = 1 / (float)(Math.PI * Math.pow(size, 4) / 4) * inverseMass;
 		renderable = new Circle();
-		renderable.red = red;
-		renderable.green = green;
-		renderable.blue = blue;
+		renderable.setRGBf(red, green, blue);
 		renderable.scale = diameter / 2;
 	}
 	

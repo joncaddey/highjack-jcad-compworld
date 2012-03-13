@@ -35,11 +35,11 @@ public class Triangle extends SceneGraphNode {
 	public void renderGeometry(GLAutoDrawable drawable) {
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glBegin(GL.GL_TRIANGLES);
-		gl.glColor3f(Math.min(1, red + .2f), Math.min(1, green + .2f), Math.min(1, blue + .2f));
+		gl.glColor3f(Math.min(1, current_red + .2f), Math.min(1, current_green + .2f), Math.min(1, current_blue + .2f));
 		gl.glVertex2f(vertices[0], vertices[1]);
-		gl.glColor3f(Math.min(1, red + .1f), Math.min(1, green + .1f), Math.min(1, blue + .1f));
+		gl.glColor3f(Math.min(1, current_red + .1f), Math.min(1, current_green + .1f), Math.min(1, current_blue + .1f));
 		gl.glVertex2f(vertices[2], vertices[3]);
-		gl.glColor3f(red, green, blue);
+		gl.glColor3f(current_red, current_green, current_blue);
 		gl.glVertex2f(vertices[4], vertices[5]);
 		gl.glEnd();
 	}
