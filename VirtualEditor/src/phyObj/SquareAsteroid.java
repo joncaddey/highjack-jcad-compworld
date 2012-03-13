@@ -12,7 +12,7 @@ public class SquareAsteroid extends Asteroid{
 	}
 	
 	@Override
-	public List<Asteroid> getFragments(float greater_than_size) {
+	public List<Asteroid> getFragments(float greater_than_size, final float the_impulse) {
 		List<Asteroid> r = new ArrayList<Asteroid>(4);
 		final float size;
 		if (my_object.getSize() / 4 > greater_than_size) {
@@ -60,6 +60,13 @@ public class SquareAsteroid extends Asteroid{
 			tmp.rotate(my_object.getRotation());
 			r.get(1).getObject().position.sum(tmp);
 			r.get(1).getObject().setRotationDegrees(my_object.getRotationDegrees() + 180);
+		}
+		for (Asteroid a : r) {
+			Vector2f dv = new Vector2f(a.getObject().getPosition());
+			dv.sumScale(my_object.getPosition(), -1);
+			dv.setLength(the_impulse / a.getObject().getMass());
+			dv.sum(a.getObject().getVelocity());
+			a.getObject().setVelocity(dv);
 		}
 		return r;
 	}
