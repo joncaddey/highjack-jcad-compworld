@@ -1,8 +1,9 @@
 package phyObj;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import main.SceneGraphNode;
 
 public class SquareAsteroid extends Asteroid{
 
@@ -22,6 +23,8 @@ public class SquareAsteroid extends Asteroid{
 				a.getObject().setPosition(my_object.getPosition().x, my_object.getPosition().y);
 				a.getObject().setAngularVelocity(my_object.getAngularVelocity());
 				a.getObject().setVelocity(my_object.getVelocity());
+				final SceneGraphNode renderable = my_object.getRenderable();
+				a.getObject().getRenderable().setRGBf(renderable.getRed(), renderable.getGreen(), renderable.getBlue());
 				r.add(a);
 			}
 			final float offset = size / 2;
@@ -46,6 +49,8 @@ public class SquareAsteroid extends Asteroid{
 				a.getObject().setPosition(my_object.getPosition().x, my_object.getPosition().y);
 				a.getObject().setAngularVelocity(my_object.getAngularVelocity());
 				a.getObject().setVelocity(my_object.getVelocity());
+				final SceneGraphNode renderable = my_object.getRenderable();
+				a.getObject().getRenderable().setRGBf(renderable.getRed(), renderable.getGreen(), renderable.getBlue());
 				r.add(a);
 			}
 			Vector2f tmp = new Vector2f(-size / 6, -size / 6);

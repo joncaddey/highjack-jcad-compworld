@@ -12,7 +12,11 @@ public class SceneGraphNode {
 	private List<SceneGraphNode> children;
 	private boolean pickable;
 	
-	public float red, blue, green;
+	/**
+	 * RGB after brightness is applied.
+	 */
+	public float current_red, current_blue, current_green;
+	private float red, green, blue;
 	
 	public SceneGraphNode() {
 		this(true);
@@ -29,6 +33,7 @@ public class SceneGraphNode {
 		green = (float) Math.random();
 		blue = (float) Math.random();
 		this.pickable = pickable;
+		setBrightness(.5f);
 	}
 	
 	public void addChild(SceneGraphNode node) {
@@ -106,10 +111,34 @@ public class SceneGraphNode {
 		red = r;
 		green = g;
 		blue = b;
+		setBrightness(.5f);
 	}
 	
 	public void setRGBi(int r, int g, int b) {
 		setRGBf(r / 256f, g / 256f, b / 256f);
 	}
 	
+	public void setBrightness(final float the_brightness) {
+		if (the_brightness < .5) {
+			current_red = red * the_brightness * 2;
+			current_green = green * the_brightness * 2;
+			current_blue = blue * the_brightness * 2;
+		} else {
+			current_red = (1 - red) * (the_brightness - .5f) * 2 + red;
+			current_green = (1 - green) * (the_brightness - .5f) * 2 + green;
+			current_blue = (1 - blue) * (the_brightness - .5f) * 2 + blue;
+		}
+	}
+	
+	public float getRed() {
+		return red;
+	}
+	
+	public float getBlue() {
+		return blue;
+	}
+	
+	public float getGreen() {
+		return green;
+	}
 }

@@ -1,25 +1,23 @@
 TODO, in approximate order.
 
-Add radius to every phyobject, so it is known how far out of bounds they must go to be off screen (and loop)
 
 and impulse argument to getfragments.
-Spawn primative asteroids.
-
-Tune asteroid hp as well as gun damage for levels.
 
 Get asteroids to go to other networks.
 
+Make it possible to die, restart game
+
+Tune asteroid hp as well as gun damage for levels.
+
+Make powerups.
+  
 Get composite asteroids (out of squares, triangles)
 
 Get ship to fire bomb (clears screen)
 
-Get ship to fire missile, which destroys asteroid of less than 10% hp and does chain reaction explosion based on destroyed asteroids max health to nearby asteroids.
 
-OR
 
-Make powerups.  Maybe powerup can be destroyed like a bomb.
 
-Make asteroids out of arbitrary triangles.
 
 ADD focus
 
@@ -35,3 +33,12 @@ add health bar or color to astroids
 
 add cahin reaction eXPLOSIONS
 
+
+
+
+DON'T CARE
+
+Make asteroids out of arbitrary triangles.
+Add radius to every phyobject, so it is known how far out of bounds they must go to be off screen (and loop)
+Get ship to fire missile, which destroys asteroid of less than 10% hp and does chain reaction explosion based on destroyed asteroids max health to nearby asteroids.
+Maybe powerup can be destroyed like a bomb.

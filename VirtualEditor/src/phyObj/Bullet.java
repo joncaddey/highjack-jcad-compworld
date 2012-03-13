@@ -7,7 +7,7 @@ public class Bullet extends PhyCircle{
 	 * How much extra time a bullet gets after bouncing.
 	 */
 	private static int BOUNCE_TIME = 100;
-	private static int MAX_TIME = 450;
+	private static int MAX_TIME = 300;
 	private int my_damage;
 	private int my_time;
 	private int my_bounces;

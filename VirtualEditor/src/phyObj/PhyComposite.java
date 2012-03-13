@@ -40,9 +40,9 @@ public class PhyComposite extends PhyObject{
 		
 		PhyPolygon finRight = PhyPolygon.getEqTriangle(.5f);
 		finRight.density = .1f;
-		finRight.renderable.red = finLeft.renderable.red;
-		finRight.renderable.green = finLeft.renderable.green;
-		finRight.renderable.blue = finLeft.renderable.blue;
+		finRight.renderable.current_red = finLeft.renderable.current_red;
+		finRight.renderable.current_green = finLeft.renderable.current_green;
+		finRight.renderable.current_blue = finLeft.renderable.current_blue;
 		finRight.orientation = radians(-90);
 		finRight.position = new Vector2f(.39f, -.3f);
 		p.addObject(finLeft);
@@ -118,9 +118,9 @@ public class PhyComposite extends PhyObject{
 		
 		PhyPolygon finRight = PhyPolygon.getEqTriangle(.3f);
 		finRight.density = .1f;
-		finRight.renderable.red = finLeft.renderable.red;
-		finRight.renderable.green = finLeft.renderable.green;
-		finRight.renderable.blue = finLeft.renderable.blue;
+		finRight.renderable.current_red = finLeft.renderable.current_red;
+		finRight.renderable.current_green = finLeft.renderable.current_green;
+		finRight.renderable.current_blue = finLeft.renderable.current_blue;
 		finRight.orientation = radians(-90);
 		finRight.position = new Vector2f(.39f, -.4f);
 		p.addObject(finLeft);

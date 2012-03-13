@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import main.SceneGraphNode;
 import main.Triangle;
 
 public class EqTriangleAsteroid extends Asteroid {
@@ -26,6 +27,8 @@ public class EqTriangleAsteroid extends Asteroid {
 			a.getObject().setPosition(my_object.getPosition().x, my_object.getPosition().y);
 			a.getObject().setAngularVelocity(my_object.getAngularVelocity());
 			a.getObject().setVelocity(my_object.getVelocity());
+			final SceneGraphNode renderable = my_object.getRenderable();
+			a.getObject().getRenderable().setRGBf(renderable.getRed(), renderable.getGreen(), renderable.getBlue());
 			r.add(a);
 		}
 		Vector2f tmp = new Vector2f(-.5f * size, -Triangle.SIN_60 * size / 3);
