@@ -72,9 +72,10 @@ public class Vector2f {
 	}
 	
 	public void setLength(float mag) {
-		scale(mag / length());
+		if (length() != 0) {
+			scale(mag / length());
+		}
 	}
-	
 	
 	
 	public String toString() {

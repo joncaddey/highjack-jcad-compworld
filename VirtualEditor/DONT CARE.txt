@@ -1,11 +1,12 @@
 TODO, in approximate order.
 
 
-and impulse argument to getfragments.
 
 Get asteroids to go to other networks.
 
 Make it possible to die, restart game
+
+replace hp-density with regular density?
 
 Tune asteroid hp as well as gun damage for levels.
 

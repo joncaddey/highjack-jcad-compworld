@@ -15,7 +15,7 @@ public class EqTriangleAsteroid extends Asteroid {
 	}
 
 	@Override
-	public List<Asteroid> getFragments(final float greater_than_size) {
+	public List<Asteroid> getFragments(final float greater_than_size, final float the_impulse) {
 		final float size = my_object.getSize() / 2;
 		if (size <= greater_than_size) {
 			return Collections.EMPTY_LIST;
@@ -41,6 +41,16 @@ public class EqTriangleAsteroid extends Asteroid {
 		tmp.rotate(my_object.getRotation());
 		r.get(2).getObject().position.sum(tmp);
 		r.get(3).getObject().setRotationDegrees(my_object.getRotationDegrees() + 180);
+		
+		// TODO this code is repeated 3 times.  should be function.
+		for (Asteroid a : r) {
+			Vector2f dv = new Vector2f(a.getObject().getPosition());
+			dv.sumScale(my_object.getPosition(), -1);
+			dv.setLength(the_impulse / a.getObject().getMass());
+			dv.sum(a.getObject().getVelocity());
+			a.getObject().setVelocity(dv);
+		}
+		
 		return r;
 	}
 
