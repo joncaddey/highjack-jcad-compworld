@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 import main.SceneGraphNode;
 
 public class RightTriangleAsteroid extends Asteroid {
