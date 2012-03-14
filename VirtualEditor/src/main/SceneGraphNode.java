@@ -12,6 +12,8 @@ public class SceneGraphNode {
 	private List<SceneGraphNode> children;
 	private boolean pickable;
 	
+	private boolean my_visible;
+	
 	/**
 	 * RGB after brightness is applied.
 	 */
@@ -27,6 +29,7 @@ public class SceneGraphNode {
 	}
 	
 	public SceneGraphNode(boolean pickable) {
+		my_visible = true;
 		scale = 1;
 		children = new LinkedList<SceneGraphNode>();
 		red = (float) Math.random();
@@ -47,19 +50,21 @@ public class SceneGraphNode {
 	}
 	
 	public final void render(GLAutoDrawable drawable) {
-		GL2 gl = drawable.getGL().getGL2();
-		
-		gl.glPushMatrix();
-		gl.glTranslatef(translateX, translateY, 0);
-		gl.glRotatef(rotation, 0, 0, 1);
-		gl.glTranslatef(-CoMX, -CoMY, 0);
-		gl.glScalef(scale, scale, scale);
-		if (children.size() == 0)
-			renderGeometry(drawable);
-		else
-			for (SceneGraphNode child : children)
-				child.render(drawable);
-		gl.glPopMatrix();
+		if (my_visible) {
+			GL2 gl = drawable.getGL().getGL2();
+			
+			gl.glPushMatrix();
+			gl.glTranslatef(translateX, translateY, 0);
+			gl.glRotatef(rotation, 0, 0, 1);
+			gl.glTranslatef(-CoMX, -CoMY, 0);
+			gl.glScalef(scale, scale, scale);
+			if (children.size() == 0)
+				renderGeometry(drawable);
+			else
+				for (SceneGraphNode child : children)
+					child.render(drawable);
+			gl.glPopMatrix();
+		}
 	}
 
 	public void renderGeometry(GLAutoDrawable drawable) {
@@ -119,15 +124,25 @@ public class SceneGraphNode {
 	}
 	
 	public void setBrightness(final float the_brightness) {
-		if (the_brightness < .5) {
-			current_red = red * the_brightness * 2;
-			current_green = green * the_brightness * 2;
-			current_blue = blue * the_brightness * 2;
+		if (children.isEmpty()) {
+			if (the_brightness < .5) {
+				current_red = red * the_brightness * 2;
+				current_green = green * the_brightness * 2;
+				current_blue = blue * the_brightness * 2;
+			} else {
+				current_red = (1 - red) * (the_brightness - .5f) * 2 + red;
+				current_green = (1 - green) * (the_brightness - .5f) * 2 + green;
+				current_blue = (1 - blue) * (the_brightness - .5f) * 2 + blue;
+			}
 		} else {
-			current_red = (1 - red) * (the_brightness - .5f) * 2 + red;
-			current_green = (1 - green) * (the_brightness - .5f) * 2 + green;
-			current_blue = (1 - blue) * (the_brightness - .5f) * 2 + blue;
+			for (SceneGraphNode s : children) {
+				s.setBrightness(the_brightness);
+			}
 		}
+	}
+	
+	public void setVisible(final boolean the_visible) {
+		my_visible = the_visible;
 	}
 	
 	public float getRed() {
