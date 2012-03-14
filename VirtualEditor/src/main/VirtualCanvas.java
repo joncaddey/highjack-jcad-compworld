@@ -1,5 +1,6 @@
 package main;
 
+
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.KeyAdapter;
@@ -294,19 +295,22 @@ public class VirtualCanvas implements GLEventListener {
 		}
 		
 		// check for collision between ship and asteroids
-		for (Asteroid a : my_asteroids) {
-			CollisionInfo c = my_ship.getCollision(a.getObject());
-			if (c != null) {
-				Vector2f dv = new Vector2f(my_ship.getVelocity());
-				my_ship.resolveCollision(a.getObject(), c);
-				dv.sumScale(my_ship.getVelocity(), -1);
-				if (dv.length() > 2) {
-					System.out.println(dv.length());
+		noCollisions = false;
+		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
+			for (Asteroid a : my_asteroids) {
+				CollisionInfo c = my_ship.getCollision(a.getObject());
+				if (c != null) {
+					Vector2f dv = new Vector2f(my_ship.getVelocity());
+					my_ship.resolveCollision(a.getObject(), c);
+					dv.sumScale(my_ship.getVelocity(), -1);
+					if (dv.length() > 2) {
+						System.out.println(dv.length());
+					}
+
 				}
-				
 			}
 		}
-		
+
 		// remove any bullets that need to be removed
 		Iterator<Bullet> bit = my_bullets.iterator();
 		while (bit.hasNext()) {

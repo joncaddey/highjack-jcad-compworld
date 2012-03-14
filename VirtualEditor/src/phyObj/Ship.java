@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 import main.SceneGraphNode;
 import main.Triangle;
 
@@ -30,7 +31,6 @@ public class Ship extends PhyComposite {
 	private boolean my_forward_toggle;
 	private boolean my_left_toggle;
 	private boolean my_right_toggle;
-	private boolean my_reverse_toggle;
 	private boolean my_bullet_toggle;
 	
 	private boolean my_shield_toggle;
@@ -143,9 +143,6 @@ public class Ship extends PhyComposite {
 		}
 		if (my_forward_toggle) {
 			forward();
-		}
-		if (my_reverse_toggle) {
-			reverse();
 		}
 		if (my_bullet_toggle) {
 			fire();

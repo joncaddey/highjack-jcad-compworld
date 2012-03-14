@@ -1,45 +1,61 @@
 TODO, in approximate order.
 
-
+Serialize asteroid class (SceneGraphNode, PhyObject, etc)
 
 Get asteroids to go to other networks.
 
 Make it possible to die, restart game
 
-replace hp-density with regular density?
 
-Tune asteroid hp as well as gun damage for levels.
+
+Tune asteroid hp for levels (min asteroids per level)
+
+add score (based on hp of destroyed asteroid?  also based on hp of _moved_ asteroid?  No score for other people's asteroids?)
 
 Make powerups.
   
-Get composite asteroids (out of squares, triangles)
-
 Get ship to fire bomb (clears screen)
 
 
-
-
-
-ADD focus
-
-remove thrusters when no thrust is aplied gigity
+Have controls dialogue, similar to jon's tetris
+Have controls saveable in named schemes. (File IO)
+Show "title" screen. (Card layout?)
+Ask whether single or multiplayer.
+REMEMBER networks previously connected to!  combo box.  (File IO)
+Have randomized network id.
+Assign aesthetically pleasing random color for asteroids, different from other players (helloo color chooser?)
 
 add exploisions
 
 add sound
 
-add score
 
-add health bar or color to astroids
 
-add cahin reaction eXPLOSIONS
+add chain reaction eXPLOSIONS
 
+
+Get composite asteroids (out of squares, triangles)
+
+
+Remove magic constants.
+
+started 0
+started 512
+started 42
+quit 512
+quit 0
+error:
+Exception in thread "Thread-1" java.lang.NullPointerException
+	at network.Peer.invalidatePeer(Peer.java:391)
+	at network.Peer.access$9(Peer.java:390)
+	at network.Peer$2.run(Peer.java:381)
 
 
 
 DON'T CARE
 
 Make asteroids out of arbitrary triangles.
-Add radius to every phyobject, so it is known how far out of bounds they must go to be off screen (and loop)
+Add radius to every phyobject, so it is known how far out of bounds they must go to be off screen (and loop)--just assuming max radius.  No composites, so don't care.
 Get ship to fire missile, which destroys asteroid of less than 10% hp and does chain reaction explosion based on destroyed asteroids max health to nearby asteroids.
 Maybe powerup can be destroyed like a bomb.
+replace hp-density with regular density?
