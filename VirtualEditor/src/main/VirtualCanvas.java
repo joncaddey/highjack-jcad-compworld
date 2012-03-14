@@ -119,7 +119,7 @@ public class VirtualCanvas implements GLEventListener {
 						my_ship.toggleRight(true);
 					break;
 					case KeyEvent.VK_DOWN:
-						my_ship.toggleReverse(true);
+						my_ship.toggleShield(true);
 					break;
 					case KeyEvent.VK_SPACE:
 						my_ship.toggleFire(true);
@@ -140,7 +140,7 @@ public class VirtualCanvas implements GLEventListener {
 						my_ship.toggleRight(false);
 					break;
 					case KeyEvent.VK_DOWN:
-						my_ship.toggleReverse(false);
+						my_ship.toggleShield(false);
 					break;
 					case KeyEvent.VK_SPACE:
 						my_ship.toggleFire(false);

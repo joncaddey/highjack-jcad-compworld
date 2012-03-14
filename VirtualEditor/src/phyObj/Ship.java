@@ -9,22 +9,35 @@ import main.Triangle;
 
 public class Ship extends PhyComposite {
 
-	private static final float ANGULAR_DECAY = 1f;
-	private static final float LINEAR_DECAY = .3f;
+	private static final float ANGULAR_DECAY = 3f; // 1f
+	private static final float LINEAR_DECAY = .15f; // .3f
 	
 	private static final float FORWARD_THRUST = LINEAR_DECAY + .3f; // .25
 	private static final float MAX_VELOCITY = 20f;
-	private static final float ANGULAR_THRUST = ANGULAR_DECAY + 1.5f;
-	private static final float MAX_ANGULAR_VELOCITY = 15;
+	private static final float ANGULAR_THRUST = ANGULAR_DECAY +1f; // 1.5f
+	private static final float MAX_ANGULAR_VELOCITY = 16;  // 15
+	
+	private static final float WEAK_KICKBACK = LINEAR_DECAY + .7f;
+	private static final float STRONG_KICKBACK = LINEAR_DECAY + 1.3f;
+	
+	private static final float MY_SHIELD_MAX = 25;
+	private static final float BROKEN_SHIELD_RECOVER_TIME = 60;
 	
 	
-	
+	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
+	private final SceneGraphNode my_hull;
 	
 	private boolean my_forward_toggle;
 	private boolean my_left_toggle;
 	private boolean my_right_toggle;
 	private boolean my_reverse_toggle;
 	private boolean my_bullet_toggle;
+	
+	private boolean my_shield_toggle;
+	
+	private float my_shield = MY_SHIELD_MAX;
+	private float my_shield_regen = .5f;
+	
 	
 	private List<Bullet> my_bullets = new ArrayList<Bullet>();
 	
@@ -44,17 +57,16 @@ public class Ship extends PhyComposite {
 		finLeft.orientation = radians(90);
 		finLeft.position = new Vector2f(-.39f, -.3f);
 		// added after finRight
-		
+
 		PhyPolygon finRight = PhyPolygon.getEqTriangle(.5f);
 		finRight.density = .1f;
-		finRight.renderable.current_red = finLeft.renderable.current_red;
-		finRight.renderable.current_green = finLeft.renderable.current_green;
-		finRight.renderable.current_blue = finLeft.renderable.current_blue;
+		finRight.renderable.setRGBf(finLeft.getRenderable().getRed(), finLeft
+				.getRenderable().getGreen(), finLeft.getRenderable().getBlue());
 		finRight.orientation = radians(-90);
 		finRight.position = new Vector2f(.39f, -.3f);
 		addObject(finLeft);
 		addObject(finRight);
-		
+
 		PhyPolygon body = PhyPolygon.getSquare(BODY_RATIO);
 		body.density = 1;
 		body.renderable.setRGBi(
@@ -73,39 +85,44 @@ public class Ship extends PhyComposite {
 		head.position.y = Triangle.SIN_60 / 3 - 0f;
 		addObject(head);
 		
-		SceneGraphNode flame = new Triangle(false);
-		flame.rotation = 180;
-		flame.scale = .25f;
-		flame.translateY = -.8f;
-		flame.setRGBf(1, .6f, 0);
-		renderable.addChild(flame);
-		
-		flame = new Triangle(false);
-		flame.rotation = 180;
-		flame.scale = .25f;
-		flame.translateY = -.7f;
-		flame.translateX = -.1f;
-		flame.setRGBf(1, .6f, 0);
-		renderable.addChild(flame);
-		
-		flame = new Triangle(false);
-		flame.rotation = 180;
-		flame.scale = .25f;
-		flame.translateY = -.7f;
-		flame.translateX = .1f;
-		flame.setRGBf(1, .6f, 0);
-		renderable.addChild(flame);
-		
-		
 		Triangle glass = new Triangle(false);
 		glass.scale = .55f;
 		glass.translateY = .1f;
 		glass.setRGBi(15, 21, 23);
 		renderable.addChild(glass);
 		
+		my_hull = renderable;
+		renderable = new SceneGraphNode();
+		
+		my_center_flame = new Triangle(false);
+		my_center_flame.rotation = 180;
+		my_center_flame.scale = .25f;
+		my_center_flame.translateY = -.8f;
+		my_center_flame.setRGBf(1, .6f, 0);
+		renderable.addChild(my_center_flame);
+		
+		my_left_flame = new Triangle(false);
+		my_left_flame.rotation = 180;
+		my_left_flame.scale = .25f;
+		my_left_flame.translateY = -.7f;
+		my_left_flame.translateX = -.1f;
+		my_left_flame.setRGBf(1, .6f, 0);
+		renderable.addChild(my_left_flame);
+		
+		my_right_flame = new Triangle(false);
+		my_right_flame.rotation = 180;
+		my_right_flame.scale = .25f;
+		my_right_flame.translateY = -.7f;
+		my_right_flame.translateX = .1f;
+		my_right_flame.setRGBf(1, .6f, 0);
+		renderable.addChild(my_right_flame);
+		
+		renderable.addChild(my_hull);
 		
 		moveToCenterOfMass();
 		setSize(.5f);
+		fixFlames();
+		
 
 	}
 	
@@ -118,14 +135,14 @@ public class Ship extends PhyComposite {
 		if (my_reload_time > 0) my_reload_time--;
 		if (my_heat > 0) my_heat--;
 		decay();
-		if (my_forward_toggle) {
-			forward();
-		}
 		if (my_right_toggle) {
 			right();
 		}
 		if (my_left_toggle) {
 			left();
+		}
+		if (my_forward_toggle) {
+			forward();
 		}
 		if (my_reverse_toggle) {
 			reverse();
@@ -133,11 +150,29 @@ public class Ship extends PhyComposite {
 		if (my_bullet_toggle) {
 			fire();
 		}
+		if (my_shield_toggle) {
+			if (my_shield > 0) {
+				my_shield--;
+				my_hull.setBrightness(.6f + .4f * (1 - my_shield / MY_SHIELD_MAX));
+			} else {
+				my_shield = -BROKEN_SHIELD_RECOVER_TIME;
+				my_hull.setBrightness(.4f);
+			}
+		} else {
+			if (my_shield < MY_SHIELD_MAX) {
+				my_shield += my_shield_regen;
+			}
+			if (my_shield == 0) {
+				my_shield = MY_SHIELD_MAX;
+				my_hull.setBrightness(.5f);
+			}
+		}
 		
 		super.updateState(the_time);
 	}
 	public void toggleForward(boolean the_on) {
 		my_forward_toggle = the_on;
+		fixFlames();
 	}
 	
 	public void toggleLeft(boolean the_on) {
@@ -145,6 +180,7 @@ public class Ship extends PhyComposite {
 		if (!my_left_toggle) {
 			right();
 		}
+		fixFlames();
 	}
 	
 	public void toggleRight(boolean the_on) {
@@ -152,10 +188,20 @@ public class Ship extends PhyComposite {
 		if (!my_right_toggle) {
 			left();
 		}
+		fixFlames();
 	}
 	
-	public void toggleReverse(boolean the_on) {
-		my_reverse_toggle = the_on;
+	private void fixFlames() {
+		my_right_flame.setVisible(my_forward_toggle || my_left_toggle);
+		my_left_flame.setVisible(my_forward_toggle || my_right_toggle);
+		my_center_flame.setVisible(my_forward_toggle);
+	}
+	
+	public void toggleShield(boolean the_on) {
+		my_shield_toggle = the_on;
+		if (!my_shield_toggle && my_shield > 0) {
+			my_hull.setBrightness(.5f);
+		}
 	}
 	
 	public void toggleFire(boolean the_on) {
@@ -173,13 +219,12 @@ public class Ship extends PhyComposite {
 		if(temp.length() < MAX_VELOCITY) {
 			velocity = temp;
 		}
-		
 	}
 
 	private void left() {
 		if (angularVelocity + ANGULAR_THRUST < MAX_ANGULAR_VELOCITY) {
 			angularVelocity += ANGULAR_THRUST;
-		}
+		}	
 	}
 
 	private void right() {
@@ -195,26 +240,28 @@ public class Ship extends PhyComposite {
 		if(temp.length() < MAX_VELOCITY) {
 			velocity = temp;
 		}
-		
+	}
+	
+	private void kickBack(final float the_oomph) {
+		Vector2f temp = new Vector2f(0, -the_oomph);
+		temp.rotate(orientation);
+		velocity.sum(temp);
 	}
 	
 	private void decay() {
-		
-		///if (!my_left_toggle && !my_right_toggle) {
-			float angleSign = Math.signum(angularVelocity);
-			if (Math.abs(angularVelocity) < ANGULAR_DECAY) {
-				angularVelocity = 0;
-			} else {
-				angularVelocity -= ANGULAR_DECAY * angleSign;
-			}
-		//}
-		//if (!my_forward_toggle && !my_reverse_toggle) {
-			if (velocity.length() < LINEAR_DECAY) {
-				velocity.scale(0);
-			} else {
-				velocity.scale((velocity.length() - LINEAR_DECAY) / velocity.length());
-			}
-		//}
+
+		float angleSign = Math.signum(angularVelocity);
+		if (Math.abs(angularVelocity) < ANGULAR_DECAY) {
+			angularVelocity = 0;
+		} else {
+			angularVelocity -= ANGULAR_DECAY * angleSign;
+		}
+		if (velocity.length() < LINEAR_DECAY) {
+			velocity.scale(0);
+		} else {
+			velocity.scale((velocity.length() - LINEAR_DECAY)
+					/ velocity.length());
+		}
 	}
 	
 	
@@ -246,16 +293,17 @@ public class Ship extends PhyComposite {
 		if (my_heat < 30) {
 			powerShot();
 			my_heat += 14;
-			reverse();
+			kickBack(STRONG_KICKBACK);
 			my_reload_time = 3;
 		} else if (my_heat < 38) {
 			my_heat += 12;
 			my_reload_time = 10;
+			kickBack(WEAK_KICKBACK);
 			weakShot();
 		} else if (my_heat < 60) {
 			weakShot();
 			my_heat += 2;
-			reverse();
+			kickBack(WEAK_KICKBACK);
 			my_reload_time = 10;
 		}
 		
