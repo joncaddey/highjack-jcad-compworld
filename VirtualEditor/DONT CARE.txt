@@ -1,6 +1,12 @@
 TODO, in approximate order.
 
+Fix bullets and thrust and shield and anything else which is based on number of frames, and instead have it based on timepassed, as velocity is.
+calculate the time it takes to render n number of frames, and add any extra time to the next n frames (for no lag)
+make asteroids loop when their size beyond the bounds of the board.  This is easily more than their "radius."  This will potentially make it harder to implement composite, though.
+
 Serialize asteroid class (SceneGraphNode, PhyObject, etc)
+
+add ID to asteroid so you know who it came from.
 
 Get asteroids to go to other networks.
 
