@@ -60,11 +60,9 @@ public class VirtualCanvas implements GLEventListener {
 	private SceneGraphNode my_root;
 	private  SceneGraphNode my_asteroid_root; // TODO final
 	private final SceneGraphNode my_bullet_root;
-	private ArrayList<PhyObject> objects; // TODO refactor out
 
 	private float left, right, top, bottom;
 	private float my_field_width, my_field_height;
-	private int displayListID = -1;
 	private final GLCanvas my_canvas;
 
 	private Ship my_ship;
@@ -86,7 +84,6 @@ public class VirtualCanvas implements GLEventListener {
 		my_root = new SceneGraphNode();
 		my_asteroid_root = new SceneGraphNode();
 		my_bullet_root = new SceneGraphNode();
-		objects = new ArrayList<PhyObject>();
 		my_bullets = new ArrayList<Bullet>();
 		my_asteroids = new ArrayList<Asteroid>();
 		
@@ -159,7 +156,6 @@ public class VirtualCanvas implements GLEventListener {
 			}
 		});
 		my_ship = new Ship();
-		attachObject(my_ship);
 
 	}
 	
@@ -196,13 +192,6 @@ public class VirtualCanvas implements GLEventListener {
 		return r;
 	}
 
-	public void attachObject(final PhyObject object) {
-		if (object.getRenderable() != null) {
-			my_root.addChild(object.getRenderable());
-		}
-		objects.add(object);
-
-	}
 
 	public Component getCanvas() {
 		return my_canvas;
@@ -262,9 +251,7 @@ public class VirtualCanvas implements GLEventListener {
 		
 		
 		// update ship
-		for (PhyObject object : objects) {
-			object.updateState(my_average_time_between_frames);
-		}
+		my_ship.updateState(my_average_time_between_frames);
 		Vector2f position = my_ship.getPosition();
 		float radius = .3f;
 		if (position.x < -my_field_width / 2 - radius) {
@@ -382,27 +369,11 @@ public class VirtualCanvas implements GLEventListener {
 
 		
 		
-		for (int repeat = 0; repeat < RESOLUTION_REPEATS && !noCollisions; repeat++) {
-			noCollisions = true;
-			for (int i = 0; i < objects.size(); i++) {
-				PhyObject a = objects.get(i);
-				for (int j = i + 1; j < objects.size(); j++) {
-					PhyObject b = objects.get(j);
-					CollisionInfo cInfo = a.getCollision(b);
-					if (cInfo != null) {
-						noCollisions = false;
-						a.resolveCollision(b, cInfo);
-					}
-				}
-			}
-
-		}
+		
 
 		
 		
-		for (PhyObject object : objects) {
-			object.updateRenderable();
-		}
+		my_ship.updateRenderable();
 		for (Bullet b : my_bullets) {
 			b.updateRenderable();
 		}
@@ -412,6 +383,7 @@ public class VirtualCanvas implements GLEventListener {
 		my_bullet_root.render(drawable);
 		my_asteroid_root.render(drawable);
 		my_root.render(drawable);
+		my_ship.getRenderable().render(drawable);
 
 	}
 
