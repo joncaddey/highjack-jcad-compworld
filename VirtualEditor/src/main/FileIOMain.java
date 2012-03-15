@@ -5,29 +5,36 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
-import phyObj.PhyCircle;
+import phyObj.PhyComposite;
 import phyObj.PhyObject;
-import phyObj.PhyPolygon;
 
 public class FileIOMain {
 
 	
 	public static void main(String args[]) {
-		PhyObject v = PhyPolygon.getEqTriangle(20);
+		List<PhyObject> list = new ArrayList<PhyObject>(10);
+		for (int i = 0; i < 10; i++) {
+			PhyObject v = PhyComposite.getRocket(i + 1);
+			list.add(v);
+		}
+		
 		FileOutputStream fos= null;
 		ObjectOutputStream out = null;
 		try {
 			fos = new FileOutputStream("data.txt");
 			out = new ObjectOutputStream(fos);
-			out.writeObject(v);
+			out.writeObject(list);
 			out.close();
 			
 			FileInputStream fis = new FileInputStream("data.txt");
 			ObjectInputStream in = new ObjectInputStream(fis);
-			PhyPolygon u = (PhyPolygon) in.readObject();
-			System.out.println(Arrays.toString(((Triangle)u.getRenderable()).vertices));
+			List<PhyObject> u = (List) in.readObject();
+			for (PhyObject i : u) {
+				System.out.println(i.getMass());
+			}
 		} catch (IOException e) {
 			System.err.println(e);
 		} catch (ClassNotFoundException f) {

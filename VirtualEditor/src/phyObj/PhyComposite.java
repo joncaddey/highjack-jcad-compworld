@@ -19,6 +19,8 @@ import main.Triangle;
 
 
 public class PhyComposite extends PhyObject{
+	private static final long serialVersionUID = 42L;
+	
 	protected static final float BODY_RATIO = (float) 8 / 13;
 	private final ArrayList<Vector2f> positions;
 	private final ArrayList<Float> sizes;
