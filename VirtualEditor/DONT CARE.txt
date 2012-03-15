@@ -1,9 +1,6 @@
 TODO, in approximate order.
 
 
-
-Serialize asteroid class (SceneGraphNode, PhyObject, etc)
-
 add ID to asteroid so you know who it came from.
 
 Get asteroids to go to other networks.
@@ -12,7 +9,7 @@ Make it possible to die, restart game
 
 
 
-Tune asteroid hp for levels (min asteroids per level)
+Tune asteroid hp, max size, minimum fragmant size, for levels (min asteroids per level)
 
 add score (based on hp of destroyed asteroid?  also based on hp of _moved_ asteroid?  No score for other people's asteroids?)
 
@@ -21,13 +18,14 @@ Make powerups.
 Get ship to fire bomb (clears screen)
 
 
-Have controls dialogue, similar to jon's tetris
-Have controls saveable in named schemes. (File IO)
 Show "title" screen. (Card layout?)
 Ask whether single or multiplayer.
 REMEMBER networks previously connected to!  combo box.  (File IO)
 Have randomized network id.
 Assign aesthetically pleasing random color for asteroids, different from other players (helloo color chooser?)
+Make relative colors, so you assign colors to other players
+Have controls dialogue, similar to jon's tetris
+Have controls saveable in named schemes. (File IO)
 
 add exploisions
 
