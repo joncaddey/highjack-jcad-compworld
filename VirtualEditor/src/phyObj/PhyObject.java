@@ -1,13 +1,17 @@
 package phyObj;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
 import java.util.List;
 
 import main.SceneGraphNode;
 
 
 
-public class PhyObject {
+public class PhyObject implements Serializable {
 	
+	private static final long serialVersionUID = 42L;
 	Vector2f position;
 	Vector2f velocity;
 	Vector2f acceleration;
@@ -24,9 +28,10 @@ public class PhyObject {
 	SceneGraphNode renderable;
 	List<PhyObject> objects;
 	
-	protected interface Resizer {
+	protected interface Resizer extends Serializable{
 		void resize(PhyObject obj, float size);
 	}
+	
 	public PhyObject() {
 		density = 1f;
 		inverseMass = 1;

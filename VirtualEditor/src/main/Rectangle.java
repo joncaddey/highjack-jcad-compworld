@@ -4,7 +4,7 @@ package main;
 import javax.media.opengl.*;
 
 public class Rectangle extends SceneGraphNode {
-
+	private static final long serialVersionUID = 42L;
 	public Rectangle() {
 		this(true);
 	}

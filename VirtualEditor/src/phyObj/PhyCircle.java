@@ -1,4 +1,7 @@
 package phyObj;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import javax.media.opengl.*;
 
 import main.Circle;
@@ -6,6 +9,12 @@ import main.SceneGraphNode;
 
 
 public class PhyCircle extends PhyObject {
+	private static final long serialVersionUID = 42L;
+
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		setSize(size);
+	}
 	public PhyCircle(float diameter) {
 		this(diameter, (float)Math.random(), (float)Math.random(), (float)Math.random());
 	}

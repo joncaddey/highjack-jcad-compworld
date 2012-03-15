@@ -9,6 +9,7 @@ import javax.media.opengl.*;
  */
 public class Circle extends SceneGraphNode {
 
+	private static final long serialVersionUID = 42L;
 	private static final int POINTS = 20;
 
 	public Circle() {
