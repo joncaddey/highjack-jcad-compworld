@@ -258,16 +258,16 @@ public class VirtualCanvas implements GLEventListener {
 			PhyObject phy = a.getObject();
 			phy.updateState(my_average_time_between_frames);
 			position = phy.getPosition();
-			final float max_size = 5;
-			if (position.x < -(my_field_width + max_size) / 2) {
-				phy.setPosition((my_field_width + max_size) + position.x, position.y);
-			} else if (position.x > (my_field_width + max_size) / 2) {
-				phy.setPosition(-(my_field_width + max_size) + position.x, position.y);
+			final float diameter = a.getObject().getSize() * 1.44f;
+			if (position.x < -(my_field_width + diameter) / 2) {
+				phy.setPosition((my_field_width + diameter) + position.x, position.y);
+			} else if (position.x > (my_field_width + diameter) / 2) {
+				phy.setPosition(-(my_field_width + diameter) + position.x, position.y);
 			}
-			if (position.y < -(my_field_height + max_size) / 2) {
-				phy.setPosition(position.x, (my_field_height + max_size) + position.y);
-			} else if (position.y > (my_field_height + max_size) / 2) {
-				phy.setPosition(position.x, -(my_field_height + max_size) + position.y);
+			if (position.y < -(my_field_height + diameter) / 2) {
+				phy.setPosition(position.x, (my_field_height + diameter) + position.y);
+			} else if (position.y > (my_field_height + diameter) / 2) {
+				phy.setPosition(position.x, -(my_field_height + diameter) + position.y);
 			}
 		}
 		

@@ -136,12 +136,6 @@ public class Ship extends PhyComposite {
 	@Override
 	public void updateState(final float the_time) {
 		my_bullets.clear();
-		if (my_reload_time > 0) {
-			my_reload_time -= the_time;
-		}
-		if (my_heat > 0) {
-			my_heat -= the_time;
-		}
 		decay(the_time);
 		if (my_right_toggle) {
 			right(the_time);
@@ -155,6 +149,14 @@ public class Ship extends PhyComposite {
 		if (my_bullet_toggle) {
 			fire();
 		}
+		if (my_reload_time > 0) {
+			my_reload_time -= the_time;
+		}
+		if (my_heat > 0) {
+			my_heat -= the_time;
+		}
+		
+		
 		if (my_shield_toggle) {
 			if (my_shield > 0) {
 				my_shield -= the_time;
@@ -211,7 +213,7 @@ public class Ship extends PhyComposite {
 	public void toggleFire(boolean the_on) {
 		my_bullet_toggle = the_on;
 		if (!my_bullet_toggle) {
-			my_heat += my_reload_time / 2;
+			my_heat += my_reload_time;
 			my_reload_time = 0; // this is to encourage breaking your keyboard
 		}
 	}
@@ -281,38 +283,42 @@ public class Ship extends PhyComposite {
 		}
 		
 		
-//		if (my_heat < 30) {
-//			powerShot();
-//			my_heat += 14;
-//			kickBack(STRONG_KICKBACK);
-//			my_reload_time = 3;
-//		} else if (my_heat < 38) {
-//			my_heat += 12;
-//			my_reload_time = 10;
-//			kickBack(WEAK_KICKBACK);
-//			weakShot();
-//		} else if (my_heat < 60) {
-//			weakShot();
-//			my_heat += 2;
-//			kickBack(WEAK_KICKBACK);
-//			my_reload_time = 10;
-//		}
+
 		
-		if (my_heat < 30f / 45) {
+//		if (my_heat < 30f / 45) {
+//			powerShot();
+//			my_heat += 14f / 45;
+//			kickBack(STRONG_KICKBACK);
+//			my_reload_time = 3f / 45;
+//		} else if (my_heat < 38 / 45f) {
+//			my_heat += 12 / 45f;
+//			my_reload_time = 10 / 45f;
+//			kickBack(WEAK_KICKBACK);
+//			weakShot();
+//		} else if (my_heat < 60 / 45f) {
+//			weakShot();
+//			my_heat += 2 / 45f;
+//			kickBack(WEAK_KICKBACK);
+//			my_reload_time = 10 / 45f;
+//		}
+//		
+//		
+//	}
+		if (my_heat < .3 * 2) {
 			powerShot();
-			my_heat += 14f / 45;
+			my_heat += .3f + .07f;
 			kickBack(STRONG_KICKBACK);
-			my_reload_time = 3f / 45;
-		} else if (my_heat < 38 / 45f) {
-			my_heat += 12 / 45f;
-			my_reload_time = 10 / 45f;
+			my_reload_time = .07f;
+		} else if (my_heat < .9f) {
+			my_heat += .3f;
+			my_reload_time = .3f;
 			kickBack(WEAK_KICKBACK);
 			weakShot();
-		} else if (my_heat < 60 / 45f) {
+		} else if (my_heat < 2f) {
 			weakShot();
-			my_heat += 2 / 45f;
+			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
-			my_reload_time = 10 / 45f;
+			my_reload_time = .3f;
 		}
 		
 		
