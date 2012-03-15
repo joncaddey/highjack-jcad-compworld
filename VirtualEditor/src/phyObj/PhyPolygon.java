@@ -1,4 +1,7 @@
 package phyObj;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+
 import javax.media.opengl.*;
 
 import main.Rectangle;
@@ -6,6 +9,7 @@ import main.SceneGraphNode;
 import main.Triangle;
 
 public class PhyPolygon extends PhyObject {
+	private static final long serialVersionUID = 42L;
 	private static final float SIN_60 = (float)Math.sin(Math.PI / 3);
 	private static final float[] VERTICES_RIGHT_TRIANGLE = {0, 0, 1, 0, 0, 1f};
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};
@@ -41,10 +45,15 @@ public class PhyPolygon extends PhyObject {
 		}
 	};
 	
-	private Vector2f[] vertexCache;
-	private Vector2f[] normalCache;
+	private transient Vector2f[] vertexCache;
+	private transient Vector2f[] normalCache;
 	private final float[] vertices;
 	private final Resizer resizer;
+	
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		setSize(size);
+	}
 	
 	public static PhyPolygon getRightTriangle(final float the_size) {
 		PhyPolygon r = new PhyPolygon(VERTICES_RIGHT_TRIANGLE, the_size, RIGHT_TRIANGLE_RESIZER);

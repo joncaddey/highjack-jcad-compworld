@@ -1,8 +1,13 @@
 package main;
+import java.io.Serializable;
 import java.util.*;
 import javax.media.opengl.*;
 // sup
-public class SceneGraphNode {
+public class SceneGraphNode implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 42L;
 	public float scale;
 	public float rotation;
 	public float translateX;

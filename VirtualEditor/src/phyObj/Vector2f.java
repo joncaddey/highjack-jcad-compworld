@@ -1,5 +1,10 @@
 package phyObj;
-public class Vector2f {
+
+import java.io.Serializable;
+
+public class Vector2f implements Serializable{
+	
+	private static final long serialVersionUID = 42L;
 	public float x;
 	public float y;
 	

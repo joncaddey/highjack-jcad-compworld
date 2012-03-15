@@ -10,6 +10,7 @@ import javax.media.opengl.GLAutoDrawable;
  *
  */
 public class Triangle extends SceneGraphNode {
+	private static final long serialVersionUID = 42L;
 	public static final float SIN_60 = (float)Math.sin(Math.PI / 3);
 	private static final float[] VERTICES_EQ_TRIANGLE = {-.5f, -SIN_60 / 3, .5f, -SIN_60 / 3, 0, SIN_60 * 2 / 3};
 
