@@ -4,13 +4,9 @@ package phyObj;
 
 public class Bullet extends PhyCircle{
 
-	/**
-	 * How much extra time a bullet gets after bouncing.
-	 */
-	private static int BOUNCE_TIME = 100;
-	private static int MAX_TIME = 300;
+	private static int MAX_TIME = 2;
 	private int my_damage;
-	private int my_time;
+	private float my_time;
 	private int my_bounces;
 	
 	
@@ -33,7 +29,7 @@ public class Bullet extends PhyCircle{
 	@Override
 	public void updateState(final float the_time) {
 		super.updateState(the_time);
-		my_time--;
+		my_time -= the_time;
 		if (my_time < 0) {
 			my_alive = false;
 		}
@@ -49,10 +45,7 @@ public class Bullet extends PhyCircle{
 	
 	public void bounce() {
 		my_bounces--;
-		my_time += BOUNCE_TIME;
-		if (my_time > MAX_TIME) {
-			my_time = MAX_TIME;
-		}
+		my_time = MAX_TIME;
 		if (my_bounces < 0) {
 			my_alive = false;
 		}

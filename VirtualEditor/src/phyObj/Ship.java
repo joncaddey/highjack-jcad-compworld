@@ -10,19 +10,23 @@ import main.Triangle;
 
 public class Ship extends PhyComposite {
 
-	private static final float ANGULAR_DECAY = 3f; // 1f
-	private static final float LINEAR_DECAY = .15f; // .3f
 	
-	private static final float FORWARD_THRUST = LINEAR_DECAY + .3f; // .25
-	private static final float MAX_VELOCITY = 20f;
-	private static final float ANGULAR_THRUST = ANGULAR_DECAY +1f; // 1.5f
-	private static final float MAX_ANGULAR_VELOCITY = 16;  // 15
 	
-	private static final float WEAK_KICKBACK = LINEAR_DECAY + .7f;
-	private static final float STRONG_KICKBACK = LINEAR_DECAY + 1.3f;
+	private static final float ANGULAR_DECAY = 3f * 45; // 1f
+	private static final float LINEAR_DECAY = .15f * 45; // .3f
 	
-	private static final float MY_SHIELD_MAX = 25;
-	private static final float BROKEN_SHIELD_RECOVER_TIME = 60;
+	private static final float FORWARD_THRUST = LINEAR_DECAY + .3f * 45; // .25
+	private static final float MAX_VELOCITY = 20f * 30f / 45;
+	private static final float ANGULAR_THRUST = ANGULAR_DECAY +1f * 45; // 1.5f
+	private static final float MAX_ANGULAR_VELOCITY = 16 * 30f / 45;  // 15
+	
+	private static final float WEAK_KICKBACK = 1f;
+	private static final float STRONG_KICKBACK = 1.45f;
+	
+	private static final float MY_SHIELD_MAX = .83f;
+	private static final float SHIELD_RECOVER_TIME = 2;
+	private static float SHIELD_REGEN = MY_SHIELD_MAX / SHIELD_RECOVER_TIME;
+	private static final float BROKEN_SHIELD_RECOVER_TIME = 2 / SHIELD_RECOVER_TIME;
 	
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
@@ -36,7 +40,7 @@ public class Ship extends PhyComposite {
 	private boolean my_shield_toggle;
 	
 	private float my_shield = MY_SHIELD_MAX;
-	private float my_shield_regen = .5f;
+	
 	
 	
 	private List<Bullet> my_bullets = new ArrayList<Bullet>();
@@ -132,39 +136,42 @@ public class Ship extends PhyComposite {
 	@Override
 	public void updateState(final float the_time) {
 		my_bullets.clear();
-		if (my_reload_time > 0) my_reload_time--;
-		if (my_heat > 0) my_heat--;
-		decay();
+		if (my_reload_time > 0) {
+			my_reload_time -= the_time;
+		}
+		if (my_heat > 0) {
+			my_heat -= the_time;
+		}
+		decay(the_time);
 		if (my_right_toggle) {
-			right();
+			right(the_time);
 		}
 		if (my_left_toggle) {
-			left();
+			left(the_time);
 		}
 		if (my_forward_toggle) {
-			forward();
+			forward(the_time);
 		}
 		if (my_bullet_toggle) {
 			fire();
 		}
 		if (my_shield_toggle) {
 			if (my_shield > 0) {
-				my_shield--;
+				my_shield -= the_time;
 				my_hull.setBrightness(.6f + .4f * (1 - my_shield / MY_SHIELD_MAX));
 			} else {
 				my_shield = -BROKEN_SHIELD_RECOVER_TIME;
-				my_hull.setBrightness(.4f);
+				my_hull.setBrightness(.3f);
 			}
 		} else {
-			if (my_shield < MY_SHIELD_MAX) {
-				my_shield += my_shield_regen;
-			}
-			if (my_shield == 0) {
+			if (my_shield <= 0 && my_shield + SHIELD_REGEN * the_time >= 0) {
 				my_shield = MY_SHIELD_MAX;
 				my_hull.setBrightness(.5f);
+			} else if (my_shield < MY_SHIELD_MAX) {
+				my_shield += SHIELD_REGEN * the_time;
 			}
+			
 		}
-		
 		super.updateState(the_time);
 	}
 	public void toggleForward(boolean the_on) {
@@ -174,17 +181,17 @@ public class Ship extends PhyComposite {
 	
 	public void toggleLeft(boolean the_on) {
 		my_left_toggle = the_on;
-		if (!my_left_toggle) {
-			right();
-		}
+//		if (!my_left_toggle) {
+//			right(); // TODO
+//		}
 		fixFlames();
 	}
 	
 	public void toggleRight(boolean the_on) {
 		my_right_toggle = the_on;
-		if (!my_right_toggle) {
-			left();
-		}
+//		if (!my_right_toggle) { // TODO
+//			left();
+//		}
 		fixFlames();
 	}
 	
@@ -209,35 +216,37 @@ public class Ship extends PhyComposite {
 		}
 	}
 
-	private void forward() {
-		Vector2f temp = new Vector2f(0, FORWARD_THRUST);
+	private void forward(final float the_time) {
+		Vector2f temp = new Vector2f(0, FORWARD_THRUST * the_time);
 		temp.rotate(orientation);
-		temp.sum(velocity);
-		if(temp.length() < MAX_VELOCITY) {
-			velocity = temp;
+		velocity.sum(temp);
+		if(temp.length() > MAX_VELOCITY) {
+			velocity.setLength(MAX_VELOCITY);
 		}
 	}
 
-	private void left() {
-		if (angularVelocity + ANGULAR_THRUST < MAX_ANGULAR_VELOCITY) {
-			angularVelocity += ANGULAR_THRUST;
+	private void left(final float the_time) {
+		angularVelocity += ANGULAR_THRUST * the_time;
+		if (angularVelocity > MAX_ANGULAR_VELOCITY) {
+			angularVelocity = MAX_ANGULAR_VELOCITY;
 		}	
 	}
 
-	private void right() {
-		if (angularVelocity - ANGULAR_THRUST > -MAX_ANGULAR_VELOCITY) {
-			angularVelocity -= ANGULAR_THRUST;
+	private void right(final float the_time) {
+		angularVelocity -= ANGULAR_THRUST * the_time;
+		if (angularVelocity < -MAX_ANGULAR_VELOCITY) {
+			angularVelocity = -MAX_ANGULAR_VELOCITY;
 		}
 	}
 
-	private void reverse() {
-		Vector2f temp = new Vector2f(0, -FORWARD_THRUST);
-		temp.rotate(orientation);
-		temp.sum(velocity);
-		if(temp.length() < MAX_VELOCITY) {
-			velocity = temp;
-		}
-	}
+//	private void reverse(final float the_time) {
+//		Vector2f temp = new Vector2f(0, -FORWARD_THRUST);
+//		temp.rotate(orientation);
+//		temp.sum(velocity);
+//		if(temp.length() < MAX_VELOCITY) {
+//			velocity = temp;
+//		}
+//	}
 	
 	private void kickBack(final float the_oomph) {
 		Vector2f temp = new Vector2f(0, -the_oomph);
@@ -245,63 +254,65 @@ public class Ship extends PhyComposite {
 		velocity.sum(temp);
 	}
 	
-	private void decay() {
+	private void decay(final float the_time) {
 
 		float angleSign = Math.signum(angularVelocity);
-		if (Math.abs(angularVelocity) < ANGULAR_DECAY) {
+		if (Math.abs(angularVelocity) < ANGULAR_DECAY * the_time) {
 			angularVelocity = 0;
 		} else {
-			angularVelocity -= ANGULAR_DECAY * angleSign;
+			angularVelocity -= ANGULAR_DECAY * angleSign * the_time;
 		}
-		if (velocity.length() < LINEAR_DECAY) {
+		if (velocity.length() < LINEAR_DECAY * the_time) {
 			velocity.scale(0);
 		} else {
-			velocity.scale((velocity.length() - LINEAR_DECAY)
+			velocity.scale((velocity.length() - LINEAR_DECAY * the_time)
 					/ velocity.length());
 		}
 	}
 	
 	
 	// TODO move to appropriate constants when figured out
-	private int my_reload_time = 0;
-	private int my_heat = 0;
+	private float my_reload_time = 0;
+	private float my_heat = 0;
 	
 	private void fire() {
 		if (my_reload_time > 0) {
 			return;
 		}
 		
-//		if (my_heat < 1) {
+		
+//		if (my_heat < 30) {
 //			powerShot();
-//			my_heat += 11;
-//			reverse();
+//			my_heat += 14;
+//			kickBack(STRONG_KICKBACK);
+//			my_reload_time = 3;
+//		} else if (my_heat < 38) {
+//			my_heat += 12;
 //			my_reload_time = 10;
-//		} else if (my_heat < 10) {
-//			my_heat += 8;
-//			my_reload_time = 8;
+//			kickBack(WEAK_KICKBACK);
 //			weakShot();
-//		} else if (my_heat < 50) {
+//		} else if (my_heat < 60) {
 //			weakShot();
-//			my_heat += 1;
-//			reverse();
+//			my_heat += 2;
+//			kickBack(WEAK_KICKBACK);
 //			my_reload_time = 10;
 //		}
 		
-		if (my_heat < 30) {
+		if (my_heat < 30f / 45) {
 			powerShot();
-			my_heat += 14;
+			my_heat += 14f / 45;
 			kickBack(STRONG_KICKBACK);
-			my_reload_time = 3;
-		} else if (my_heat < 38) {
-			my_heat += 12;
-			my_reload_time = 10;
+			my_reload_time = 3f / 45;
+		} else if (my_heat < 38 / 45f) {
+			my_heat += 12 / 45f;
+			my_reload_time = 10 / 45f;
 			kickBack(WEAK_KICKBACK);
 			weakShot();
-		} else if (my_heat < 60) {
+		} else if (my_heat < 60 / 45f) {
 			weakShot();
-			my_heat += 2;
+			my_heat += 2 / 45f;
 			kickBack(WEAK_KICKBACK);
-			my_reload_time = 10;
+			my_reload_time = 10 / 45f;
 		}
 		
 		
@@ -313,31 +324,31 @@ public class Ship extends PhyComposite {
 		final int bullet_spread = 6;
 		final int max_bullet_spread = 64;
 		for (int i = 0; i < bullet_spread; i++) {
-			Bullet bullet = new Bullet(1, 0, 45, .2f, .5f); // old density .01
+			Bullet bullet = new Bullet(1, 0, 1, .2f, .5f); // old density .01
 			bullet.position = new Vector2f(0, .4f);
 			bullet.position.rotate(orientation);
 			bullet.position.sum(position);
-			bullet.velocity = new Vector2f(0, 13);
+			bullet.velocity = new Vector2f(0, 13 * 30f / 45);
 			bullet.velocity.rotate(orientation + (float) Math.PI / max_bullet_spread * 2 * (i + .5f - bullet_spread / 2));
 			my_bullets.add(bullet);
 		}
 		
-		Bullet bullet = new Bullet(1, 0, 45, .3f, 1f);
+		Bullet bullet = new Bullet(1, 0, 1, .3f, 1f);
 		bullet.renderable.setRGBi(200, 54, 42);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 14);
+		bullet.velocity = new Vector2f(0, 14 * 30f / 45);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(10, 4, 90, .2f, .0001f);
+		Bullet bullet = new Bullet(10, 4, 1, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 10);
+		bullet.velocity = new Vector2f(0, 10 * 30f / 45);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 	}

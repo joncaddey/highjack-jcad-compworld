@@ -45,19 +45,23 @@ import com.jogamp.opengl.util.FPSAnimator;
  * 
  */
 public class VirtualCanvas implements GLEventListener {
-	private static final int TARGET_FPS = 45;
+	private static final float NANO = 1f / 1000000000;
+	private static final int TARGET_FPS = 120;
+	private static final int FRAMES_TO_AVERAGE = 10;
+	private static final float MINIMUM_TIME_BETWEEN_FRAMES = 1f / 30;
 	private static final int RESOLUTION_REPEATS = 10;
 	
 
 	private static final int BOARD_SIZE = 10;
 
-	// relating to clicking
+	private int my_frame_count;
+	private float my_average_time_between_frames = 1f / TARGET_FPS;
+	private long my_time;
+	
 	private SceneGraphNode my_root;
 	private final SceneGraphNode my_asteroid_root;
 	private final SceneGraphNode my_bullet_root;
 	private ArrayList<PhyObject> objects; // TODO refactor out
-	private boolean pickNextFrame;
-	private Point pickedPoint;
 
 	private float left, right, top, bottom;
 	private float my_field_width, my_field_height;
@@ -77,8 +81,6 @@ public class VirtualCanvas implements GLEventListener {
 		my_canvas.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 
-				pickNextFrame = true;
-				pickedPoint = new Point(e.getX(), e.getY());
 
 			}
 		});
@@ -207,19 +209,29 @@ public class VirtualCanvas implements GLEventListener {
 
 
 	public void display(GLAutoDrawable drawable) {
+		
+		// predict time per frame
+		my_frame_count++;
+		if (my_frame_count == FRAMES_TO_AVERAGE) {
+			my_frame_count = 0;
+			final long old = my_time;
+			my_time = System.nanoTime();
+			my_average_time_between_frames = Math.min((float)(my_time - old) * NANO / FRAMES_TO_AVERAGE, MINIMUM_TIME_BETWEEN_FRAMES);
+			System.out.println(1f / my_average_time_between_frames);
+		}
+		
 		GL2 gl = drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
-		final float time = 1f / TARGET_FPS;
 		
 		// update bullets
 		for (Bullet b : my_bullets) {
-			b.updateState(time);
+			b.updateState(my_average_time_between_frames);
 		}
 		
 		
 		// update ship
 		for (PhyObject object : objects) {
-			object.updateState(time);
+			object.updateState(my_average_time_between_frames);
 		}
 		Vector2f position = my_ship.getPosition();
 		float radius = .3f;
@@ -244,7 +256,7 @@ public class VirtualCanvas implements GLEventListener {
 		// update asteroids
 		for (Asteroid a : my_asteroids) {
 			PhyObject phy = a.getObject();
-			phy.updateState(time);
+			phy.updateState(my_average_time_between_frames);
 			position = phy.getPosition();
 			final float max_size = 5;
 			if (position.x < -(my_field_width + max_size) / 2) {
@@ -300,13 +312,7 @@ public class VirtualCanvas implements GLEventListener {
 			for (Asteroid a : my_asteroids) {
 				CollisionInfo c = my_ship.getCollision(a.getObject());
 				if (c != null) {
-					Vector2f dv = new Vector2f(my_ship.getVelocity());
 					my_ship.resolveCollision(a.getObject(), c);
-					dv.sumScale(my_ship.getVelocity(), -1);
-					if (dv.length() > 2) {
-						System.out.println(dv.length());
-					}
-
 				}
 			}
 		}
@@ -385,7 +391,8 @@ public class VirtualCanvas implements GLEventListener {
 		gl.glClearColor(0, 0, 0, 0);
 		IntBuffer selectBuffer = Buffers.newDirectIntBuffer(3);
 		gl.glSelectBuffer(selectBuffer.capacity(), selectBuffer);
-		FPSAnimator fps = new FPSAnimator(drawable, 30);
+		my_time = System.nanoTime();
+		FPSAnimator fps = new FPSAnimator(drawable, TARGET_FPS);
 		fps.start();
 	}
 
