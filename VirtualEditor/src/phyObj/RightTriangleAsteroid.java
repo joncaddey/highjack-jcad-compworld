@@ -8,6 +8,7 @@ import java.util.List;
 import main.SceneGraphNode;
 
 public class RightTriangleAsteroid extends Asteroid {
+	private static final long serialVersionUID = 42L;
 
 	public RightTriangleAsteroid(final float the_size, final float the_hp_density) {
 		super(PhyPolygon.getRightTriangle(the_size), the_hp_density);

@@ -1,11 +1,13 @@
 package phyObj;
 
+import java.io.Serializable;
 import java.util.List;
 
 
 import main.SceneGraphNode;
 
-public abstract class Asteroid {
+public abstract class Asteroid implements Serializable{
+	private static final long serialVersionUID = 42L;
 	
 	private int my_hp;
 	private final int my_max_hp;

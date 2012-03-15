@@ -7,13 +7,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Observable;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
@@ -22,14 +24,11 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import javax.media.opengl.awt.GLCanvas;
-import javax.media.opengl.glu.GLU;
 
 import phyObj.Asteroid;
 import phyObj.Bullet;
 import phyObj.CollisionInfo;
 import phyObj.EqTriangleAsteroid;
-import phyObj.HalfSpace;
-import phyObj.PhyComposite;
 import phyObj.PhyObject;
 import phyObj.RightTriangleAsteroid;
 import phyObj.Ship;
@@ -59,7 +58,7 @@ public class VirtualCanvas implements GLEventListener {
 	private long my_time;
 	
 	private SceneGraphNode my_root;
-	private final SceneGraphNode my_asteroid_root;
+	private  SceneGraphNode my_asteroid_root; // TODO final
 	private final SceneGraphNode my_bullet_root;
 	private ArrayList<PhyObject> objects; // TODO refactor out
 
@@ -70,7 +69,7 @@ public class VirtualCanvas implements GLEventListener {
 
 	private Ship my_ship;
 	private final List<Bullet> my_bullets;
-	private final List<Asteroid> my_asteroids;
+	private  List<Asteroid> my_asteroids; // TODO final
 
 	public VirtualCanvas() {
 		GLProfile profile = GLProfile.getDefault();
@@ -127,6 +126,14 @@ public class VirtualCanvas implements GLEventListener {
 					case KeyEvent.VK_SPACE:
 						my_ship.toggleFire(true);
 					break;
+					case KeyEvent.VK_Q:
+						System.out.println("Saving");
+						writeObjects();
+					break;
+					case KeyEvent.VK_P:
+						System.out.println("Loading");
+						readObjects();
+					break;
 				}
 			}
 			
@@ -154,6 +161,32 @@ public class VirtualCanvas implements GLEventListener {
 		my_ship = new Ship();
 		attachObject(my_ship);
 
+	}
+	
+	
+	private void writeObjects() {
+		try {
+			FileOutputStream fos = new FileOutputStream("data.txt");
+			ObjectOutputStream out = new ObjectOutputStream(fos);
+			out.writeObject(my_asteroids);
+			out.writeObject(my_asteroid_root);
+			out.close();
+		} catch (Exception e) {
+			System.err.println(e);
+
+		}
+
+	}
+
+	private void readObjects() {
+		try {
+			FileInputStream fis = new FileInputStream("data.txt");
+			ObjectInputStream in = new ObjectInputStream(fis);
+			my_asteroids = (List<Asteroid>) in.readObject();
+			my_asteroid_root = (SceneGraphNode) in.readObject();
+		} catch (Exception e) {
+			System.err.println(e);
+		}
 	}
 
 	private Vector2f pixelToWorld(Point pixel) {
@@ -217,7 +250,6 @@ public class VirtualCanvas implements GLEventListener {
 			final long old = my_time;
 			my_time = System.nanoTime();
 			my_average_time_between_frames = Math.min((float)(my_time - old) * NANO / FRAMES_TO_AVERAGE, MINIMUM_TIME_BETWEEN_FRAMES);
-			System.out.println(1f / my_average_time_between_frames);
 		}
 		
 		GL2 gl = drawable.getGL().getGL2();
