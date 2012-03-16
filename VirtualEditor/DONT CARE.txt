@@ -6,7 +6,7 @@ add ID to asteroid so you know who it came from.
 Get asteroids to go to other networks.
 
 Make it possible to die, restart game
-
+Implement auto-shield.  If you get hit, your shiled will engage for a small amount of time.  This small amount of time can be lessened by manually engaging shield.
 
 
 Tune asteroid hp, max size, minimum fragmant size, for levels (min asteroids per level)
