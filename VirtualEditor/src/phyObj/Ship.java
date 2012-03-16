@@ -23,10 +23,12 @@ public class Ship extends PhyComposite {
 	private static final float WEAK_KICKBACK = 1f;
 	private static final float STRONG_KICKBACK = 1.45f;
 	
-	private static final float MY_SHIELD_MAX = .83f;
-	private static final float SHIELD_RECOVER_TIME = 2;
-	private static float SHIELD_REGEN = MY_SHIELD_MAX / SHIELD_RECOVER_TIME;
-	private static final float BROKEN_SHIELD_RECOVER_TIME = 2 / SHIELD_RECOVER_TIME;
+	private static final float SHIELD_MAX = 1.1f;
+	private static final float SHIELD_RECOVER_TIME = 3;
+	private static final float BROKEN_SHIELD_RECOVER_TIME = 3;
+	private static float SHIELD_REGEN = SHIELD_MAX / SHIELD_RECOVER_TIME;
+	private static final float AUTO_SHIELD_TIME = .25f;
+	private static final float AUTO_SHIELD_PENALTY = .3f;
 	
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
@@ -36,10 +38,12 @@ public class Ship extends PhyComposite {
 	private boolean my_left_toggle;
 	private boolean my_right_toggle;
 	private boolean my_bullet_toggle;
+	private boolean my_auto_shield_toggle;
 	
 	private boolean my_shield_toggle;
 	
-	private float my_shield = MY_SHIELD_MAX;
+	private float my_shield = SHIELD_MAX;
+	private float my_auto_shield;
 	
 	
 	
@@ -156,24 +160,37 @@ public class Ship extends PhyComposite {
 			my_heat -= the_time;
 		}
 		
-		
-		if (my_shield_toggle) {
+		if (my_auto_shield_toggle) {
+			if (my_auto_shield > 0) {
+				my_auto_shield -= the_time;
+			} else {
+				my_auto_shield_toggle = false;
+				toggleShield(my_shield_toggle);
+			}
+		}
+		if (my_shield_toggle || my_auto_shield_toggle) {
 			if (my_shield > 0) {
 				my_shield -= the_time;
-				my_hull.setBrightness(.6f + .4f * (1 - my_shield / MY_SHIELD_MAX));
+				my_hull.setBrightness(.6f + .4f * (1 - my_shield / SHIELD_MAX));
 			} else {
 				my_shield = -BROKEN_SHIELD_RECOVER_TIME;
 				toggleShield(false);
 				my_hull.setBrightness(.3f);
 			}
 		} else {
-			if (my_shield <= 0 && my_shield + SHIELD_REGEN * the_time >= 0) {
-				my_shield = MY_SHIELD_MAX;
-				my_hull.setBrightness(.5f);
-			} else if (my_shield < MY_SHIELD_MAX) {
+			if (my_shield > 0) {
 				my_shield += SHIELD_REGEN * the_time;
+				if (my_shield > SHIELD_MAX) {
+					my_shield = SHIELD_MAX;
+				}
+			} else {
+				if (my_shield + the_time >= 0) {
+					my_shield = SHIELD_MAX;
+					my_hull.setBrightness(.5f);
+				} else {
+					my_shield += the_time;
+				}
 			}
-			
 		}
 		super.updateState(the_time);
 	}
@@ -208,6 +225,10 @@ public class Ship extends PhyComposite {
 		my_shield_toggle = the_on;
 		if (!my_shield_toggle && my_shield > 0) {
 			my_hull.setBrightness(.5f);
+		}
+		if (!my_shield_toggle) {
+			my_auto_shield_toggle = false;
+			my_auto_shield = 0;
 		}
 	}
 	
@@ -251,8 +272,19 @@ public class Ship extends PhyComposite {
 //		}
 //	}
 	
+	
+	public void autoShield() {
+		if (!my_shield_toggle && !my_auto_shield_toggle) {
+			my_auto_shield_toggle = true;
+			my_auto_shield = AUTO_SHIELD_TIME;
+			if (my_shield - AUTO_SHIELD_PENALTY > 0) {
+				my_shield -= AUTO_SHIELD_PENALTY;
+			}
+		}
+	}
+	
 	public boolean isShielded() {
-		return my_shield > 0;
+		return my_shield > 0 && (my_shield_toggle || my_auto_shield_toggle);
 	}
 	private void kickBack(final float the_oomph) {
 		Vector2f temp = new Vector2f(0, -the_oomph);

@@ -45,7 +45,7 @@ import com.jogamp.opengl.util.FPSAnimator;
  */
 public class VirtualCanvas implements GLEventListener {
 	private static final float NANO = 1f / 1000000000;
-	private static final int TARGET_FPS = 120;
+	private static final int TARGET_FPS = 90;
 	private static final int FRAMES_TO_AVERAGE = 10;
 	private static final float MINIMUM_TIME_BETWEEN_FRAMES = 1f / 30;
 	private static final int RESOLUTION_REPEATS = 10;
@@ -332,7 +332,7 @@ public class VirtualCanvas implements GLEventListener {
 				CollisionInfo c = my_ship.getCollision(a.getObject());
 				if (c != null) {
 					my_ship.resolveCollision(a.getObject(), c);
-					my_ship.toggleShield(true);
+					my_ship.autoShield();
 					if (!my_ship.isShielded()) {
 						System.out.println("BOOM!  You LOSE");
 					}
