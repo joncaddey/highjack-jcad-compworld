@@ -1,5 +1,6 @@
 TODO, in approximate order.
 
+Make it so you get a different ID if your requested ID is already taken.
 
 add ID to asteroid so you know who it came from.
 

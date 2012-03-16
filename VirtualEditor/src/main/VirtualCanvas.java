@@ -253,7 +253,7 @@ public class VirtualCanvas implements GLEventListener {
 		// update ship
 		my_ship.updateState(my_average_time_between_frames);
 		Vector2f position = my_ship.getPosition();
-		float radius = .3f;
+		float radius = .2f;
 		if (position.x < -my_field_width / 2 - radius) {
 			my_ship.setPosition(my_field_width + 2 * radius + position.x, position.y);
 		} else if (position.x > my_field_width / 2 + radius) {

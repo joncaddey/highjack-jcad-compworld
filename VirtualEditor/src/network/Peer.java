@@ -81,15 +81,15 @@ public class Peer {
 	
 	
 	
-	public boolean connectToNetwork(String host) {
+	public boolean connectToNetwork(String host) throws IOException, InterruptedException {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT);
 	}
 
-	public boolean connectToNetwork(String host, long id) {
+	public boolean connectToNetwork(String host, long id) throws IOException, InterruptedException {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT, id);
 	}
 
-	public boolean connectToNetwork(String host, int port) {
+	public boolean connectToNetwork(String host, int port) throws IOException, InterruptedException {
 		try {
 			return connectToNetwork(InetAddress.getByName(host), port);
 		} catch (UnknownHostException e) {
@@ -98,7 +98,7 @@ public class Peer {
 		}
 	}
 
-	public boolean connectToNetwork(String host, int port, long id) {
+	public boolean connectToNetwork(String host, int port, long id) throws IOException, InterruptedException {
 		try {
 			return connectToNetwork(InetAddress.getByName(host), port, id);
 		} catch (UnknownHostException e) {
@@ -107,50 +107,49 @@ public class Peer {
 		}
 	}
 
-	public boolean connectToNetwork(InetAddress host) {
+	public boolean connectToNetwork(InetAddress host) throws IOException, InterruptedException {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT);
 	}
 
-	public boolean connectToNetwork(InetAddress host, long id) {
+	public boolean connectToNetwork(InetAddress host, long id) throws IOException, InterruptedException {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT, id);
 	}
 
-	public boolean connectToNetwork(InetAddress host, int port) {
+	public boolean connectToNetwork(InetAddress host, int port) throws IOException, InterruptedException {
 		return connectToNetwork(host, port, (long)(ID_LIMIT * Math.random()));
 	}
 
-	public boolean connectToNetwork(InetAddress host, int port, long id) {
+	// TODO this should be a private helper method that will attempt to give the id, but 
+	// try different ids if that id is already taken.
+	public boolean connectToNetwork(InetAddress host, int port, long id) throws IOException, InterruptedException {
 		myInfo.id = id;
 		if (serverSocket == null)
 			if (!startServer())
 				return false;
+		Socket socket = new Socket();
 		try {
-			Socket socket = new Socket();
-			try {
-				socket.connect(new InetSocketAddress(host, port), 10000);
-			} catch (IOException e) {
-//				System.err.println(e);
-				System.out.println("Unable to connect to " + host + ":" + port);
-				return false;
-			}
-			ObjectOutputStream socketOut = new ObjectOutputStream(socket.getOutputStream());
-			PeerMessage mesg = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
-			mesg.idToFindSuccessorOf = myInfo.id;
-			mesg.indexToFix = -1;
-			socketOut.writeObject(mesg);
-			socket.close();
-			while (successor == null)
-				Thread.sleep(1000);
-			if (logEnabled)
-				logMessage("Joined network @ " + myInfo.id);
-			else
-				System.out.println("Joined network @ " + myInfo.id);
-			startPeriodicThread();
-			return true;
-		} catch (Exception e) {
-			System.err.println(e);
-			return false;
+			socket.connect(new InetSocketAddress(host, port), 10000);
+		} catch (IOException e) {
+			throw new IOException("Unable to connect to " + host + ":" + port,
+					e);
 		}
+		ObjectOutputStream socketOut = new ObjectOutputStream(
+				socket.getOutputStream());
+		PeerMessage mesg = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR,
+				myInfo);
+		mesg.idToFindSuccessorOf = myInfo.id;
+		mesg.indexToFix = -1;
+		socketOut.writeObject(mesg);
+		socket.close();
+		while (successor == null)
+			Thread.sleep(1000);
+		if (logEnabled)
+			logMessage("Joined network @ " + myInfo.id);
+		else
+			System.out.println("Joined network @ " + myInfo.id);
+		startPeriodicThread();
+		return true;
+		
 	}
 
 	
@@ -361,10 +360,16 @@ public class Peer {
 	
 	
 	
-	
+	/**
+	 * My successor is the successor of the querying node if the id to find the successor of is
+	 * between me, exclusive, and my successor, inclusive.  That is, if the id is of my successor,
+	 * then my successor is its own successor.
+	 * @param mesg
+	 */
 	private void findSuccessor(PeerMessage mesg) {
-		// TODO when would successor ever be null?
+		// TODO when would successor ever be null?  right at the start, when trying to join another network
 		if (successor != null && withinHalfClosed(mesg.idToFindSuccessorOf, myInfo.id, successor.id)) {
+			// TODO so, if you ask who the successor of 42 is, you may get 42?
 			mesg.type = PeerMessage.Type.SUCCESSOR;
 			PeerInformation sender = mesg.sender;
 			mesg.sender = myInfo;
@@ -372,13 +377,15 @@ public class Peer {
 			sendMessage(mesg, sender);
 		} else {
 			PeerInformation closest = closestPrecedingNode(mesg.idToFindSuccessorOf);
-			if (!myInfo.equals(closest)) // TODO when _wouldn't_ this happen?  
-				//When no entry in the table is between this and idtofindsuccessorof.  all nulls, say
+			if (!myInfo.equals(closest)) {
 				sendMessage(mesg, closest);
-			else if (successor == myInfo && predecessor != null)
+			} else if (successor == myInfo && predecessor != null) {
+				// closest is me, so ask my predecessor who the successor of the idToFindSuccessorOf is
+				// (may not necessarily be me)
+				// TODO this still seems fishy to JON
 				sendMessage(mesg, predecessor);
-			
-			// TODO I feel like this is wrong somehow in some cases.
+			}
+
 		}
 	}
 
@@ -404,8 +411,8 @@ public class Peer {
 		PeerMessage mesg = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
 		mesg.idToFindSuccessorOf = (myInfo.id + (1 << next)) % ID_LIMIT;
 		mesg.indexToFix = next;
-		next = (next + 1) % finger.length;
 		findSuccessor(mesg);
+		next = (next + 1) % finger.length;
 	}
 
 	
@@ -478,14 +485,18 @@ public class Peer {
 	
 	
 	
-	private void invalidatePeer(PeerInformation peer) {
-		if (peer.equals(predecessor))
+	private void invalidatePeer(PeerInformation invalid) {
+		if (invalid.equals(predecessor)) {
 			predecessor = null;
-		if (peer.equals(successor))
+		}
+		if (invalid.equals(successor)) {
 			successor = myInfo;
-		for (int i = 0; i < finger.length; i++)
-			if (peer.equals(finger[i]))
+		}
+		for (int i = 0; i < finger.length; i++) {
+			if (invalid.equals(finger[i])) {
 				finger[i] = null;
+			}
+		}
 		logMessage('\n' + internalState());
 	}
 
@@ -597,6 +608,7 @@ public class Peer {
 		} else {
 			String ip = "127.0.0.1";
 			int port = Peer.DEFAULT_SERVER_PORT;
+			boolean success = false;
 			do {
 				System.out.print("Enter host to connect to [" + ip + "[:" + port + "]]: ");
 				try {
@@ -610,7 +622,13 @@ public class Peer {
 						ip = input;
 				} catch (IOException e) {
 				}
-			} while (id == -1 ? !peer.connectToNetwork(ip, port) : !peer.connectToNetwork(ip, port, id));
+				try {
+					success = id == -1 ? peer.connectToNetwork(ip, port) : peer.connectToNetwork(ip, port, id);
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			} while (!success);
+			
 		}
 
 		System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
