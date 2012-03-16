@@ -26,6 +26,7 @@ Assign aesthetically pleasing random color for asteroids, different from other p
 Make relative colors, so you assign colors to other players
 Have controls dialogue, similar to jon's tetris
 Have controls saveable in named schemes. (File IO)
+FPS drop-down
 
 add exploisions
 

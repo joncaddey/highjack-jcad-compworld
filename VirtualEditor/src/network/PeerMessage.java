@@ -12,7 +12,7 @@ public class PeerMessage implements Serializable {
 	public Type type;
 	public PeerInformation sender;
 	public long idToFindSuccessorOf;	// FIND_SUCCESSOR
-	public int successorDestination;	// FIND_SUCCESSOR, SUCCESSOR
+	public int indexToFix;	// FIND_SUCCESSOR, SUCCESSOR
 	public PeerInformation peer;		// SUCCESSOR, PREDECESSOR
 	public long idOfPayloadDestination;	// PAYLOAD
 	public String payload;				// PAYLOAD
