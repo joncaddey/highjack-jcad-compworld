@@ -163,6 +163,7 @@ public class Ship extends PhyComposite {
 				my_hull.setBrightness(.6f + .4f * (1 - my_shield / MY_SHIELD_MAX));
 			} else {
 				my_shield = -BROKEN_SHIELD_RECOVER_TIME;
+				toggleShield(false);
 				my_hull.setBrightness(.3f);
 			}
 		} else {
@@ -250,6 +251,9 @@ public class Ship extends PhyComposite {
 //		}
 //	}
 	
+	public boolean isShielded() {
+		return my_shield > 0;
+	}
 	private void kickBack(final float the_oomph) {
 		Vector2f temp = new Vector2f(0, -the_oomph);
 		temp.rotate(orientation);

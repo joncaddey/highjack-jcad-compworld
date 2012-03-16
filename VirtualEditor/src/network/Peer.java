@@ -43,11 +43,21 @@ public class Peer {
 	private PeerInformation predecessor;
 	private int next;
 
+	
+	
+	
+	
+	
+	
 	public Peer() {
 		myInfo = new PeerInformation();
 //		logEnabled = true;
 		finger = new PeerInformation[FINGER_ENTRIES];
 	}
+	
+	
+	
+	
 
 	public boolean createNetwork() {
 		return createNetwork((long)(ID_LIMIT * Math.random()));
@@ -66,6 +76,11 @@ public class Peer {
 		return true;
 	}
 
+	
+	
+	
+	
+	
 	public boolean connectToNetwork(String host) {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT);
 	}
@@ -121,7 +136,7 @@ public class Peer {
 			ObjectOutputStream socketOut = new ObjectOutputStream(socket.getOutputStream());
 			PeerMessage mesg = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
 			mesg.idToFindSuccessorOf = myInfo.id;
-			mesg.successorDestination = -1;
+			mesg.indexToFix = -1;
 			socketOut.writeObject(mesg);
 			socket.close();
 			while (successor == null)
@@ -138,6 +153,12 @@ public class Peer {
 		}
 	}
 
+	
+	
+	
+	
+	
+	
 	public void disconnectFromNetwork() {
 		if (periodicThread != null)
 			periodicThread.interrupt();
@@ -147,6 +168,12 @@ public class Peer {
 		}
 	}
 
+	
+	
+	
+	
+	
+	
 	private boolean startServer() {
 		return startServer(DEFAULT_SERVER_PORT);
 	}
@@ -209,6 +236,12 @@ public class Peer {
 		return true;
 	}
 
+	
+	
+	
+	
+	
+	
 	private void processConnection(Socket socket) {
 		try {
 			if (myInfo.address == null) {
@@ -229,6 +262,13 @@ public class Peer {
 		}
 	}
 
+	
+	
+	
+	
+	
+	
+
 	private void processMessage(PeerMessage mesg) {
 		logMessage("Received message " + mesg.type + " from " + mesg.sender.id);
 		switch (mesg.type) {
@@ -236,13 +276,13 @@ public class Peer {
 			findSuccessor(mesg);
 			break;
 		case SUCCESSOR:
-			if (mesg.successorDestination == -1) {
+			if (mesg.indexToFix == -1) { // TODO wtf?
 				successor = mesg.peer;
 				logMessage("** Updated successor @ " + successor.id);
 				logMessage('\n' + internalState());
 			} else {
-				finger[mesg.successorDestination] = mesg.peer;
-				logMessage("** Updated finger[" + mesg.successorDestination + "] @ " + finger[mesg.successorDestination].id);
+				finger[mesg.indexToFix] = mesg.peer;
+				logMessage("** Updated finger[" + mesg.indexToFix + "] @ " + finger[mesg.indexToFix].id);
 				logMessage('\n' + internalState());
 			}
 			break;
@@ -275,8 +315,15 @@ public class Peer {
 		}
 	}
 
+	
+			
+			
+			
+			
+			
 	private boolean sendMessage(PeerMessage mesg, PeerInformation destination) {
 		if (destination.address == null)	// silently fail when IP_DETECTION == 3 and no other peer has connected
+			// TODO maybe this is wrong when no one else on network and talking to self
 			return false;
 		logMessage("Sending message " + mesg.type + " to " + destination.id);
 		try {
@@ -290,7 +337,7 @@ public class Peer {
 			if (successor == myInfo) {
 				PeerMessage mesg2 = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
 				mesg2.idToFindSuccessorOf = myInfo.id;
-				mesg2.successorDestination = -1;
+				mesg2.indexToFix = -1;
 				findSuccessor(mesg2);
 			}
 			return false;
@@ -298,12 +345,25 @@ public class Peer {
 		return true;
 	}
 
+	
+	
+	
+	
+	
+	
 	private void logMessage(String text) {
 		if (logEnabled)
 			System.err.println(new Date() + " -- " + text);
 	}
 
+	
+	
+	
+	
+	
+	
 	private void findSuccessor(PeerMessage mesg) {
+		// TODO when would successor ever be null?
 		if (successor != null && withinHalfClosed(mesg.idToFindSuccessorOf, myInfo.id, successor.id)) {
 			mesg.type = PeerMessage.Type.SUCCESSOR;
 			PeerInformation sender = mesg.sender;
@@ -312,13 +372,21 @@ public class Peer {
 			sendMessage(mesg, sender);
 		} else {
 			PeerInformation closest = closestPrecedingNode(mesg.idToFindSuccessorOf);
-			if (!myInfo.equals(closest))
+			if (!myInfo.equals(closest)) // TODO when _wouldn't_ this happen?  
+				//When no entry in the table is between this and idtofindsuccessorof.  all nulls, say
 				sendMessage(mesg, closest);
 			else if (successor == myInfo && predecessor != null)
 				sendMessage(mesg, predecessor);
+			
+			// TODO I feel like this is wrong somehow in some cases.
 		}
 	}
 
+	
+	
+	
+	
+	
 	private PeerInformation closestPrecedingNode(long id) {
 		for (int i = finger.length - 1; i >= 0; i--)
 			if (finger[i] != null && withinOpen(finger[i].id, myInfo.id, id))
@@ -326,14 +394,26 @@ public class Peer {
 		return myInfo;
 	}
 
+	
+	
+	
+	
+	
+	
 	private void fixFingers() {
 		PeerMessage mesg = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
 		mesg.idToFindSuccessorOf = (myInfo.id + (1 << next)) % ID_LIMIT;
-		mesg.successorDestination = next;
+		mesg.indexToFix = next;
 		next = (next + 1) % finger.length;
 		findSuccessor(mesg);
 	}
 
+	
+	
+	
+	
+	
+	
 	private static boolean withinOpen(long id, long start, long end) {
 		return id != start && (start == end || distance(start, id) < distance(start, end));
 	}
@@ -349,6 +429,12 @@ public class Peer {
 		return dist;
 	}
 
+	
+	
+	
+	
+	
+	
 	private void startPeriodicThread() {
 		periodicThread = new Thread() {
 			{
@@ -387,6 +473,11 @@ public class Peer {
 		periodicThread.start();
 	}
 
+	
+	
+	
+	
+	
 	private void invalidatePeer(PeerInformation peer) {
 		if (peer.equals(predecessor))
 			predecessor = null;
@@ -398,6 +489,12 @@ public class Peer {
 		logMessage('\n' + internalState());
 	}
 
+	
+	
+	
+	
+	
+	
 	private String internalState() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Predecessor: ");
@@ -413,6 +510,12 @@ public class Peer {
 		return sb.toString();
 	}
 
+	
+	
+	
+	
+	
+	
 	public void sendText(String text, long id) {
 		PeerMessage mesg = new PeerMessage(PeerMessage.Type.PAYLOAD, myInfo);
 		mesg.payload = text;
@@ -420,6 +523,12 @@ public class Peer {
 		handlePayload(mesg);
 	}
 
+	
+	
+	
+	
+	
+	
 	private void handlePayload(PeerMessage mesg) {
 		if (mesg.idOfPayloadDestination == -1)
 			System.out.println("Peer " + mesg.sender.id + " says, \"" + mesg.payload + "\"");
@@ -435,6 +544,12 @@ public class Peer {
 		}
 	}
 
+	
+	
+	
+	
+	
+	
 	public static void main(String[] args) {
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		boolean newNetwork = false;

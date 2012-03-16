@@ -332,6 +332,10 @@ public class VirtualCanvas implements GLEventListener {
 				CollisionInfo c = my_ship.getCollision(a.getObject());
 				if (c != null) {
 					my_ship.resolveCollision(a.getObject(), c);
+					my_ship.toggleShield(true);
+					if (!my_ship.isShielded()) {
+						System.out.println("BOOM!  You LOSE");
+					}
 				}
 			}
 		}
