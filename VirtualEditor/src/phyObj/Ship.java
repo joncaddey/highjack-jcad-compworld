@@ -27,8 +27,8 @@ public class Ship extends PhyComposite {
 	private static final float SHIELD_RECOVER_TIME = 3;
 	private static final float BROKEN_SHIELD_RECOVER_TIME = 3;
 	private static float SHIELD_REGEN = SHIELD_MAX / SHIELD_RECOVER_TIME;
-	private static final float AUTO_SHIELD_TIME = .25f;
-	private static final float AUTO_SHIELD_PENALTY = .3f;
+	private static final float AUTO_SHIELD_TIME = .4f;
+	private static final float AUTO_SHIELD_PENALTY = .15f;
 	
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
@@ -367,7 +367,7 @@ public class Ship extends PhyComposite {
 		final int max_bullet_spread = 64;
 		for (int i = 0; i < bullet_spread; i++) {
 			Bullet bullet = new Bullet(1, 0, 1, .2f, .5f); // old density .01
-			bullet.position = new Vector2f(0, .4f);
+			bullet.position = new Vector2f(0, .3f);
 			bullet.position.rotate(orientation);
 			bullet.position.sum(position);
 			bullet.velocity = new Vector2f(0, 13 * 30f / 45);
