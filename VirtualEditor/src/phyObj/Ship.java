@@ -61,6 +61,8 @@ public class Ship extends PhyComposite {
 	public Ship() {
 		//sound
 		my_music = new SoundPlayer();
+		my_music.preLoad(LAZER_SOUND);
+		my_music.preLoad(POWER_LAZER_SOUND);
 		
 		int variability = 20;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.5f);
@@ -352,8 +354,7 @@ public class Ship extends PhyComposite {
 			powerShot();
 			my_heat += .3f + .07f;
 			kickBack(STRONG_KICKBACK);
-			my_reload_time = .07f;
-			my_music.play(LAZER_SOUND);
+			my_reload_time = .07f;			
 			my_music.play(POWER_LAZER_SOUND);
 			
 		} else if (my_heat < .9f) {
