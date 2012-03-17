@@ -10,8 +10,8 @@ import main.SceneGraphNode;
 public class RightTriangleAsteroid extends Asteroid {
 	private static final long serialVersionUID = 42L;
 
-	public RightTriangleAsteroid(final float the_size, final float the_hp_density) {
-		super(PhyPolygon.getRightTriangle(the_size), the_hp_density);
+	public RightTriangleAsteroid(final long the_id, final float the_size, final float the_hp_density) {
+		super(the_id, PhyPolygon.getRightTriangle(the_size), the_hp_density);
 	}
 
 	@Override
@@ -22,7 +22,7 @@ public class RightTriangleAsteroid extends Asteroid {
 		}
 		List<Asteroid> r = new ArrayList<Asteroid>(4);
 		for (int i = 0; i < 4; i++) {
-			RightTriangleAsteroid a = new RightTriangleAsteroid(size, my_hp_density);
+			RightTriangleAsteroid a = new RightTriangleAsteroid(getOriginator(), size, my_hp_density);
 			a.getObject().setRotationDegrees(my_object.getRotationDegrees());
 			a.getObject().setPosition(my_object.getPosition().x, my_object.getPosition().y);
 			a.getObject().setAngularVelocity(my_object.getAngularVelocity());
