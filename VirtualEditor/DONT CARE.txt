@@ -9,13 +9,7 @@ Get asteroids to go to other networks.
 Make it so friends can join a network, and all join at the same time.  The friends are notified when their friends lose.  PARTY SYSTEM.  PRivate game.
 
 
-Make it possible to die, restart game
-Implement auto-shield.  If you get hit, your shiled will engage for a small amount of time.  This small amount of time can be lessened by manually engaging shield.
-
-
 Tune asteroid hp, max size, minimum fragmant size, for levels (min asteroids per level)
-
-add score (based on hp of destroyed asteroid?  also based on hp of _moved_ asteroid?  No score for other people's asteroids?)
 
 Make powerups.
   
@@ -23,7 +17,6 @@ Get ship to fire bomb (clears screen)
 
 
 Show "title" screen. (Card layout?)
-Ask whether single or multiplayer.
 REMEMBER networks previously connected to!  combo box.  (File IO)
 Have randomized network id.
 Assign aesthetically pleasing random color for asteroids, different from other players (helloo color chooser?)
@@ -36,6 +29,7 @@ add exploisions
 
 add sound
 
+add screen fixed sizes make sure ratio not so bad
 
 
 add chain reaction eXPLOSIONS
