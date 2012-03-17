@@ -4,6 +4,8 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -24,7 +26,7 @@ import com.jogamp.newt.event.KeyEvent;
 @SuppressWarnings("serial")
 public class NewGameDialog extends JDialog implements ActionListener{
 	
-//	public static void main(String args[]) {
+	public static void main(String args[]) {
 //		JFrame a  = new JFrame();
 //		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		
@@ -36,7 +38,13 @@ public class NewGameDialog extends JDialog implements ActionListener{
 //		System.out.print(b.showDialog());
 //		a.add(new JButton("i like this class :D"));
 //		a.pack();
-//	}
+		
+		
+//		JFrame a  = new JFrame();
+//		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		NewGameDialog b = new NewGameDialog(a);
+//		b.getLocalIP();
+	}
 	
 	private Peer my_peer;
 	private long my_id;
@@ -266,6 +274,30 @@ public class NewGameDialog extends JDialog implements ActionListener{
 			a_compComponent.setEnabled(true);
 			pack();
 		}
+	}
+	
+	/**
+	 * @author Steven Cozart and Solairis(www.solairis.com)
+	 * @return Your default ip or null if none found
+	 */
+	private String getLocalIP(){
+		String myHost = null;
+		try {
+
+			InetAddress addr = InetAddress.getLocalHost();
+			
+
+			String myIP = addr.getHostAddress();
+
+			// Bonus. Get your hostname.
+			myHost = addr.getHostName();
+
+			System.out.println(myIP + " " + myHost);
+
+		} catch (UnknownHostException e) {
+			System.out.println("Unknown Host: "+e);
+		}
+		return myHost;
 	}
 
 	public boolean showDialog() {
