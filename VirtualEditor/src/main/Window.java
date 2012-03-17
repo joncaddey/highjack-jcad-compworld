@@ -104,6 +104,7 @@ public class Window extends JFrame implements Observer, ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == my_new_game_button) {
 			if (my_new_game_dialog.showDialog()) {
+				my_game.setPeer(my_new_game_dialog.getNetworkingPeer());
 				my_game.startGame();
 				my_canvas.requestFocus();
 			}

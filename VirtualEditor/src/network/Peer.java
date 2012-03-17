@@ -4,7 +4,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-public class Peer {
+import phyObj.Vector2f;
+
+public class Peer extends Observable{
 	/**
 	 * The default port number for incoming network connections.
 	 */
@@ -526,7 +528,7 @@ public class Peer {
 	
 	
 	
-	public void sendText(String text, long id) {
+	public void sendObject(Serializable text, long id) {
 		PeerMessage mesg = new PeerMessage(PeerMessage.Type.PAYLOAD, myInfo);
 		mesg.payload = text;
 		mesg.idOfPayloadDestination = id;
@@ -540,8 +542,10 @@ public class Peer {
 	
 	
 	private void handlePayload(PeerMessage mesg) {
-		if (mesg.idOfPayloadDestination == -1)
-			System.out.println("Peer " + mesg.sender.id + " says, \"" + mesg.payload + "\"");
+		if (mesg.idOfPayloadDestination == -1) {
+			setChanged();
+			notifyObservers(mesg.payload);
+		}
 		else if (successor != null && withinHalfClosed(mesg.idOfPayloadDestination, myInfo.id, successor.id)) {
 			mesg.idOfPayloadDestination = -1;
 			sendMessage(mesg, successor);
@@ -560,4 +564,104 @@ public class Peer {
 	
 	
 	
+	public static void main(String[] args) {
+		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+		boolean newNetwork = false;
+		String input = null;
+
+		while (true) {
+			System.out.println("Create a new network or join an existing network?");
+			System.out.println("  1. Create a new network");
+			System.out.println("  2. Join an existing network");
+			try {
+				input = in.readLine();
+			} catch (IOException e) {
+				continue;
+			}
+			if (input.equals("1")) {
+				newNetwork = true;
+				break;
+			} else if (input.equals("2"))
+				break;
+		}
+
+		long id = -1;
+		while (true) {
+			System.out.println("Desired network ID, 0-" + (Peer.ID_LIMIT-1) + " [random]: ");
+			try {
+				input = in.readLine();
+				if (input.length() == 0)
+					break;
+				id = Long.parseLong(input);
+			} catch (NumberFormatException e) {
+				continue;
+			} catch (IOException e) {
+				continue;
+			}
+			if (id >= -1 && id < Peer.ID_LIMIT)
+				break;
+		}
+
+		Peer peer = new Peer();
+		if (newNetwork) {
+			if (id == -1)
+				peer.createNetwork();
+			else
+				peer.createNetwork(id);
+		} else {
+			String ip = "127.0.0.1";
+			int port = Peer.DEFAULT_SERVER_PORT;
+			boolean success = false;
+			do {
+				System.out.print("Enter host to connect to [" + ip + "[:" + port + "]]: ");
+				try {
+					input = in.readLine();
+					int index = input.indexOf(':');
+					if (index >= 0) {
+						port = Integer.parseInt(input.substring(index + 1));
+						input = input.substring(0, index);
+					}
+					if (input.length() > 0)
+						ip = input;
+				} catch (IOException e) {
+				}
+				try {
+					success = id == -1 ? peer.connectToNetwork(ip, port) : peer.connectToNetwork(ip, port, id);
+				} catch (Exception e) {
+					System.out.println(e);
+				}
+			} while (!success);
+			
+		}
+
+		System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
+		while (true) {
+			try {
+				input = in.readLine();
+				if (input.length() == 0)
+					continue;
+				Scanner sc = new Scanner(input);
+				if (!sc.hasNextLong()) {
+					input = sc.next();
+					if (input.equals("quit")) {
+						peer.disconnectFromNetwork();
+						break;
+					} else if (input.equals("state"))
+						System.out.println(peer.internalState());
+					else
+						System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
+					continue;
+				}
+				id = sc.nextLong();
+				if (id < 0 || id >= ID_LIMIT) {
+					System.out.println("Invalid ID.");
+					continue;
+				}
+				sc.skip(sc.delimiter());
+				sc.nextLine();
+				peer.sendObject(new Vector2f(id, id), id);
+			} catch (IOException e) {
+			}
+		}
+	}
 }

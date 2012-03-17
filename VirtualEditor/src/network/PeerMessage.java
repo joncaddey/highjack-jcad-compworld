@@ -15,7 +15,7 @@ public class PeerMessage implements Serializable {
 	public int indexToFix;	// FIND_SUCCESSOR, SUCCESSOR
 	public PeerInformation peer;		// SUCCESSOR, PREDECESSOR
 	public long idOfPayloadDestination;	// PAYLOAD
-	public String payload;				// PAYLOAD
+	public Serializable payload;				// PAYLOAD
 
 	public PeerMessage(Type type, PeerInformation sender) {
 		this.type = type;
