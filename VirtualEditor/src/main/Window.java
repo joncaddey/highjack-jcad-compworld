@@ -42,10 +42,10 @@ public class Window extends JFrame implements Observer, ActionListener{
 		my_score.setEnabled(false);
 		my_level = new JTextField(5);
 		my_level.setEnabled(false);
-		my_new_game_dialog = new NewGameDialog(null);
+		my_new_game_dialog = new NewGameDialog(this);
 		my_new_game_button = new JButton("New Game...");
 		setup();
-		JOptionPane.showMessageDialog(null, "Welcome to Asteroids!\nUse arrow keys to move, press space to fire,\nand press down arrow for a rechargeable shield.\nStart a game with New Game.");
+		JOptionPane.showMessageDialog(null, "Use arrow keys to move, press space to fire,\nand press down arrow for a rechargeable shield.\nStart a game with New Game.", "Welcome to Asteroids!", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void setup() {
@@ -95,6 +95,7 @@ public class Window extends JFrame implements Observer, ActionListener{
 			my_level.setText(String.valueOf((Integer) the_arg));
 		} else if (the_arg instanceof Boolean) {
 			JOptionPane.showMessageDialog(this, "Game Over");
+			my_new_game_button.requestFocus();
 		}
 		
 	}
