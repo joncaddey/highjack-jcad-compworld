@@ -49,4 +49,10 @@ public abstract class Asteroid implements Serializable{
 	}
 	public abstract List<Asteroid> getFragments(final float the_min_size, final float the_impulse);
 
+
+
+	public float getMaxHP() {
+		return my_max_hp;
+	}
+
 }
