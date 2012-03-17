@@ -31,7 +31,7 @@ public class AsteroidsCanvas extends GLCanvas implements GLEventListener{
 	
 
 	private AsteroidsGame my_game;
-	private static final int BOARD_SIZE = 10;
+	private static final int BOARD_SIZE = 16;
 
 	private int my_frame_count;
 	private float my_average_time_between_frames = 1f / TARGET_FPS;

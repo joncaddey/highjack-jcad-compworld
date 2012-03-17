@@ -4,7 +4,7 @@ package phyObj;
 
 public class Bullet extends PhyCircle{
 
-	private static int MAX_TIME = 2;
+	public static int MAX_TIME = 4;
 	private int my_damage;
 	private float my_time;
 	private int my_bounces;

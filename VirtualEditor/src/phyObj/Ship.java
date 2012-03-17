@@ -366,7 +366,7 @@ public class Ship extends PhyComposite {
 		final int bullet_spread = 6;
 		final int max_bullet_spread = 64;
 		for (int i = 0; i < bullet_spread; i++) {
-			Bullet bullet = new Bullet(1, 0, 1, .2f, .5f); // old density .01
+			Bullet bullet = new Bullet(1, 0, 3, .2f, .5f); // old density .01
 			bullet.position = new Vector2f(0, .3f);
 			bullet.position.rotate(orientation);
 			bullet.position.sum(position);
@@ -375,7 +375,7 @@ public class Ship extends PhyComposite {
 			my_bullets.add(bullet);
 		}
 		
-		Bullet bullet = new Bullet(1, 0, 1, .3f, 1f);
+		Bullet bullet = new Bullet(1, 0, 3, .3f, 1f);
 		bullet.renderable.setRGBi(200, 54, 42);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
@@ -386,7 +386,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(10, 4, 1, .2f, .0001f);
+		Bullet bullet = new Bullet(10, 4, 3, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
