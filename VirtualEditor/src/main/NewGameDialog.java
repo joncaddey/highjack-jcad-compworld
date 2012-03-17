@@ -21,29 +21,32 @@ import com.jogamp.newt.event.KeyEvent;
 @SuppressWarnings("serial")
 public class NewGameDialog extends JDialog implements ActionListener{
 	
-	public static void main(String args[]) {
-		JFrame a  = new JFrame();
-		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		
-		NewGameDialog b = new NewGameDialog(a);
-		
-		
-		a.setVisible(true);
-		System.out.print(b.showDialog());
-		a.add(new JButton("i like this class :D"));
-		a.pack();
-	}
+//	public static void main(String args[]) {
+//		JFrame a  = new JFrame();
+//		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//		
+//		
+//		NewGameDialog b = new NewGameDialog(a);
+//		
+//		
+//		a.setVisible(true);
+//		System.out.print(b.showDialog());
+//		a.add(new JButton("i like this class :D"));
+//		a.pack();
+//	}
 	
 	JPanel player_panel;
 	
 	JPanel network_panel;
+	
+	
+	private String singleText, createText, joinText, startText;
 
 	private boolean my_single_player;
 
 	private JTextField network_textbox;
 
-	private JTextField port_textbox;
+	private JTextField id_textbox;
 
 	private boolean my_aproved;
 	
@@ -69,6 +72,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 		//add the main panel to the window
 		add(main_panel);
 		pack();
+		setLocationRelativeTo(the_owner);
 	}
 	
 	
@@ -94,9 +98,16 @@ public class NewGameDialog extends JDialog implements ActionListener{
 		a_JPanel.add(port_label);
 
 		//make the port text box
-		port_textbox = new JTextField(5);
-		a_JPanel.add(port_textbox);
-			
+		id_textbox = new JTextField(5);
+		a_JPanel.add(id_textbox);
+		
+		//make the ID label
+		a_JPanel.add(new JLabel("ID:"));
+
+		//make the ID text box
+		id_textbox = new JTextField(5);
+		a_JPanel.add(id_textbox);
+		
 		return a_JPanel;
 	}
 	
@@ -107,7 +118,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	    ButtonGroup group = new ButtonGroup();
 		
 		//make single player radio button
-		String singleText = new String("Single Player");
+		singleText = new String("Single Player");
 		JRadioButton single = new JRadioButton(singleText);
 		single.setMnemonic(KeyEvent.VK_S);
 		single.setActionCommand(singleText);
@@ -116,17 +127,26 @@ public class NewGameDialog extends JDialog implements ActionListener{
 		a_panel.add(single);
 		group.add(single);
 		
-		//make a multiplayer radio button
-		String multiText = new String("Multi player");
-		JRadioButton multi = new JRadioButton(multiText);
-		multi.setMnemonic(KeyEvent.VK_M);
-		multi.setActionCommand(multiText);
-		multi.addActionListener(this);
-		a_panel.add(multi);
-		group.add(multi);
+		//make a create network radio button
+		createText = new String("Create Network");
+		JRadioButton create = new JRadioButton(createText);
+		create.setMnemonic(KeyEvent.VK_C);
+		create.setActionCommand(createText);
+		create.addActionListener(this);
+		a_panel.add(create);
+		group.add(create);
+		
+		//make a join game radio button
+		joinText = new String("Join Network");
+		JRadioButton join = new JRadioButton(joinText);
+		create.setMnemonic(KeyEvent.VK_J);
+		create.setActionCommand(joinText);
+		create.addActionListener(this);
+		a_panel.add(join);
+		group.add(join);
 		
 		//make newgame button
-		String startText = new String("Start Game");
+		startText = new String("Start Game");
 		JButton start_game = new JButton(startText);
 		start_game.setMnemonic(KeyEvent.VK_G);
 		start_game.setActionCommand(startText);
@@ -138,14 +158,15 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) {
-		String comand = e.getActionCommand();
-		if(comand.equals("Multi player")){
+		String command = e.getActionCommand();
+		if(command.equals(createText) || command.equals(joinText)){
 			enable(network_panel);
+			network_textbox.setEnabled(command.equals(joinText));
 			my_single_player = false;
-		}else if(comand.equals("Single Player")) {
+		}else if(command.equals(singleText)) {
 			my_single_player = true;
 			unenable(network_panel);
-		}else{
+		}else if (command.equals(startText)){
 			setVisible(false);
 			my_aproved = true;
 		}
@@ -160,19 +181,21 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	}
 	
 	public String getPort(){
-		return port_textbox.getText();
+		return id_textbox.getText();
 	}
 
 
 	private void unenable(JPanel the_panel){
 		for(Component a_compComponent : the_panel.getComponents()){
 			a_compComponent.setEnabled(false);
+			pack();
 		}
 	}
 	
 	private void enable(JPanel the_panel){
 		for(Component a_compComponent : the_panel.getComponents()){
 			a_compComponent.setEnabled(true);
+			pack();
 		}
 	}
 
