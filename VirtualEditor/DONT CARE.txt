@@ -6,6 +6,9 @@ add ID to asteroid so you know who it came from.
 
 Get asteroids to go to other networks.
 
+Make it so friends can join a network, and all join at the same time.  The friends are notified when their friends lose.  PARTY SYSTEM.  PRivate game.
+
+
 Make it possible to die, restart game
 Implement auto-shield.  If you get hit, your shiled will engage for a small amount of time.  This small amount of time can be lessened by manually engaging shield.
 
