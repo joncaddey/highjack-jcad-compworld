@@ -34,6 +34,7 @@ public class Ship extends PhyComposite {
 	
 	//sound player
 	private static final String LAZER_SOUND = "sound/lazersmall.wav";
+	private static final String POWER_LAZER_SOUND = "sound/POWER.wav";
 	private SoundPlayer my_music;
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
@@ -352,18 +353,22 @@ public class Ship extends PhyComposite {
 			my_heat += .3f + .07f;
 			kickBack(STRONG_KICKBACK);
 			my_reload_time = .07f;
+			my_music.play(LAZER_SOUND);
+			my_music.play(POWER_LAZER_SOUND);
+			
 		} else if (my_heat < .9f) {
 			my_heat += .3f;
 			my_reload_time = .3f;
 			kickBack(WEAK_KICKBACK);
 			weakShot();
+			
 		} else if (my_heat < 2f) {
 			weakShot();
 			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
 			my_reload_time = .3f;
 		}
-		
+		my_music.stop(LAZER_SOUND);
 		my_music.play(LAZER_SOUND);
 		
 	}
