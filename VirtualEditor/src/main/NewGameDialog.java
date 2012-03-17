@@ -27,7 +27,7 @@ import com.jogamp.newt.event.KeyEvent;
 @SuppressWarnings("serial")
 public class NewGameDialog extends JDialog implements ActionListener{
 	
-	public static void main(String args[]) {
+//	public static void main(String args[]) {
 //		JFrame a  = new JFrame();
 //		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		
@@ -45,7 +45,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 //		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //		NewGameDialog b = new NewGameDialog(a);
 //		b.getLocalIP();
-	}
+//	}
 	
 	private Peer my_peer;
 	private long my_id;
@@ -111,6 +111,10 @@ public class NewGameDialog extends JDialog implements ActionListener{
 
 		//make the network text box
 		network_textbox = new JTextField(15);
+		String ip = getLocalIP();
+		if(ip != null){
+			network_textbox.setText(ip);
+		}
 		a_JPanel.add(network_textbox);
 		
 		//make the port label
@@ -291,22 +295,20 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	 */
 	private String getLocalIP(){
 		String myHost = null;
+		String myIP = null;
 		try {
 
 			InetAddress addr = InetAddress.getLocalHost();
 			
-
-			String myIP = addr.getHostAddress();
+			myIP = addr.getHostAddress();
 
 			// Bonus. Get your hostname.
 			myHost = addr.getHostName();
 
-			System.out.println(myIP + " " + myHost);
-
 		} catch (UnknownHostException e) {
-			System.out.println("Unknown Host: "+e);
+			//dont care
 		}
-		return myHost;
+		return myIP;
 	}
 
 	public boolean showDialog() {
