@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import sound.SoundPlayer;
+
 
 import main.SceneGraphNode;
 import main.Triangle;
@@ -30,6 +32,9 @@ public class Ship extends PhyComposite {
 	private static final float AUTO_SHIELD_TIME = .4f;
 	private static final float AUTO_SHIELD_PENALTY = .15f;
 	
+	//sound player
+	private static final String LAZER_SOUND = "sound/lazersmall.wav";
+	private SoundPlayer my_music;
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
 	private final SceneGraphNode my_hull;
@@ -53,7 +58,8 @@ public class Ship extends PhyComposite {
 	 * Its a shipssss it poilted by kirck cause he has funny hair. picard no hair
 	 */
 	public Ship() {
-		
+		//sound
+		my_music = new SoundPlayer();
 		
 		int variability = 20;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.5f);
@@ -313,6 +319,7 @@ public class Ship extends PhyComposite {
 	private float my_reload_time = 0;
 	private float my_heat = 0;
 	
+	
 	private void fire() {
 		if (my_reload_time > 0) {
 			return;
@@ -357,6 +364,7 @@ public class Ship extends PhyComposite {
 			my_reload_time = .3f;
 		}
 		
+		my_music.play(LAZER_SOUND);
 		
 	}
 	
