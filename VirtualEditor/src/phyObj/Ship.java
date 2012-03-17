@@ -359,6 +359,10 @@ public class Ship extends PhyComposite {
 		} else if (my_heat < .9f) {
 			my_heat += .3f;
 			my_reload_time = .3f;
+			
+			my_music.stop(LAZER_SOUND);
+			my_music.play(LAZER_SOUND);
+			
 			kickBack(WEAK_KICKBACK);
 			weakShot();
 			
@@ -367,9 +371,10 @@ public class Ship extends PhyComposite {
 			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
 			my_reload_time = .3f;
+			my_music.stop(LAZER_SOUND);
+			my_music.play(LAZER_SOUND);
 		}
-		my_music.stop(LAZER_SOUND);
-		my_music.play(LAZER_SOUND);
+
 		
 	}
 	
