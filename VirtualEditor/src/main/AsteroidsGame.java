@@ -22,9 +22,15 @@ import phyObj.RightTriangleAsteroid;
 import phyObj.Ship;
 import phyObj.SquareAsteroid;
 import phyObj.Vector2f;
+import sound.SoundPlayer;
 
 public class AsteroidsGame extends Observable {
 	private static final int RESOLUTION_REPEATS = 10;
+	
+	//sound player
+	private static final String DEATH_SOUND = "sound/death.wav";
+	private SoundPlayer my_music;
+	
 	private SceneGraphNode my_asteroid_root;
 	private SceneGraphNode my_bullet_root;
 
@@ -41,6 +47,8 @@ public class AsteroidsGame extends Observable {
 	
 	
 	public AsteroidsGame() {
+		my_music = new SoundPlayer();
+		
 		my_asteroid_root = new SceneGraphNode();
 		my_bullet_root = new SceneGraphNode();
 		my_bullets = new ArrayList<Bullet>();
@@ -326,6 +334,10 @@ public class AsteroidsGame extends Observable {
 	private void gameOver() {
 		if (!my_game_over) {
 			my_game_over = true;
+			
+			//sound
+			my_music.play(DEATH_SOUND);
+			
 			setChanged();
 			notifyObservers(new Boolean(true));
 		}
