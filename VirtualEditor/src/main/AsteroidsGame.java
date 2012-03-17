@@ -46,7 +46,6 @@ public class AsteroidsGame extends Observable {
 		my_bullets = new ArrayList<Bullet>();
 		my_asteroids = new ArrayList<Asteroid>();
 		my_game_over = true;
-		startGame();
 		
 		
 		// Add independent SceneGraphNode representing all the HalfSpaces.
@@ -73,14 +72,15 @@ public class AsteroidsGame extends Observable {
 		my_asteroids.clear();
 		my_ship = new Ship();
 		setChanged();
-		notifyObservers(my_score);
+		notifyObservers(new Long((long)my_score));
 		setChanged();
-		notifyObservers(my_level);
+		notifyObservers(new Integer(my_level));
 		my_game_over = false;
 		
 	}
 	
 	public void keyPressed(KeyEvent the_e) {
+		if (my_game_over) return;
 		int code = the_e.getKeyCode();
 		switch (code) {
 			case KeyEvent.VK_UP:
@@ -102,6 +102,7 @@ public class AsteroidsGame extends Observable {
 	}
 	
 	public void keyReleased(KeyEvent the_e) {
+		if (my_game_over) return;
 		int code = the_e.getKeyCode();
 		switch (code) {
 			case KeyEvent.VK_UP:
@@ -136,33 +137,35 @@ public class AsteroidsGame extends Observable {
 		
 		// update ship
 		if (!my_game_over) {
-			my_ship.updateState(the_time_passed);
-		}
-		Vector2f position = my_ship.getPosition();
-		float radius = .2f;
-		if (position.x < -getWidth() / 2 - radius) {
-			my_ship.setPosition(getWidth() + 2 * radius + position.x, position.y);
-		} else if (position.x > getWidth() / 2 + radius) {
-			my_ship.setPosition(-getWidth() - 2 * radius + position.x, position.y);
-		}
-		if (position.y < -getHeight() / 2 - radius) {
-			my_ship.setPosition(position.x, getHeight() + 2 * radius + position.y);
-		} else if (position.y > getHeight() / 2 + radius) {
-			my_ship.setPosition(position.x, -getHeight() - 2 * radius + position.y);
+				my_ship.updateState(the_time_passed);
+			Vector2f position = my_ship.getPosition();
+			float radius = .2f;
+			if (position.x < -getWidth() / 2 - radius) {
+				my_ship.setPosition(getWidth() + 2 * radius + position.x, position.y);
+			} else if (position.x > getWidth() / 2 + radius) {
+				my_ship.setPosition(-getWidth() - 2 * radius + position.x, position.y);
+			}
+			if (position.y < -getHeight() / 2 - radius) {
+				my_ship.setPosition(position.x, getHeight() + 2 * radius + position.y);
+			} else if (position.y > getHeight() / 2 + radius) {
+				my_ship.setPosition(position.x, -getHeight() - 2 * radius + position.y);
+			}
 		}
 		
 		
 		// add any bullets fired since updating the ships state
-		for (Bullet bill : my_ship.getBullets()) {
-			my_bullet_root.addChild(bill.getRenderable());
-			my_bullets.add(bill);
+		if (!my_game_over) {
+			for (Bullet bill : my_ship.getBullets()) {
+				my_bullet_root.addChild(bill.getRenderable());
+				my_bullets.add(bill);
+			}
 		}
 		
 		// update asteroids
 		for (Asteroid a : my_asteroids) {
 			PhyObject phy = a.getObject();
 			phy.updateState(the_time_passed);
-			position = phy.getPosition();
+			Vector2f position = phy.getPosition();
 			final float diameter = a.getObject().getSize() * 1.44f;
 			if (position.x < -(getWidth() + diameter) / 2) {
 				phy.setPosition((getWidth() + diameter) + position.x, position.y);

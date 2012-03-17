@@ -3,6 +3,8 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -21,14 +23,16 @@ import javax.swing.WindowConstants;
  *
  */
 @SuppressWarnings("serial")
-public class Window extends JFrame implements Observer{
+public class Window extends JFrame implements Observer, ActionListener{
 	
 	
 	private final AsteroidsGame my_game;
-	private AsteroidsCanvas my_canvas;
-	private JTextField my_score;
-	private JTextField my_level;
+	private final AsteroidsCanvas my_canvas;
+	private final JTextField my_score;
+	private final JTextField my_level;
+	private final JButton my_new_game_button;
 
+	private final NewGameDialog my_new_game_dialog;
 	public Window(String the_title){
 		super(the_title);
 		my_game = new AsteroidsGame();
@@ -38,7 +42,10 @@ public class Window extends JFrame implements Observer{
 		my_score.setEnabled(false);
 		my_level = new JTextField(5);
 		my_level.setEnabled(false);
+		my_new_game_dialog = new NewGameDialog(null);
+		my_new_game_button = new JButton("New Game...");
 		setup();
+		JOptionPane.showMessageDialog(null, "Welcome to Asteroids!\nUse arrow keys to move, press space to fire,\nand press down arrow for a rechargeable shield.\nStart a game with New Game.");
 	}
 
 	private void setup() {
@@ -53,7 +60,8 @@ public class Window extends JFrame implements Observer{
 		root.add(my_canvas, BorderLayout.CENTER);
 		JPanel status = new JPanel();
 		//status.setLayout(new BoxLayout(status, BoxLayout.X_AXIS));
-		status.add(new JButton("New game"));
+		my_new_game_button.addActionListener(this);
+		status.add(my_new_game_button);
 		
 		JPanel p;
 		
@@ -77,15 +85,27 @@ public class Window extends JFrame implements Observer{
 		if (Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH))
 			this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);
-		my_canvas.requestFocus(); // TODO whenever you start
 	}
 
 	@Override
 	public void update(Observable the_observer, Object the_arg) {
 		if (the_arg.getClass().equals(Long.class)) {
 			my_score.setText(String.valueOf((Long) the_arg));
+		} else if (the_arg.getClass().equals(Integer.class)) {
+			my_level.setText(String.valueOf((Integer) the_arg));
 		} else if (the_arg instanceof Boolean) {
 			JOptionPane.showMessageDialog(this, "Game Over");
+		}
+		
+	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == my_new_game_button) {
+			if (my_new_game_dialog.showDialog()) {
+				my_game.startGame();
+				my_canvas.requestFocus();
+			}
 		}
 		
 	}
