@@ -4,6 +4,7 @@ import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.peer.ComponentPeer;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
@@ -194,7 +195,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 			if (my_single_player) {
 				my_approved = true;
 			} else {
-				Peer my_peer = new Peer();
+				my_peer = new Peer();
 				if (my_create_network) {
 					if (id_textbox.getText().length() == 0) {
 						my_peer.createNetwork();
@@ -218,8 +219,8 @@ public class NewGameDialog extends JDialog implements ActionListener{
 					}
 				}
 			}
-			setVisible(false);
 			my_approved = true;
+			setVisible(false);
 		}
 	}
 	
@@ -259,6 +260,14 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	
 	public long getID() {
 		return my_id;
+	}
+	
+	public Peer getNetworkingPeer() {
+		if (my_single_player) {
+			return null;
+		} else {
+			return my_peer;
+		}
 	}
 
 

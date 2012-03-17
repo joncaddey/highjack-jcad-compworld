@@ -8,10 +8,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Observable;
+import java.util.Observer;
 
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
+
+import network.Peer;
 
 import phyObj.Asteroid;
 import phyObj.Bullet;
@@ -24,7 +27,7 @@ import phyObj.SquareAsteroid;
 import phyObj.Vector2f;
 import sound.SoundPlayer;
 
-public class AsteroidsGame extends Observable {
+public class AsteroidsGame extends Observable implements Observer{
 	private static final int RESOLUTION_REPEATS = 10;
 	
 	//sound player
@@ -43,6 +46,7 @@ public class AsteroidsGame extends Observable {
 	private boolean my_game_over;
 	private float my_score;
 	private int my_level;
+	private Peer my_peer;
 	
 	
 	
@@ -177,6 +181,10 @@ public class AsteroidsGame extends Observable {
 			final float diameter = a.getObject().getSize() * 1.44f;
 			if (position.x < -(getWidth() + diameter) / 2) {
 				phy.setPosition((getWidth() + diameter) + position.x, position.y);
+				if (my_peer != null) {
+					System.out.println("MSG SENT");
+					my_peer.sendObject("HELLO", 0);
+				}
 			} else if (position.x > (getWidth() + diameter) / 2) {
 				phy.setPosition(-(getWidth() + diameter) + position.x, position.y);
 			}
@@ -331,6 +339,13 @@ public class AsteroidsGame extends Observable {
 		my_asteroid_root.addChild(a.getRenderable());
 	}
 	
+	private void sendAsteroid() {
+	
+	}
+	private void receiveAsteroid() {
+		
+	}
+	
 	private void gameOver() {
 		if (!my_game_over) {
 			my_game_over = true;
@@ -357,6 +372,24 @@ public class AsteroidsGame extends Observable {
 
 	public void setHeight(float the_field_height) {
 		this.my_field_height = the_field_height;
+	}
+	
+	public void setPeer(final Peer the_peer) {
+		if (my_peer != null) {
+			my_peer.deleteObserver(this);
+		}
+		my_peer = the_peer;
+		if (my_peer != null) {
+			my_peer.addObserver(this);
+		}
+	}
+
+	@Override
+	public void update(Observable o, Object arg) {
+		if (o.equals(my_peer)) {
+			System.out.println(arg);
+		}
+		
 	}
 
 }
