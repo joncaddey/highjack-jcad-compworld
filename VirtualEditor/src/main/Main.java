@@ -9,14 +9,9 @@ import javax.swing.SwingUtilities;
  */
 public class Main {
 
-	VirtualCanvas my_canvas;
-	public Main() {
-		my_canvas = new VirtualCanvas();
-		my_canvas.getCanvas().requestFocus();
-	}
 	
 	public void start() {
-		new Window("Highjacad's Asteroids", my_canvas);
+		new Window("Highjacad's Asteroids");
 	}
 	public static void main(String args[]) {
 		
