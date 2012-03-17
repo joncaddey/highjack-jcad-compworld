@@ -52,6 +52,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	public AsteroidsGame() {
 		my_music = new SoundPlayer();
+		my_music.preLoad(DEATH_SOUND);
 		
 		my_asteroid_root = new SceneGraphNode();
 		my_bullet_root = new SceneGraphNode();
