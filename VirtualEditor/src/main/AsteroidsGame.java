@@ -32,6 +32,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
+
 	private SoundPlayer my_music;
 	
 	private SceneGraphNode my_asteroid_root;
@@ -47,6 +48,8 @@ public class AsteroidsGame extends Observable implements Observer{
 	private float my_score;
 	private int my_level;
 	private Peer my_peer;
+
+	private long my_id;
 	
 	
 	
@@ -179,20 +182,20 @@ public class AsteroidsGame extends Observable implements Observer{
 			PhyObject phy = a.getObject();
 			phy.updateState(the_time_passed);
 			Vector2f position = phy.getPosition();
-			final float diameter = a.getObject().getSize() * 1.44f;
+			final float diameter = a.getObject().getSize();
 			if (position.x < -(getWidth() + diameter) / 2) {
 				phy.setPosition((getWidth() + diameter) + position.x, position.y);
-				if (my_peer != null) {
-					System.out.println("MSG SENT");
-					my_peer.sendObject("HELLO", 0);
-				}
+				sendAsteroid(a);
 			} else if (position.x > (getWidth() + diameter) / 2) {
 				phy.setPosition(-(getWidth() + diameter) + position.x, position.y);
+				sendAsteroid(a);
 			}
 			if (position.y < -(getHeight() + diameter) / 2) {
 				phy.setPosition(position.x, (getHeight() + diameter) + position.y);
+				sendAsteroid(a);
 			} else if (position.y > (getHeight() + diameter) / 2) {
 				phy.setPosition(position.x, -(getHeight() + diameter) + position.y);
+				sendAsteroid(a);
 			}
 		}
 		
@@ -318,11 +321,11 @@ public class AsteroidsGame extends Observable implements Observer{
 		final Asteroid a;
 		final float hp = 10;
 		if (type <= .3) {
-			a = new EqTriangleAsteroid(size, hp);
+			a = new EqTriangleAsteroid(my_id, size, hp);
 		} else if (type <= .6) {
-			a = new RightTriangleAsteroid(size, hp);
+			a = new RightTriangleAsteroid(my_id, size, hp);
 		} else {
-			a = new SquareAsteroid(size, hp);
+			a = new SquareAsteroid(my_id, size, hp);
 		}
 		final float position1 = (float) Math.random() - .5f;
 		final float position2 = Math.random() < .5 ? -.5f : .5f;
@@ -340,11 +343,40 @@ public class AsteroidsGame extends Observable implements Observer{
 		my_asteroid_root.addChild(a.getRenderable());
 	}
 	
-	private void sendAsteroid() {
-	
-	}
-	private void receiveAsteroid() {
+	private void sendAsteroid(Asteroid the_asteroid) {
 		
+	 // if mypeer isn't null, set alive to false _after_ sending it.
+	}
+	/**
+	 * The asteroid should have its position relative to the border it came from, not the origin.
+	 * @param the_asteroid
+	 */
+	private void receiveAsteroid(Asteroid the_asteroid) {
+		final long id = the_asteroid.getDestination();
+		Vector2f position = idToPosition(the_asteroid.getDestination(), my_field_width, my_field_height);
+		position.sum(the_asteroid.getObject().getPosition());
+		the_asteroid.getObject().setPosition(position.x, position.y);
+		
+	}
+	
+	private Vector2f idToPosition(final long the_id, float width, float height) {
+		float x = 0;
+		float y = 0;
+		long id = the_id;
+		if (id < Peer.ID_LIMIT / 4) {
+			y = -height / 2;
+			x = id / (Peer.ID_LIMIT / 4) * width - width / 2;
+		} else if (id < Peer.ID_LIMIT / 2) {
+			x = -width / 2;
+			y = (id - Peer.ID_LIMIT / 4) * height - height / 2;
+		} else if (id < Peer.ID_LIMIT * 4 / 3) {
+			y = height / 2;
+			x = -(id - Peer.ID_LIMIT / 2) * width + width / 2;
+		} else {
+			x = width / 2;
+			y = -(id - Peer.ID_LIMIT * 3 / 4) * height + height / 2;
+		}
+		return new Vector2f(x, y);
 	}
 	
 	private void gameOver() {
@@ -382,6 +414,7 @@ public class AsteroidsGame extends Observable implements Observer{
 		my_peer = the_peer;
 		if (my_peer != null) {
 			my_peer.addObserver(this);
+			my_id = my_peer.getID();
 		}
 	}
 

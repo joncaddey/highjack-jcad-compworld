@@ -559,6 +559,10 @@ public class Peer extends Observable{
 	}
 
 	
+	public long getID() {
+		return myInfo.id;
+	}
+	
 	
 	
 	
