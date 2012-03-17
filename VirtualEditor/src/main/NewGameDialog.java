@@ -139,9 +139,9 @@ public class NewGameDialog extends JDialog implements ActionListener{
 		//make a join game radio button
 		joinText = new String("Join Network");
 		JRadioButton join = new JRadioButton(joinText);
-		create.setMnemonic(KeyEvent.VK_J);
-		create.setActionCommand(joinText);
-		create.addActionListener(this);
+		join.setMnemonic(KeyEvent.VK_J);
+		join.setActionCommand(joinText);
+		join.addActionListener(this);
 		a_panel.add(join);
 		group.add(join);
 		
@@ -159,7 +159,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	
 	public void actionPerformed(ActionEvent e) {
 		String command = e.getActionCommand();
-		if(command.equals(createText) || command.equals(joinText)){
+		if(command.equals(joinText) || command.equals(createText)){
 			enable(network_panel);
 			network_textbox.setEnabled(command.equals(joinText));
 			my_single_player = false;
