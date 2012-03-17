@@ -19,14 +19,14 @@ import com.jogamp.newt.event.KeyEvent;
 
 
 @SuppressWarnings("serial")
-public class NetworkGui extends JDialog implements ActionListener{
+public class NewGameDialog extends JDialog implements ActionListener{
 	
 	public static void main(String args[]) {
 		JFrame a  = new JFrame();
 		a.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		
-		NetworkGui b = new NetworkGui(a);
+		NewGameDialog b = new NewGameDialog(a);
 		
 		
 		a.setVisible(true);
@@ -47,8 +47,8 @@ public class NetworkGui extends JDialog implements ActionListener{
 
 	private boolean my_aproved;
 	
-	public NetworkGui(final Frame the_owner){
-		super(the_owner,"Chose game", true);
+	public NewGameDialog(final Frame the_owner){
+		super(the_owner,"Choose game", true);
 		setResizable(false);
 		
 		JPanel main_panel = new JPanel();
@@ -181,4 +181,5 @@ public class NetworkGui extends JDialog implements ActionListener{
 		setVisible(true);
 		return my_aproved;
 	}
+	
 }
