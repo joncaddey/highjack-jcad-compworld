@@ -36,6 +36,7 @@ public class Ship extends PhyComposite {
 	private static final String LAZER_SOUND = "sound/lazersmall.wav";
 	private static final String POWER_LAZER_SOUND = "sound/POWER.wav";
 	private SoundPlayer my_music;
+	private SoundPlayer my_music2;
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
 	private final SceneGraphNode my_hull;
@@ -61,8 +62,9 @@ public class Ship extends PhyComposite {
 	public Ship() {
 		//sound
 		my_music = new SoundPlayer();
+		my_music2 = new SoundPlayer();
 		my_music.preLoad(LAZER_SOUND);
-		my_music.preLoad(POWER_LAZER_SOUND);
+		my_music2.preLoad(POWER_LAZER_SOUND);
 		
 		int variability = 20;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.5f);
@@ -354,15 +356,25 @@ public class Ship extends PhyComposite {
 			powerShot();
 			my_heat += .3f + .07f;
 			kickBack(STRONG_KICKBACK);
-			my_reload_time = .07f;			
-			my_music.play(POWER_LAZER_SOUND);
+			my_reload_time = .07f;
+			
+			try{
+				my_music2.play(POWER_LAZER_SOUND);
+			}catch (Exception e) {
+				System.out.print(":D");
+			}
 			
 		} else if (my_heat < .9f) {
 			my_heat += .3f;
 			my_reload_time = .3f;
 			
-			my_music.stop(LAZER_SOUND);
-			my_music.play(LAZER_SOUND);
+			try{
+				my_music.stop(LAZER_SOUND);
+				my_music.play(LAZER_SOUND);
+			}catch (Exception e) {
+				System.out.print(":D 1");
+			}
+
 			
 			kickBack(WEAK_KICKBACK);
 			weakShot();
@@ -372,8 +384,13 @@ public class Ship extends PhyComposite {
 			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
 			my_reload_time = .3f;
-			my_music.stop(LAZER_SOUND);
-			my_music.play(LAZER_SOUND);
+			
+			try{
+				my_music.stop(LAZER_SOUND);
+				my_music.play(LAZER_SOUND);
+			}catch (Exception e) {
+				System.out.print(":D 2");
+			}
 		}
 
 		
