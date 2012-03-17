@@ -89,22 +89,17 @@ public class Peer {
 		return connectToNetwork(host, DEFAULT_SERVER_PORT, id);
 	}
 
-	public boolean connectToNetwork(String host, int port) throws IOException, InterruptedException {
-		try {
-			return connectToNetwork(InetAddress.getByName(host), port);
-		} catch (UnknownHostException e) {
-			System.err.println(e);
-			return false;
-		}
+	public boolean connectToNetwork(String host, int port) throws IOException,
+			InterruptedException {
+
+		return connectToNetwork(InetAddress.getByName(host), port);
 	}
 
-	public boolean connectToNetwork(String host, int port, long id) throws IOException, InterruptedException {
-		try {
-			return connectToNetwork(InetAddress.getByName(host), port, id);
-		} catch (UnknownHostException e) {
-			System.err.println(e);
-			return false;
-		}
+	public boolean connectToNetwork(String host, int port, long id)
+			throws IOException, InterruptedException {
+
+		return connectToNetwork(InetAddress.getByName(host), port, id);
+
 	}
 
 	public boolean connectToNetwork(InetAddress host) throws IOException, InterruptedException {
@@ -141,8 +136,12 @@ public class Peer {
 		mesg.indexToFix = -1;
 		socketOut.writeObject(mesg);
 		socket.close();
-		while (successor == null)
-			Thread.sleep(1000);
+		int wait = 3;
+		int i;
+		for (i = 0; i < wait && successor == null; i++)	Thread.sleep(1000);
+		if (i == wait) {
+			return false;
+		}
 		if (logEnabled)
 			logMessage("Joined network @ " + myInfo.id);
 		else
@@ -561,103 +560,4 @@ public class Peer {
 	
 	
 	
-	public static void main(String[] args) {
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		boolean newNetwork = false;
-		String input = null;
-
-		while (true) {
-			System.out.println("Create a new network or join an existing network?");
-			System.out.println("  1. Create a new network");
-			System.out.println("  2. Join an existing network");
-			try {
-				input = in.readLine();
-			} catch (IOException e) {
-				continue;
-			}
-			if (input.equals("1")) {
-				newNetwork = true;
-				break;
-			} else if (input.equals("2"))
-				break;
-		}
-
-		long id = -1;
-		while (true) {
-			System.out.println("Desired network ID, 0-" + (Peer.ID_LIMIT-1) + " [random]: ");
-			try {
-				input = in.readLine();
-				if (input.length() == 0)
-					break;
-				id = Long.parseLong(input);
-			} catch (NumberFormatException e) {
-				continue;
-			} catch (IOException e) {
-				continue;
-			}
-			if (id >= -1 && id < Peer.ID_LIMIT)
-				break;
-		}
-
-		Peer peer = new Peer();
-		if (newNetwork) {
-			if (id == -1)
-				peer.createNetwork();
-			else
-				peer.createNetwork(id);
-		} else {
-			String ip = "127.0.0.1";
-			int port = Peer.DEFAULT_SERVER_PORT;
-			boolean success = false;
-			do {
-				System.out.print("Enter host to connect to [" + ip + "[:" + port + "]]: ");
-				try {
-					input = in.readLine();
-					int index = input.indexOf(':');
-					if (index >= 0) {
-						port = Integer.parseInt(input.substring(index + 1));
-						input = input.substring(0, index);
-					}
-					if (input.length() > 0)
-						ip = input;
-				} catch (IOException e) {
-				}
-				try {
-					success = id == -1 ? peer.connectToNetwork(ip, port) : peer.connectToNetwork(ip, port, id);
-				} catch (Exception e) {
-					System.out.println(e);
-				}
-			} while (!success);
-			
-		}
-
-		System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
-		while (true) {
-			try {
-				input = in.readLine();
-				if (input.length() == 0)
-					continue;
-				Scanner sc = new Scanner(input);
-				if (!sc.hasNextLong()) {
-					input = sc.next();
-					if (input.equals("quit")) {
-						peer.disconnectFromNetwork();
-						break;
-					} else if (input.equals("state"))
-						System.out.println(peer.internalState());
-					else
-						System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
-					continue;
-				}
-				id = sc.nextLong();
-				if (id < 0 || id >= ID_LIMIT) {
-					System.out.println("Invalid ID.");
-					continue;
-				}
-				sc.skip(sc.delimiter());
-				peer.sendText(sc.nextLine(), id);
-			} catch (IOException e) {
-			}
-		}
-	}
 }

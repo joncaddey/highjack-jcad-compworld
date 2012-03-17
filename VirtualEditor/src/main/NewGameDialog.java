@@ -11,9 +11,12 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
+
+import network.Peer;
 
 import com.jogamp.newt.event.KeyEvent;
 
@@ -35,20 +38,29 @@ public class NewGameDialog extends JDialog implements ActionListener{
 //		a.pack();
 //	}
 	
-	JPanel player_panel;
-	
-	JPanel network_panel;
+	private Peer my_peer;
+	private long my_id;
+	private int my_port;
+	private String my_ip;
+	private JPanel player_panel;
+	private JPanel network_panel;
 	
 	
 	private String singleText, createText, joinText, startText;
 
 	private boolean my_single_player;
+	
+	private boolean my_create_network;
 
 	private JTextField network_textbox;
 
+	private JTextField port_textbox;
+	
 	private JTextField id_textbox;
+	private String my_default_port = "5507";
+	
 
-	private boolean my_aproved;
+	private boolean my_approved;
 	
 	public NewGameDialog(final Frame the_owner){
 		super(the_owner,"Choose game", true);
@@ -98,8 +110,8 @@ public class NewGameDialog extends JDialog implements ActionListener{
 		a_JPanel.add(port_label);
 
 		//make the port text box
-		id_textbox = new JTextField(5);
-		a_JPanel.add(id_textbox);
+		port_textbox = new JTextField(my_default_port, 5);
+		a_JPanel.add(port_textbox);
 		
 		//make the ID label
 		a_JPanel.add(new JLabel("ID:"));
@@ -158,18 +170,71 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	}
 	
 	public void actionPerformed(ActionEvent e) {
+		
 		String command = e.getActionCommand();
 		if(command.equals(joinText) || command.equals(createText)){
 			enable(network_panel);
 			network_textbox.setEnabled(command.equals(joinText));
+			my_create_network = command.equals(createText);
 			my_single_player = false;
 		}else if(command.equals(singleText)) {
 			my_single_player = true;
 			unenable(network_panel);
 		}else if (command.equals(startText)){
+			my_approved = validateFields();
+			if (!my_approved) return;
+			if (my_single_player) {
+				my_approved = true;
+			} else {
+				Peer my_peer = new Peer();
+				if (my_create_network) {
+					if (id_textbox.getText().length() == 0) {
+						my_peer.createNetwork();
+					} else {
+						my_approved = my_peer.createNetwork(my_id);
+						if (!my_approved) return;
+					}
+				} else {
+					try {
+						if (id_textbox.getText().length() == 0) {
+							my_approved = my_peer.connectToNetwork(my_ip, my_port);
+						} else {
+							my_approved = my_peer.connectToNetwork(my_ip, my_port, my_id);
+						}
+					} catch (Exception the_e) {
+						JOptionPane.showMessageDialog(null, the_e.toString());
+						my_approved = false;
+					}
+					if (!my_approved) {
+						return;
+					}
+				}
+			}
 			setVisible(false);
-			my_aproved = true;
+			my_approved = true;
 		}
+	}
+	
+	private boolean validateFields() {
+		boolean good = true;
+		if (!id_textbox.getText().equals("")) {
+			try {
+				my_id = Long.parseLong(id_textbox.getText());
+			} catch (NumberFormatException e) {
+				id_textbox.setText("");
+				good = false;
+			}
+		}
+		
+		try {
+			my_port = Integer.parseInt(port_textbox.getText());
+		} catch (NumberFormatException e) {
+			port_textbox.setText(my_default_port);
+			good = false;
+		}
+
+		my_ip = network_textbox.getText();
+		return good;
 	}
 	
 	public boolean getSinglePlayer(){
@@ -177,11 +242,15 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	}
 	
 	public String getIP(){
-		return network_textbox.getText();
+		return my_ip;
 	}
 	
-	public String getPort(){
-		return id_textbox.getText();
+	public int getPort(){
+		return my_port;
+	}
+	
+	public long getID() {
+		return my_id;
 	}
 
 
@@ -200,9 +269,9 @@ public class NewGameDialog extends JDialog implements ActionListener{
 	}
 
 	public boolean showDialog() {
-		my_aproved = false;
+		my_approved = false;
 		setVisible(true);
-		return my_aproved;
+		return my_approved;
 	}
 	
 }

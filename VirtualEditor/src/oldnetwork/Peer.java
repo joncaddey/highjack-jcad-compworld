@@ -130,6 +130,8 @@ public class Peer {
 		try {
 			socket.connect(new InetSocketAddress(host, port), 10000);
 		} catch (IOException e) {
+			System.out.println("HEY")
+			;
 			throw new IOException("Unable to connect to " + host + ":" + port,
 					e);
 		}
