@@ -2,8 +2,6 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -30,11 +28,13 @@ import sound.SoundPlayer;
 
 public class AsteroidsGame extends Observable implements Observer{
 	private static final int RESOLUTION_REPEATS = 100;
+	private static final int POINTS_FOR_BOMB = 100;
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
 	private static final String BOMB = "sound/DABOMB.wav";
 	private SoundPlayer my_music;
+
 	
 	private SceneGraphNode my_asteroid_root;
 	private SceneGraphNode my_bullet_root;
@@ -55,6 +55,8 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	//bad code ...like really bad
 	private JFrame my_frame;
+	private int my_bombs;
+	private int my_bomb_pointer;
 
 	private Asteroid my_to_add;
 	
@@ -89,6 +91,8 @@ public class AsteroidsGame extends Observable implements Observer{
 	}
 	
 	public void startGame() {
+		my_bomb_pointer = POINTS_FOR_BOMB;
+		my_bombs = 0;
 		my_score = 0;
 		my_level = 0;
 		my_asteroid_root = new SceneGraphNode();
@@ -100,6 +104,8 @@ public class AsteroidsGame extends Observable implements Observer{
 		notifyObservers(new Long((long)my_score));
 		setChanged();
 		notifyObservers(new Integer(my_level));
+		setChanged();
+		notifyObservers(new String("" + my_bombs));
 		my_game_over = false;
 		
 	}
@@ -129,18 +135,29 @@ public class AsteroidsGame extends Observable implements Observer{
 		}
 	}
 	
+	
+	/**
+	 * if a bomb is avalible remove all objects shake screen 
+	 */
 	private void bomb() {
-		
-		ListIterator<Asteroid> ait = my_asteroids.listIterator();
-		while (ait.hasNext()) {
-			final Asteroid a = ait.next();
-				ait.remove();
-				my_asteroid_root.removeChild(a.getRenderable());
+		if(my_bombs > 0 ){
+			my_bombs --;
+			
+			setChanged();
+			notifyObservers(new String(""+ my_bombs));
+			
+			ListIterator<Asteroid> ait = my_asteroids.listIterator();
+			while (ait.hasNext()) {
+				final Asteroid a = ait.next();
+					ait.remove();
+					my_asteroid_root.removeChild(a.getRenderable());
+			}
+			my_music.play(BOMB);
+			FrameUtils.vibrate(my_frame);
 		}
+
 		
-		FrameUtils.vibrate(my_frame);
-		
-		my_music.play(BOMB);
+
 	}
 
 	public void keyReleased(KeyEvent the_e) {
@@ -274,8 +291,20 @@ public class AsteroidsGame extends Observable implements Observer{
 					a.decrementHP(bill.getDamage());
 					if (!a.isAlive()) {
 						my_score += a.getMaxHP();
+						
+						if(my_bomb_pointer < my_score){
+							my_bomb_pointer += POINTS_FOR_BOMB;
+							my_bombs ++;
+							setChanged();
+							notifyObservers(new String(""+ my_bombs));
+						}
+						
 						setChanged();
 						notifyObservers(new Long((long)my_score));
+						
+						
+						
+						
 					}
 					
 					bill.bounce();
