@@ -28,7 +28,7 @@ import sound.SoundPlayer;
 
 public class AsteroidsGame extends Observable implements Observer{
 	private static final int RESOLUTION_REPEATS = 100;
-	private static final int POINTS_FOR_BOMB = 100;
+	private static final int POINTS_FOR_BOMB = 1000;
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";

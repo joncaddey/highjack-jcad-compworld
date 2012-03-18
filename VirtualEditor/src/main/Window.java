@@ -5,6 +5,7 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -38,6 +39,17 @@ public class Window extends JFrame implements Observer, ActionListener{
 	
 	public Window(String the_title){
 		super(the_title);
+		
+		//stevens min code
+		addComponentListener(new java.awt.event.ComponentAdapter() {
+			  public void componentResized(ComponentEvent event) {
+			    setSize(
+			      Math.max(600, getWidth()),
+			      Math.max(500, getHeight()));
+			  }
+			});
+		
+		
 		my_game = new AsteroidsGame(this);
 		my_game.addObserver(this);
 		my_canvas = AsteroidsCanvas.getInstance(my_game);
@@ -55,6 +67,9 @@ public class Window extends JFrame implements Observer, ActionListener{
 		setup();
 		JOptionPane.showMessageDialog(null, "Use arrow keys to move, press space to fire,\nand press down arrow for a rechargeable shield.\nUse B to fire a bomb that will destroy everything.\nStart a game with New Game.", "Welcome to Asteroids!", JOptionPane.INFORMATION_MESSAGE);
 	}
+
+	
+	
 
 	private void setup() {
 		//sets the icon to the hulk..... hulk smash
