@@ -32,7 +32,6 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
-
 	private SoundPlayer my_music;
 	
 	private SceneGraphNode my_asteroid_root;
@@ -339,6 +338,13 @@ public class AsteroidsGame extends Observable implements Observer{
 		Vector2f tmp = new Vector2f(0, 1 + (float) Math.random() * 5f);
 		tmp.rotate((float) (Math.random() * 2 * Math.PI));
 		a.getObject().setVelocity(tmp);
+		
+		//code to set color based on id				
+		int r = (int) (( (my_id + 1) * 10) % 255);
+		int g = (int)( (my_id + 2 ) * 50) % 255;
+		int b = (int) ( (my_id + 3) * 100) % 255;		
+		a.getRenderable().setRGBi(r, g, b);
+		
 		my_asteroids.add(a);
 		my_asteroid_root.addChild(a.getRenderable());
 	}

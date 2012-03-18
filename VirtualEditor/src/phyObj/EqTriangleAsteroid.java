@@ -10,6 +10,7 @@ import main.Triangle;
 
 public class EqTriangleAsteroid extends Asteroid {
 	private static final long serialVersionUID = 42L;
+	
 	public EqTriangleAsteroid(final long the_id, final float the_size, final float the_hp_density) {
 		super(the_id, PhyPolygon.getEqTriangle(the_size), the_hp_density);
 		

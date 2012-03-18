@@ -31,8 +31,9 @@ public class Window extends JFrame implements Observer, ActionListener{
 	private final JTextField my_score;
 	private final JTextField my_level;
 	private final JButton my_new_game_button;
-
 	private final NewGameDialog my_new_game_dialog;
+	
+	
 	public Window(String the_title){
 		super(the_title);
 		my_game = new AsteroidsGame();

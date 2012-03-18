@@ -27,8 +27,6 @@ FPS drop-down
 
 add exploisions
 
-add sound
-
 add screen fixed sizes make sure ratio not so bad
 
 
