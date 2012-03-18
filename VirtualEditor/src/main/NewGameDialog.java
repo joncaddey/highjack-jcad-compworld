@@ -239,6 +239,9 @@ public class NewGameDialog extends JDialog implements ActionListener{
 		if (!id_textbox.getText().equals("")) {
 			try {
 				my_id = Long.parseLong(id_textbox.getText());
+				if(my_id > Peer.ID_LIMIT || my_id < 0 ){
+					id_textbox.setText("");
+				}
 			} catch (NumberFormatException e) {
 				id_textbox.setText("");
 				good = false;

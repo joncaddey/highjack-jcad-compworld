@@ -28,6 +28,7 @@ import javax.swing.WindowConstants;
 public class Window extends JFrame implements Observer, ActionListener{
 	
 	
+	private static final double MAX_RATIO = 1.8;
 	private final AsteroidsGame my_game;
 	private final AsteroidsCanvas my_canvas;
 	private final JTextField my_score;
@@ -43,13 +44,13 @@ public class Window extends JFrame implements Observer, ActionListener{
 		//Enforces a min size of screen and a spect ratio
 		addComponentListener(new java.awt.event.ComponentAdapter() {
 			  public void componentResized(ComponentEvent event) {
-				 int width = my_canvas.getWidth();
-				 int hight = my_canvas.getHeight();
+				 int width = getWidth();
+				 int hight = getHeight();
 				 
-				 if(width > (hight *2)){
-					 setSize(getWidth() * hight * 2 / width, getHeight());
-				 }else if(hight > (width *2)){
-					 setSize(getWidth(), getHeight() * width * 2 / hight);
+				 if(width > (hight *MAX_RATIO)){
+					 setSize( (int)(hight * MAX_RATIO ), hight);
+				 }else if(hight > (width *MAX_RATIO)){
+					 setSize(width, (int)( width * MAX_RATIO )) ;
 				 }
 				
 		

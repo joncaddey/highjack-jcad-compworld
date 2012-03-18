@@ -1,11 +1,5 @@
 TODO, in approximate order.
 
-Make it so you get a different ID if your requested ID is already taken.
-
-add ID to asteroid so you know who it came from.
-
-Get asteroids to go to other networks.
-
 Make it so friends can join a network, and all join at the same time.  The friends are notified when their friends lose.  PARTY SYSTEM.  PRivate game.
 
 
@@ -13,43 +7,11 @@ Tune asteroid hp, max size, minimum fragmant size, for levels (min asteroids per
 
 Make powerups.
   
-Get ship to fire bomb (clears screen)
-
-
-Show "title" screen. (Card layout?)
-REMEMBER networks previously connected to!  combo box.  (File IO)
-Have randomized network id.
-Assign aesthetically pleasing random color for asteroids, different from other players (helloo color chooser?)
-Make relative colors, so you assign colors to other players
-Have controls dialogue, similar to jon's tetris
-Have controls saveable in named schemes. (File IO)
-FPS drop-down
-
 add exploisions
-
-add screen fixed sizes make sure ratio not so bad
-
-
-add chain reaction eXPLOSIONS
-
 
 Get composite asteroids (out of squares, triangles)
 
-
-Remove magic constants.
-
-started 0
-started 512
-started 42
-quit 512
-quit 0
-error:
-Exception in thread "Thread-1" java.lang.NullPointerException
-	at network.Peer.invalidatePeer(Peer.java:391)
-	at network.Peer.access$9(Peer.java:390)
-	at network.Peer$2.run(Peer.java:381)
-
-
+level box min number of astorids, size , 
 
 DON'T CARE
 
