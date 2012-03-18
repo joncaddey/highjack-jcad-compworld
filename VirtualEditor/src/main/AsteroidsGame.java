@@ -83,7 +83,7 @@ public class AsteroidsGame extends Observable implements Observer{
 //				gl.glBegin(GL.GL_LINE_LOOP);
 //				gl.glVertex2f(-5, -5);
 //				gl.glVertex2f(5, -5);
-//				gl.glVertex2f(5, 5);
+//				gl.glVertex2f(5, 5); 
 //				gl.glVertex2f(-5, 5);
 //				gl.glEnd();
 //			}
@@ -414,11 +414,14 @@ public class AsteroidsGame extends Observable implements Observer{
 		tmp.rotate((float) (Math.random() * 2 * Math.PI));
 		a.getObject().setVelocity(tmp);
 		
-		//code to set color based on id				
-		int r = (int) (( (my_id + 1) * 10) % 255);
-		int g = (int)( (my_id + 2 ) * 50) % 255;
-		int b = (int) ( (my_id + 3) * 100) % 255;		
-		a.getRenderable().setRGBi(r, g, b);
+		//code to set color based on id
+		if(my_id != 0){
+			int r = (int) (( (my_id + 1) * 10) % 255);
+			int g = (int)( (my_id + 2 ) * 50) % 255;
+			int b = (int) ( (my_id + 3) * 100) % 255;		
+			a.getRenderable().setRGBi(r, g, b);
+		}
+
 		
 		my_asteroids.add(a);
 		my_asteroid_root.addChild(a.getRenderable());

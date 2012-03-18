@@ -53,7 +53,7 @@ public class Window extends JFrame implements Observer, ActionListener{
 		my_new_game_dialog = new NewGameDialog(this);
 		my_new_game_button = new JButton("New Game...");
 		setup();
-		JOptionPane.showMessageDialog(null, "Use arrow keys to move, press space to fire,\nand press down arrow for a rechargeable shield.\nStart a game with New Game.", "Welcome to Asteroids!", JOptionPane.INFORMATION_MESSAGE);
+		JOptionPane.showMessageDialog(null, "Use arrow keys to move, press space to fire,\nand press down arrow for a rechargeable shield.\nUse B to fire a bomb that will destroy everything.\nStart a game with New Game.", "Welcome to Asteroids!", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	private void setup() {
