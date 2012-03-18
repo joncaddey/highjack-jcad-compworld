@@ -40,7 +40,7 @@ public class Window extends JFrame implements Observer, ActionListener{
 	public Window(String the_title){
 		super(the_title);
 		
-		//stevens min code
+		//Enforces a min size of screen and a spect ratio
 		addComponentListener(new java.awt.event.ComponentAdapter() {
 			  public void componentResized(ComponentEvent event) {
 				 int width = getWidth();
