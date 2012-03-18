@@ -38,7 +38,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	private static final float LEVEL_TIME = 6;
 	private static final float MAX_SIZE = 10;
 	private static final float MIN_SIZE = .25f;
-	private static final float MAX_MOMENTUM = 20;
+	private static final float MAX_MOMENTUM = 50;
 	private SoundPlayer my_music;
 
 	
