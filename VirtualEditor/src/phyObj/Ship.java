@@ -25,7 +25,7 @@ public class Ship extends PhyComposite {
 	private static final float WEAK_KICKBACK = 1f;
 	private static final float STRONG_KICKBACK = 1.45f;
 	
-	private static final float SHIELD_MAX = 11.1f;
+	private static final float SHIELD_MAX = 1.1f;
 	private static final float SHIELD_RECOVER_TIME = 4;
 	private static final float BROKEN_SHIELD_RECOVER_TIME = 4;
 	private static float SHIELD_REGEN = SHIELD_MAX / SHIELD_RECOVER_TIME;
@@ -359,7 +359,7 @@ public class Ship extends PhyComposite {
 			bullet.position = new Vector2f(0, .3f);
 			bullet.position.rotate(orientation);
 			bullet.position.sum(position);
-			bullet.velocity = new Vector2f(0, 13 * 30f / 45);
+			bullet.velocity = new Vector2f(0, 16 * 30f / 45);
 			bullet.velocity.rotate(orientation + (float) Math.PI / max_bullet_spread * 2 * (i + .5f - bullet_spread / 2));
 			my_bullets.add(bullet);
 		}
@@ -369,7 +369,7 @@ public class Ship extends PhyComposite {
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 14 * 30f / 45);
+		bullet.velocity = new Vector2f(0, 18 * 30f / 45);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 	}
@@ -379,7 +379,7 @@ public class Ship extends PhyComposite {
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 10 * 30f / 45);
+		bullet.velocity = new Vector2f(0, 14 * 30f / 45);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 	}
