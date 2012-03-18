@@ -11,7 +11,7 @@ public class Bullet extends PhyCircle{
 	
 	
 	private boolean my_alive = true;
-	public Bullet(final int the_damage, final int the_bounces, final int the_time, final float the_radius, final float the_density) {
+	public Bullet(final int the_damage, final int the_bounces, final float the_time, final float the_radius, final float the_density) {
 		super(the_radius * 2);
 		my_damage = the_damage;
 		my_bounces = the_bounces;

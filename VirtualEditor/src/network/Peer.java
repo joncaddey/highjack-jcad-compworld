@@ -76,8 +76,8 @@ public class Peer extends Observable{
 		successor = myInfo;
 		if (logEnabled)
 			logMessage("Established network @ " + myInfo.id);
-		else
-			System.out.println("Established network @ " + myInfo.id);
+		//else
+			//System.out.println("Established network @ " + myInfo.id);
 		return true;
 	}
 
@@ -148,7 +148,7 @@ public class Peer extends Observable{
 		if (logEnabled)
 			logMessage("Joined network @ " + myInfo.id);
 		else
-			System.out.println("Joined network @ " + myInfo.id);
+			//System.out.println("Joined network @ " + myInfo.id);
 		startPeriodicThread();
 		return true;
 		
@@ -214,7 +214,7 @@ public class Peer extends Observable{
 		
 		my_port = port;
 
-		System.out.println("Listening on " + (myInfo.address != null ? myInfo.address : "") + ":" + myInfo.port);
+		//System.out.println("Listening on " + (myInfo.address != null ? myInfo.address : "") + ":" + myInfo.port);
 
 		incomingThread = new Thread() {
 			{
@@ -251,8 +251,8 @@ public class Peer extends Observable{
 				myInfo.address = socket.getLocalAddress();
 				if (logEnabled)
 					logMessage("Updated local IP to " + myInfo.address);
-				else
-					System.out.println("Updated local IP to " + myInfo.address);
+				//else
+					//System.out.println("Updated local IP to " + myInfo.address);
 			}
 			ObjectInputStream socketIn = new ObjectInputStream(socket.getInputStream());
 			PeerMessage mesg = (PeerMessage)socketIn.readObject();

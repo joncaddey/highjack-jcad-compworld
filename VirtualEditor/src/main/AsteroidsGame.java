@@ -38,7 +38,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	private static final float LEVEL_TIME = 6;
 	private static final float MAX_SIZE = 10;
 	private static final float MIN_SIZE = .25f;
-	private static final float MAX_VELOCITY = 15;
+	private static final float MAX_MOMENTUM = 20;
 	private SoundPlayer my_music;
 
 	
@@ -71,7 +71,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	private float my_timer;
 	private float my_max_size;
 	private float my_min_size;
-	private float my_max_velocity;
+	private float my_max_momentum;
 	public AsteroidsGame(JFrame the_frame) {
 		my_frame = the_frame;
 		
@@ -439,7 +439,7 @@ public class AsteroidsGame extends Observable implements Observer{
 			a.getObject().setPosition(position2 * (getWidth() + size),
 					position1 * (getHeight() + size));
 		}
-		final float speed = 1 + (my_max_velocity - 1) * (float) Math.random();
+		final float speed = (1 + (my_max_momentum - 1) * (float) Math.random()) / a.getObject().getMass();
 		Vector2f tmp = new Vector2f(0, speed);
 		tmp.rotate((float) (Math.random() * 2 * Math.PI));
 		a.getObject().setVelocity(tmp);
@@ -474,9 +474,9 @@ public class AsteroidsGame extends Observable implements Observer{
 		my_min_asteroids = (int) (MAX_ASTEROIDS - MAX_ASTEROIDS * Math.pow(16f / 17, my_level)) + 1;
 		my_max_size = (float) (MAX_SIZE - MAX_SIZE * Math.pow(16f / 17, my_level)) +1;
 		my_min_size = (float) (MIN_SIZE + 2 * Math.pow(18f / 19, my_level));
-		my_max_velocity = (float) (MAX_VELOCITY - MAX_VELOCITY * Math.pow(14f / 15, my_level));
-		System.out.println("max / min size " + my_max_size + " / " + my_min_size);
-		System.out.println("max velocity " + my_max_velocity);
+		my_max_momentum = (float) (MAX_MOMENTUM - MAX_MOMENTUM * Math.pow(14f / 15, my_level));
+//		System.out.println("max / min size " + my_max_size + " / " + my_min_size);
+//		System.out.println("max velocity " + my_max_momentum);
 		setChanged();
 		notifyObservers(new Integer(my_level));
 	}
