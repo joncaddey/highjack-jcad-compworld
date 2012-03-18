@@ -135,8 +135,8 @@ public class AsteroidsCanvas extends GLCanvas implements GLEventListener{
 			right = (float) width / height * BOARD_SIZE / 2;
 			left = -right;
 		}
-		my_game.setWidth(right - left);
-		my_game.setHeight(top - bottom);
+		my_game.setWidth((right - left) / 2);
+		my_game.setHeight((top - bottom) / 2);
 
 
 		GL2 gl = drawable.getGL().getGL2();

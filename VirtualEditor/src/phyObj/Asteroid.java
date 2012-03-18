@@ -9,8 +9,8 @@ import main.SceneGraphNode;
 public abstract class Asteroid implements Serializable{
 	private static final long serialVersionUID = 42L;
 	
-	private int my_hp;
-	private final int my_max_hp;
+	private float my_hp;
+	private final float my_max_hp;
 	protected final float my_hp_density;
 	
 	protected final PhyObject my_object;
@@ -23,7 +23,7 @@ public abstract class Asteroid implements Serializable{
 		my_originator = the_id;
 		my_object = the_object;
 		my_hp_density = the_hp_density;
-		my_max_hp = (int) (the_hp_density * the_object.getMass());
+		my_max_hp = the_hp_density * the_object.getMass();
 		my_hp = my_max_hp; 
 		decrementHP(0);
 	}
@@ -35,7 +35,7 @@ public abstract class Asteroid implements Serializable{
 		return (my_hp > 0);
 	}
 	
-	public void decrementHP(int the_dmg){
+	public void decrementHP(float the_dmg){
 		my_hp = my_hp - the_dmg;
 		my_object.getRenderable().setBrightness((1 - (float)my_hp / my_max_hp) * .5f + .5f);
 	}
