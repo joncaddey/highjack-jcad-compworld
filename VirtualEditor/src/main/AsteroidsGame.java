@@ -27,6 +27,7 @@ import phyObj.Vector2f;
 import sound.SoundPlayer;
 
 public class AsteroidsGame extends Observable implements Observer{
+	private static final int MAX_BOMBS = 3;
 	private static final int RESOLUTION_REPEATS = 100;
 	private static final int POINTS_FOR_BOMB = 1000;
 	
@@ -292,8 +293,13 @@ public class AsteroidsGame extends Observable implements Observer{
 					if (!a.isAlive()) {
 						my_score += a.getMaxHP();
 						
+						
+						//gives you more bombs!
 						if(my_bomb_pointer < my_score){
-							my_bomb_pointer += POINTS_FOR_BOMB;
+							if(my_bombs < MAX_BOMBS ){
+								my_bomb_pointer += POINTS_FOR_BOMB;
+							}
+							
 							my_bombs ++;
 							setChanged();
 							notifyObservers(new String(""+ my_bombs));
