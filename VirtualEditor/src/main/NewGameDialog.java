@@ -111,7 +111,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 
 		//make the network text box
 		network_textbox = new JTextField(15);
-		//String ip = getLocalIP();
+//		String ip = getLocalIP();
 //		if(ip != null){
 //			network_textbox.setText(ip);
 //		}
