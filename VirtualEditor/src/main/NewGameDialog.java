@@ -198,6 +198,7 @@ public class NewGameDialog extends JDialog implements ActionListener{
 			if (!my_approved) return;
 			if (my_single_player) {
 				my_approved = true;
+				my_id = 0;
 			} else {
 				my_peer = new Peer();
 				if (my_create_network) {
