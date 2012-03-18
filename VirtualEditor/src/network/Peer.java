@@ -279,7 +279,7 @@ public class Peer extends Observable{
 			findSuccessor(mesg);
 			break;
 		case SUCCESSOR:
-			if (mesg.indexToFix == -1) { // TODO wtf?
+			if (mesg.indexToFix == -1) {
 				successor = mesg.peer;
 				logMessage("** Updated successor @ " + successor.id);
 				logMessage('\n' + internalState());
@@ -326,7 +326,6 @@ public class Peer extends Observable{
 			
 	private boolean sendMessage(PeerMessage mesg, PeerInformation destination) {
 		if (destination.address == null)	// silently fail when IP_DETECTION == 3 and no other peer has connected
-			// TODO maybe this is wrong when no one else on network and talking to self
 			return false;
 		logMessage("Sending message " + mesg.type + " to " + destination.id);
 		try {
@@ -335,7 +334,6 @@ public class Peer extends Observable{
 			socketOut.writeObject(mesg);
 			socket.close();
 		} catch (IOException e) {
-//			System.err.println(e);
 			invalidatePeer(destination);
 			if (successor == myInfo) {
 				PeerMessage mesg2 = new PeerMessage(PeerMessage.Type.FIND_SUCCESSOR, myInfo);
@@ -371,9 +369,7 @@ public class Peer extends Observable{
 	 * @param mesg
 	 */
 	private void findSuccessor(PeerMessage mesg) {
-		// TODO when would successor ever be null?  right at the start, when trying to join another network
 		if (successor != null && withinHalfClosed(mesg.idToFindSuccessorOf, myInfo.id, successor.id)) {
-			// TODO so, if you ask who the successor of 42 is, you may get 42?
 			mesg.type = PeerMessage.Type.SUCCESSOR;
 			PeerInformation sender = mesg.sender;
 			mesg.sender = myInfo;
@@ -384,9 +380,6 @@ public class Peer extends Observable{
 			if (!myInfo.equals(closest)) {
 				sendMessage(mesg, closest);
 			} else if (successor == myInfo && predecessor != null) {
-				// closest is me, so ask my predecessor who the successor of the idToFindSuccessorOf is
-				// (may not necessarily be me)
-				// TODO this still seems fishy to JON
 				sendMessage(mesg, predecessor);
 			}
 
@@ -565,113 +558,9 @@ public class Peer extends Observable{
 	public long getID() {
 		return myInfo.id;
 	}
-	
-	
-	
-	
-	
-	
-	public static void main(String[] args) {
-		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-		boolean newNetwork = false;
-		String input = null;
 
-		while (true) {
-			System.out.println("Create a new network or join an existing network?");
-			System.out.println("  1. Create a new network");
-			System.out.println("  2. Join an existing network");
-			try {
-				input = in.readLine();
-			} catch (IOException e) {
-				continue;
-			}
-			if (input.equals("1")) {
-				newNetwork = true;
-				break;
-			} else if (input.equals("2"))
-				break;
-		}
-
-		long id = -1;
-		while (true) {
-			System.out.println("Desired network ID, 0-" + (Peer.ID_LIMIT-1) + " [random]: ");
-			try {
-				input = in.readLine();
-				if (input.length() == 0)
-					break;
-				id = Long.parseLong(input);
-			} catch (NumberFormatException e) {
-				continue;
-			} catch (IOException e) {
-				continue;
-			}
-			if (id >= -1 && id < Peer.ID_LIMIT)
-				break;
-		}
-
-		Peer peer = new Peer();
-		if (newNetwork) {
-			if (id == -1)
-				peer.createNetwork();
-			else
-				peer.createNetwork(id);
-		} else {
-			String ip = "127.0.0.1";
-			int port = Peer.DEFAULT_SERVER_PORT;
-			boolean success = false;
-			do {
-				System.out.print("Enter host to connect to [" + ip + "[:" + port + "]]: ");
-				try {
-					input = in.readLine();
-					int index = input.indexOf(':');
-					if (index >= 0) {
-						port = Integer.parseInt(input.substring(index + 1));
-						input = input.substring(0, index);
-					}
-					if (input.length() > 0)
-						ip = input;
-				} catch (IOException e) {
-				}
-				try {
-					success = id == -1 ? peer.connectToNetwork(ip, port) : peer.connectToNetwork(ip, port, id);
-				} catch (Exception e) {
-					System.out.println(e);
-				}
-			} while (!success);
-			
-		}
-
-		System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
-		while (true) {
-			try {
-				input = in.readLine();
-				if (input.length() == 0)
-					continue;
-				Scanner sc = new Scanner(input);
-				if (!sc.hasNextLong()) {
-					input = sc.next();
-					if (input.equals("quit")) {
-						peer.disconnectFromNetwork();
-						break;
-					} else if (input.equals("state"))
-						System.out.println(peer.internalState());
-					else
-						System.out.println("Enter a message in <id> <text> format, \"quit\", or \"state\" .");
-					continue;
-				}
-				id = sc.nextLong();
-				if (id < 0 || id >= ID_LIMIT) {
-					System.out.println("Invalid ID.");
-					continue;
-				}
-				sc.skip(sc.delimiter());
-				sc.nextLine();
-				peer.sendObject(new Vector2f(id, id), id);
-			} catch (IOException e) {
-			}
-		}
-	}
 	public int getPort() {
 		return my_port;
 	}
+	
 }

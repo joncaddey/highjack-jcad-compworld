@@ -35,8 +35,8 @@ public class Ship extends PhyComposite {
 	//sound player
 	private static final String LAZER_SOUND = "sound/lazersmall.wav";
 	private static final String POWER_LAZER_SOUND = "sound/POWER.wav";
-	private SoundPlayer my_music;
-	private SoundPlayer my_music2;
+	private SoundPlayer my_weak_shot_player;
+	private SoundPlayer my_power_shot_player;
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
 	private final SceneGraphNode my_hull;
@@ -52,6 +52,11 @@ public class Ship extends PhyComposite {
 	private float my_shield = SHIELD_MAX;
 	private float my_auto_shield;
 	
+	private float my_reload_time = 0;
+	private float my_heat = 0;
+	
+	
+	
 	
 	
 	private List<Bullet> my_bullets = new ArrayList<Bullet>();
@@ -61,10 +66,10 @@ public class Ship extends PhyComposite {
 	 */
 	public Ship() {
 		//sound
-		my_music = new SoundPlayer();
-		my_music2 = new SoundPlayer();
-		my_music.preLoad(LAZER_SOUND);
-		my_music2.preLoad(POWER_LAZER_SOUND);
+		my_weak_shot_player = new SoundPlayer();
+		my_power_shot_player = new SoundPlayer();
+		my_weak_shot_player.preLoad(LAZER_SOUND);
+		my_power_shot_player.preLoad(POWER_LAZER_SOUND);
 		
 		int variability = 20;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.5f);
@@ -212,17 +217,11 @@ public class Ship extends PhyComposite {
 	
 	public void toggleLeft(boolean the_on) {
 		my_left_toggle = the_on;
-//		if (!my_left_toggle) {
-//			right(); // TODO
-//		}
 		fixFlames();
 	}
 	
 	public void toggleRight(boolean the_on) {
 		my_right_toggle = the_on;
-//		if (!my_right_toggle) { // TODO
-//			left();
-//		}
 		fixFlames();
 	}
 	
@@ -319,64 +318,26 @@ public class Ship extends PhyComposite {
 		}
 	}
 	
-	
-	// TODO move to appropriate constants when figured out
-	private float my_reload_time = 0;
-	private float my_heat = 0;
-	
-	
 	private void fire() {
 		if (my_reload_time > 0) {
 			return;
 		}
-		
-		
-
-		
-//		if (my_heat < 30f / 45) {
-//			powerShot();
-//			my_heat += 14f / 45;
-//			kickBack(STRONG_KICKBACK);
-//			my_reload_time = 3f / 45;
-//		} else if (my_heat < 38 / 45f) {
-//			my_heat += 12 / 45f;
-//			my_reload_time = 10 / 45f;
-//			kickBack(WEAK_KICKBACK);
-//			weakShot();
-//		} else if (my_heat < 60 / 45f) {
-//			weakShot();
-//			my_heat += 2 / 45f;
-//			kickBack(WEAK_KICKBACK);
-//			my_reload_time = 10 / 45f;
-//		}
-//		
-//		
-//	}
 		if (my_heat < .3 * 2) {
 			powerShot();
 			my_heat += .3f + .07f;
 			kickBack(STRONG_KICKBACK);
 			my_reload_time = .07f;
 			
-			try{
-				my_music2.pause(POWER_LAZER_SOUND);
-				my_music2.play(POWER_LAZER_SOUND);
-			}catch (Exception e) {
-				System.out.print(":D");
-			}
+			my_power_shot_player.pause(POWER_LAZER_SOUND);
+			my_power_shot_player.play(POWER_LAZER_SOUND);
 			
 		} else if (my_heat < .9f) {
 			my_heat += .3f;
 			my_reload_time = .3f;
 			
-			try{
-				my_music.pause(LAZER_SOUND);
-				my_music.play(LAZER_SOUND);
-			}catch (Exception e) {
-				System.out.print(":D 1");
-			}
+			my_weak_shot_player.pause(LAZER_SOUND);
+			my_weak_shot_player.play(LAZER_SOUND);
 
-			
 			kickBack(WEAK_KICKBACK);
 			weakShot();
 			
@@ -385,25 +346,16 @@ public class Ship extends PhyComposite {
 			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
 			my_reload_time = .3f;
-			
-			try{
-			my_music.pause(LAZER_SOUND);
-			my_music.play(LAZER_SOUND);
-		}catch (Exception e) {
-			System.out.print(":D 1");
+			my_weak_shot_player.pause(LAZER_SOUND);
+			my_weak_shot_player.play(LAZER_SOUND);
 		}
-		}
-
-		
 	}
 	
 	private void powerShot() {
-
-		
 		final int bullet_spread = 6;
 		final int max_bullet_spread = 64;
 		for (int i = 0; i < bullet_spread; i++) {
-			Bullet bullet = new Bullet(1, 0, 3, .2f, .5f); // old density .01
+			Bullet bullet = new Bullet(1, 0, 2, .2f, .5f);
 			bullet.position = new Vector2f(0, .3f);
 			bullet.position.rotate(orientation);
 			bullet.position.sum(position);
@@ -412,7 +364,7 @@ public class Ship extends PhyComposite {
 			my_bullets.add(bullet);
 		}
 		
-		Bullet bullet = new Bullet(1, 0, 3, .3f, 1f);
+		Bullet bullet = new Bullet(1, 0, 2, .3f, 1f);
 		bullet.renderable.setRGBi(200, 54, 42);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);

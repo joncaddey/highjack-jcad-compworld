@@ -131,6 +131,13 @@ public class PhyObject implements Serializable {
 		if (inverseMass == 0 && other.inverseMass == 0) {
 			return null;
 		}
+		if (!(this instanceof PhyComposite) && !(other instanceof PhyComposite) ) {
+			float length = this.size + other.size;
+			if (Math.abs(this.position.x - other.position.x) >= length || Math.abs(this.position.y - other.position.y) >= length) {
+				return null;
+			}
+		}
+		
 		// HalfSpace, Circle, Triangle, Composite
 		if (this instanceof HalfSpace) {
 			if (other instanceof PhyCircle) {
