@@ -43,9 +43,16 @@ public class Window extends JFrame implements Observer, ActionListener{
 		//stevens min code
 		addComponentListener(new java.awt.event.ComponentAdapter() {
 			  public void componentResized(ComponentEvent event) {
-			    setSize(
-			      Math.max(600, getWidth()),
-			      Math.max(500, getHeight()));
+				 int width = getWidth();
+				 int hight = getHeight();
+				 if(width < 600 || hight < 500){
+					setSize(600, 500);
+				 }else if(width > (hight *2)){
+					 setSize(hight, hight);
+				 }else if(hight > (width *2)){
+					 setSize(width, width);
+				 }
+		
 			  }
 			});
 		
