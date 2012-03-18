@@ -36,7 +36,7 @@ public class Window extends JFrame implements Observer, ActionListener{
 	
 	public Window(String the_title){
 		super(the_title);
-		my_game = new AsteroidsGame();
+		my_game = new AsteroidsGame(this);
 		my_game.addObserver(this);
 		my_canvas = AsteroidsCanvas.getInstance(my_game);
 		my_score = new JTextField(15);

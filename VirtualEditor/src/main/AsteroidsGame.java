@@ -13,6 +13,7 @@ import java.util.Observer;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
+import javax.swing.JFrame;
 
 import network.Peer;
 
@@ -32,13 +33,15 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
+	private static final String BOMB = "sound/DABOMB.wav";
 	private SoundPlayer my_music;
 	
 	private SceneGraphNode my_asteroid_root;
 	private SceneGraphNode my_bullet_root;
 
-	private float my_field_width, my_field_height;
-
+	private float my_field_width;
+	private float my_field_height;
+	
 	private Ship my_ship;
 	private final List<Bullet> my_bullets;
 	private final List<Asteroid> my_asteroids;
@@ -50,9 +53,14 @@ public class AsteroidsGame extends Observable implements Observer{
 
 	private long my_id;
 	
+	//bad code ...like really bad
+	private JFrame my_frame;
 	
 	
-	public AsteroidsGame() {
+	
+	public AsteroidsGame(JFrame the_frame) {
+		my_frame = the_frame;
+		
 		my_music = new SoundPlayer();
 		my_music.preLoad(DEATH_SOUND);
 		
@@ -113,9 +121,26 @@ public class AsteroidsGame extends Observable implements Observer{
 			case KeyEvent.VK_SPACE:
 				my_ship.toggleFire(true);
 			break;
+			case KeyEvent.VK_B:
+				bomb();
+			break;	
 		}
 	}
 	
+	private void bomb() {
+		
+		ListIterator<Asteroid> ait = my_asteroids.listIterator();
+		while (ait.hasNext()) {
+			final Asteroid a = ait.next();
+				ait.remove();
+				my_asteroid_root.removeChild(a.getRenderable());
+		}
+		
+		FrameUtils.vibrate(my_frame);
+		
+		my_music.play(BOMB);
+	}
+
 	public void keyReleased(KeyEvent the_e) {
 		if (my_game_over) return;
 		int code = the_e.getKeyCode();
