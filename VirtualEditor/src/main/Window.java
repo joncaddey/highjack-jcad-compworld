@@ -43,15 +43,15 @@ public class Window extends JFrame implements Observer, ActionListener{
 		//Enforces a min size of screen and a spect ratio
 		addComponentListener(new java.awt.event.ComponentAdapter() {
 			  public void componentResized(ComponentEvent event) {
-				 int width = getWidth();
-				 int hight = getHeight();
-				 if(width < 600 || hight < 500){
-					setSize(600, 500);
-				 }else if(width > (hight *2)){
-					 setSize(hight, hight);
+				 int width = my_canvas.getWidth();
+				 int hight = my_canvas.getHeight();
+				 
+				 if(width > (hight *2)){
+					 setSize(getWidth() * hight * 2 / width, getHeight());
 				 }else if(hight > (width *2)){
-					 setSize(width, width);
+					 setSize(getWidth(), getHeight() * width * 2 / hight);
 				 }
+				
 		
 			  }
 			});
@@ -114,11 +114,11 @@ public class Window extends JFrame implements Observer, ActionListener{
 		this.add(root);
 		
 	
-		
-		this.setMinimumSize(new Dimension(256, 256));
+		pack();
+		this.setMinimumSize(new Dimension(this.getWidth(), 500));
+		Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+		setSize(size.width * 5 / 8, size.height * 5 / 8);
 		this.setLocationRelativeTo(null);
-		if (Toolkit.getDefaultToolkit().isFrameStateSupported(JFrame.MAXIMIZED_BOTH))
-			this.setExtendedState(this.getExtendedState() | JFrame.MAXIMIZED_BOTH);
 		this.setVisible(true);
 	}
 

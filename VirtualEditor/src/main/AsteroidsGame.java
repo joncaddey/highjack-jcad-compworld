@@ -61,7 +61,7 @@ public class AsteroidsGame extends Observable implements Observer{
 
 	private Asteroid my_to_add;
 	
-	
+	private float my_red, my_blue, my_green;
 	
 	public AsteroidsGame(JFrame the_frame) {
 		my_frame = the_frame;
@@ -422,10 +422,11 @@ public class AsteroidsGame extends Observable implements Observer{
 		
 		//code to set color based on id
 		if(my_peer != null){
-			int r = (int) (( (my_id + 1) * 10) % 255);
-			int g = (int)( (my_id + 2 ) * 50) % 255;
-			int b = (int) ( (my_id + 3) * 100) % 255;		
-			a.getRenderable().setRGBi(r, g, b);
+//			int r = (int) (( (my_id + 1) * 10) % 255);
+//			int g = (int)( (my_id + 2 ) * 50) % 255;
+//			int b = (int) ( (my_id + 3) * 100) % 255;
+			
+			a.getRenderable().setRGBf(my_red, my_green, my_blue);
 		}
 
 		
@@ -509,6 +510,9 @@ public class AsteroidsGame extends Observable implements Observer{
 			my_peer.addObserver(this);
 			my_id = my_peer.getID();
 		}
+		my_red = (float) Math.random();
+		my_blue = (float) Math.random();
+		my_green = (float) Math.random();
 	}
 
 	@Override
