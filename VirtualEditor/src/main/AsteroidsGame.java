@@ -30,10 +30,13 @@ public class AsteroidsGame extends Observable implements Observer{
 	private static final int MAX_BOMBS = 3;
 	private static final int RESOLUTION_REPEATS = 100;
 	private static final int POINTS_FOR_BOMB = 1000;
+	private static final int MAX_ASTEROIDS = 25;
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
 	private static final String BOMB = "sound/DABOMB.wav";
+	private static final float LEVEL_TIME = 6;
+	private static final float MAX_SIZE = 10;
 	private SoundPlayer my_music;
 
 	
@@ -62,6 +65,9 @@ public class AsteroidsGame extends Observable implements Observer{
 	private Asteroid my_to_add;
 	
 	private float my_red, my_blue, my_green;
+	private int my_min_asteroids;
+	private float my_timer;
+	private float my_max_size;
 	
 	public AsteroidsGame(JFrame the_frame) {
 		my_frame = the_frame;
@@ -96,6 +102,10 @@ public class AsteroidsGame extends Observable implements Observer{
 		my_bombs = 0;
 		my_score = 0;
 		my_level = 0;
+		
+		my_timer = 0;
+		setLevel(0);
+		
 		my_asteroid_root = new SceneGraphNode();
 		my_bullet_root = new SceneGraphNode();
 		my_bullets.clear();
@@ -186,6 +196,16 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	
 	public void display(final GLAutoDrawable the_drawable, final float the_time_passed) {
+		
+		//update timer for level here
+		if(!my_game_over){
+			my_timer += the_time_passed;
+			if (my_timer > LEVEL_TIME){
+				my_timer -= LEVEL_TIME;
+				setLevel(my_level+1);
+			}
+		}
+		
 		GL2 gl = the_drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		
@@ -361,8 +381,9 @@ public class AsteroidsGame extends Observable implements Observer{
 				}
 			}
 		}
-		if (my_asteroids.size() < 6) {
-			addRandomAsteroid();
+		
+		//used to add extra asteroids if the number gets to low
+		if (my_asteroids.size() < my_min_asteroids ) {
 			addRandomAsteroid();
 		}
 		
@@ -397,7 +418,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	// TODO this is hackey. Should parameterize it for difficulty.
 	private void addRandomAsteroid() {
 		double type = Math.random();
-		float size = 1 + 4 * (float) Math.random();
+		float size = 1 + (my_max_size - 1) * (float) Math.random();
 		final Asteroid a;
 		final float hp = 10;
 		if (type <= .3) {
@@ -432,6 +453,14 @@ public class AsteroidsGame extends Observable implements Observer{
 		
 		my_asteroids.add(a);
 		my_asteroid_root.addChild(a.getRenderable());
+	}
+	
+	private void setLevel(int level){
+		my_level = level;
+		my_min_asteroids = (int) (MAX_ASTEROIDS - MAX_ASTEROIDS * Math.pow(16f / 17, my_level)) +1;
+		my_max_size = (float) (MAX_SIZE - MAX_SIZE * Math.pow(16f / 17, my_level)) +1;
+		setChanged();
+		notifyObservers(new Integer(my_level));
 	}
 	
 	private void sendAsteroid(Asteroid the_asteroid) {
