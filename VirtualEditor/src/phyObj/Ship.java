@@ -25,7 +25,7 @@ public class Ship extends PhyComposite {
 	private static final float WEAK_KICKBACK = 1f;
 	private static final float STRONG_KICKBACK = 1.45f;
 	
-	private static final float SHIELD_MAX = 1.1f;
+	private static final float SHIELD_MAX = 11.1f;
 	private static final float SHIELD_RECOVER_TIME = 4;
 	private static final float BROKEN_SHIELD_RECOVER_TIME = 4;
 	private static float SHIELD_REGEN = SHIELD_MAX / SHIELD_RECOVER_TIME;

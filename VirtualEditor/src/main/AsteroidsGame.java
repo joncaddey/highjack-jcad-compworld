@@ -55,6 +55,8 @@ public class AsteroidsGame extends Observable implements Observer{
 	
 	//bad code ...like really bad
 	private JFrame my_frame;
+
+	private Asteroid my_to_add;
 	
 	
 	
@@ -169,6 +171,12 @@ public class AsteroidsGame extends Observable implements Observer{
 		GL2 gl = the_drawable.getGL().getGL2();
 		gl.glClear(GL.GL_COLOR_BUFFER_BIT);
 		
+		// Add any asteroids the network may have given us
+		if (my_to_add != null) {
+			my_asteroids.add(my_to_add);
+			my_asteroid_root.addChild(my_to_add.getRenderable());
+			my_to_add = null;
+		}
 		// update bullets
 		for (Bullet b : my_bullets) {
 			b.updateState(the_time_passed);
@@ -470,8 +478,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	public void update(Observable o, Object arg) {
 		if (o.equals(my_peer)) {
 			Asteroid a = (Asteroid) arg;
-			my_asteroids.add(a);
-			my_asteroid_root.addChild(a.getRenderable());
+			my_to_add = a;
 		}
 		
 	}
