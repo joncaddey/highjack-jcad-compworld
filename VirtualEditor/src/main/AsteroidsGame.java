@@ -37,6 +37,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	private static final String BOMB = "sound/DABOMB.wav";
 	private static final float LEVEL_TIME = 6;
 	private static final float MAX_SIZE = 10;
+	private static final float MIN_SIZE = .25f;
 	private SoundPlayer my_music;
 
 	
@@ -68,6 +69,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	private int my_min_asteroids;
 	private float my_timer;
 	private float my_max_size;
+	private float my_min_size;
 	
 	public AsteroidsGame(JFrame the_frame) {
 		my_frame = the_frame;
@@ -374,7 +376,7 @@ public class AsteroidsGame extends Observable implements Observer{
 				ait.remove();
 				my_asteroid_root.removeChild(a.getRenderable());
 				if (a.getDestination() != -1) {
-					for (Asteroid b : a.getFragments()) {
+					for (Asteroid b : a.getFragments(my_min_size, 30f / 45)) {
 						ait.add(b);
 						my_asteroid_root.addChild(b.getRenderable());
 					}
@@ -459,6 +461,9 @@ public class AsteroidsGame extends Observable implements Observer{
 		my_level = level;
 		my_min_asteroids = (int) (MAX_ASTEROIDS - MAX_ASTEROIDS * Math.pow(16f / 17, my_level)) +1;
 		my_max_size = (float) (MAX_SIZE - MAX_SIZE * Math.pow(16f / 17, my_level)) +1;
+		my_min_size = (float) (MIN_SIZE + 2 * Math.pow(18f / 19, my_level));
+		System.out.println(my_max_size);
+		System.out.println(my_min_size);
 		setChanged();
 		notifyObservers(new Integer(my_level));
 	}
