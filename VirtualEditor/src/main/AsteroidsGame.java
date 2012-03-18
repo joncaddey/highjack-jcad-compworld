@@ -29,7 +29,7 @@ import phyObj.Vector2f;
 import sound.SoundPlayer;
 
 public class AsteroidsGame extends Observable implements Observer{
-	private static final int RESOLUTION_REPEATS = 10;
+	private static final int RESOLUTION_REPEATS = 100;
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
