@@ -359,6 +359,7 @@ public class Ship extends PhyComposite {
 			my_reload_time = .07f;
 			
 			try{
+				my_music2.pause(POWER_LAZER_SOUND);
 				my_music2.play(POWER_LAZER_SOUND);
 			}catch (Exception e) {
 				System.out.print(":D");
@@ -369,7 +370,7 @@ public class Ship extends PhyComposite {
 			my_reload_time = .3f;
 			
 			try{
-				my_music.stop(LAZER_SOUND);
+				my_music.pause(LAZER_SOUND);
 				my_music.play(LAZER_SOUND);
 			}catch (Exception e) {
 				System.out.print(":D 1");
@@ -386,11 +387,11 @@ public class Ship extends PhyComposite {
 			my_reload_time = .3f;
 			
 			try{
-				my_music.stop(LAZER_SOUND);
-				my_music.play(LAZER_SOUND);
-			}catch (Exception e) {
-				System.out.print(":D 2");
-			}
+			my_music.pause(LAZER_SOUND);
+			my_music.play(LAZER_SOUND);
+		}catch (Exception e) {
+			System.out.print(":D 1");
+		}
 		}
 
 		
@@ -422,7 +423,7 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void weakShot() {
-		Bullet bullet = new Bullet(10, 4, 3, .2f, .0001f);
+		Bullet bullet = new Bullet(10, 10, 3, .2f, .0001f);
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);

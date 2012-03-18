@@ -27,6 +27,8 @@ public class Peer extends Observable{
 	 * The period between invocations of background tasks, e.g., stabilize, fix fingers.
 	 */
 	public static final int BACKGROUND_TASK_PERIOD = 10000;
+	
+	public static final int TIME_OUT = 5;
 	/**
 	 * IP address detection method:
 	 * (1) InetAddress.getLocalHost()
@@ -44,6 +46,7 @@ public class Peer extends Observable{
 	private PeerInformation successor;
 	private PeerInformation predecessor;
 	private int next;
+	private int my_port;
 
 	
 	
@@ -116,8 +119,7 @@ public class Peer extends Observable{
 		return connectToNetwork(host, port, (long)(ID_LIMIT * Math.random()));
 	}
 
-	// TODO this should be a private helper method that will attempt to give the id, but 
-	// try different ids if that id is already taken.
+
 	public boolean connectToNetwork(InetAddress host, int port, long id) throws IOException, InterruptedException {
 		myInfo.id = id;
 		if (serverSocket == null)
@@ -138,10 +140,9 @@ public class Peer extends Observable{
 		mesg.indexToFix = -1;
 		socketOut.writeObject(mesg);
 		socket.close();
-		int wait = 3;
 		int i;
-		for (i = 0; i < wait && successor == null; i++)	Thread.sleep(1000);
-		if (i == wait) {
+		for (i = 0; i < TIME_OUT && successor == null; i++)	Thread.sleep(1000);
+		if (i == TIME_OUT) {
 			return false;
 		}
 		if (logEnabled)
@@ -210,6 +211,8 @@ public class Peer extends Observable{
 			myInfo.port = port;
 			break;
 		}
+		
+		my_port = port;
 
 		System.out.println("Listening on " + (myInfo.address != null ? myInfo.address : "") + ":" + myInfo.port);
 
@@ -667,5 +670,8 @@ public class Peer extends Observable{
 			} catch (IOException e) {
 			}
 		}
+	}
+	public int getPort() {
+		return my_port;
 	}
 }

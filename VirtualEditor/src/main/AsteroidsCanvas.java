@@ -64,33 +64,6 @@ public class AsteroidsCanvas extends GLCanvas implements GLEventListener{
 	public AsteroidsGame getObservable() {
 		return my_game; // TODO sigh
 	}
-//	private void writeObjects() {
-//		try {
-//			FileOutputStream fos = new FileOutputStream("data.txt");
-//			ObjectOutputStream out = new ObjectOutputStream(fos);
-//			out.writeObject(my_asteroids);
-//			out.writeObject(my_asteroid_root);
-//			out.close();
-//		} catch (Exception e) {
-//			System.err.println(e);
-//
-//		}
-//
-//	}
-//
-//	private void readObjects() {
-//		try {
-//			FileInputStream fis = new FileInputStream("data.txt");
-//			ObjectInputStream in = new ObjectInputStream(fis);
-//			my_asteroids = (List<Asteroid>) in.readObject();
-//			my_asteroid_root = (SceneGraphNode) in.readObject();
-//		} catch (Exception e) {
-//			System.err.println(e);
-//		}
-//	}
-
-	
-	
 	
 
 
@@ -135,8 +108,8 @@ public class AsteroidsCanvas extends GLCanvas implements GLEventListener{
 			right = (float) width / height * BOARD_SIZE / 2;
 			left = -right;
 		}
-		my_game.setWidth((right - left) / 2);
-		my_game.setHeight((top - bottom) / 2);
+		my_game.setWidth((right - left) / 1);
+		my_game.setHeight((top - bottom) / 1);
 
 
 		GL2 gl = drawable.getGL().getGL2();
