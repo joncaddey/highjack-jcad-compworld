@@ -320,10 +320,10 @@ public class AsteroidsGame extends Observable implements Observer{
 						//gives you more bombs!
 						if(my_bomb_pointer < my_score){
 							if(my_bombs < MAX_BOMBS ){
-								my_bomb_pointer += POINTS_FOR_BOMB;
+								my_bombs ++;
 							}
-							
-							my_bombs ++;
+							my_bomb_pointer += POINTS_FOR_BOMB;
+
 							setChanged();
 							notifyObservers(new String(""+ my_bombs));
 						}
