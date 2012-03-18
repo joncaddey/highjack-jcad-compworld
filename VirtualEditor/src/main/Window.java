@@ -8,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
 
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -32,6 +33,7 @@ public class Window extends JFrame implements Observer, ActionListener{
 	private final JTextField my_level;
 	private final JButton my_new_game_button;
 	private final NewGameDialog my_new_game_dialog;
+	private final JTextField my_bombs;
 	
 	
 	public Window(String the_title){
@@ -43,6 +45,11 @@ public class Window extends JFrame implements Observer, ActionListener{
 		my_score.setEnabled(false);
 		my_level = new JTextField(5);
 		my_level.setEnabled(false);
+		
+		my_bombs = new JTextField(2);
+		my_bombs.setText("0");
+		my_bombs.setEnabled(false);
+		
 		my_new_game_dialog = new NewGameDialog(this);
 		my_new_game_button = new JButton("New Game...");
 		setup();
@@ -76,6 +83,11 @@ public class Window extends JFrame implements Observer, ActionListener{
 		p.add(my_level);
 		status.add(p);
 		
+		p = new JPanel();
+		p.add(new JLabel("Bombs:"));
+		p.add(my_bombs);
+		status.add(p);
+		
 		root.add(status, BorderLayout.NORTH);
 		this.add(root);
 		
@@ -97,6 +109,8 @@ public class Window extends JFrame implements Observer, ActionListener{
 		} else if (the_arg instanceof Boolean) {
 			JOptionPane.showMessageDialog(this, "Game Over");
 			my_new_game_button.requestFocus();
+		}else if(the_arg.getClass().equals(String.class)){
+			my_bombs.setText((String) the_arg);
 		}
 		
 	}
