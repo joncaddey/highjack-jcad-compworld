@@ -415,7 +415,7 @@ public class AsteroidsGame extends Observable implements Observer{
 		a.getObject().setVelocity(tmp);
 		
 		//code to set color based on id
-		if(my_id != 0){
+		if(my_peer != null){
 			int r = (int) (( (my_id + 1) * 10) % 255);
 			int g = (int)( (my_id + 2 ) * 50) % 255;
 			int b = (int) ( (my_id + 3) * 100) % 255;		
