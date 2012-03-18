@@ -450,7 +450,7 @@ public class AsteroidsGame extends Observable implements Observer{
 			tmp = new Vector2f(a.getObject().getPosition());
 			positionShip.sumScale(tmp,  -1);
 			if (tmp.length() != 0) {
-				tmp.setLength(speed);
+				tmp.setLength(-speed);
 				a.getObject().setVelocity(tmp);
 			}
 		}
