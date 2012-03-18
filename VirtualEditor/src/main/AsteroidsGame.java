@@ -355,7 +355,7 @@ public class AsteroidsGame extends Observable implements Observer{
 				}
 			}
 		}
-		if (my_asteroids.size() < 1) {
+		if (my_asteroids.size() < 6) {
 			addRandomAsteroid();
 			addRandomAsteroid();
 		}
@@ -431,7 +431,6 @@ public class AsteroidsGame extends Observable implements Observer{
 			the_asteroid.decrementHP(the_asteroid.getMaxHP());
 			the_asteroid.setDestination(-1);
 		}
-	 // if mypeer isn't null, set alive to false _after_ sending it.
 	}
 	/**
 	 * The asteroid should have its position relative to the border it came from, not the origin.
@@ -439,7 +438,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	 */
 	private void receiveAsteroid(Asteroid the_asteroid) {
 		Vector2f position = idToPosition(the_asteroid.getDestination(), my_field_width + the_asteroid.getObject().getSize(), my_field_height + the_asteroid.getObject().getSize());
-		//position.sum(the_asteroid.getObject().getPosition());
+		position.sum(the_asteroid.getObject().getPosition());
 		the_asteroid.getObject().setPosition(position.x, position.y);
 		
 	}

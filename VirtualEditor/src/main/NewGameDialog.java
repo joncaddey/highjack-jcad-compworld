@@ -111,10 +111,10 @@ public class NewGameDialog extends JDialog implements ActionListener{
 
 		//make the network text box
 		network_textbox = new JTextField(15);
-		String ip = getLocalIP();
-		if(ip != null){
-			network_textbox.setText(ip);
-		}
+		//String ip = getLocalIP();
+//		if(ip != null){
+//			network_textbox.setText(ip);
+//		}
 		a_JPanel.add(network_textbox);
 		
 		//make the port label
@@ -224,6 +224,11 @@ public class NewGameDialog extends JDialog implements ActionListener{
 				}
 			}
 			my_approved = true;
+			if (!my_single_player) {
+				port_textbox.setText(String.valueOf(my_peer.getPort()));
+				my_id = my_peer.getID();
+				id_textbox.setText(String.valueOf(my_id));
+			}
 			setVisible(false);
 		}
 	}
