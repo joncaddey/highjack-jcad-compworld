@@ -19,7 +19,7 @@ public class Ship extends PhyComposite {
 	
 	private static final float FORWARD_THRUST = LINEAR_DECAY + .3f * 45; // .25
 	private static final float MAX_VELOCITY = 20f * 30f / 45;
-	private static final float ANGULAR_THRUST = ANGULAR_DECAY +.8f * 45; // 1.5f
+	private static final float ANGULAR_THRUST = ANGULAR_DECAY +.5f * 45; // 1
 	private static final float MAX_ANGULAR_VELOCITY = 16 * 30f / 45;  // 15
 	
 	private static final float WEAK_KICKBACK = 1f;
@@ -32,11 +32,16 @@ public class Ship extends PhyComposite {
 	private static final float AUTO_SHIELD_TIME = .4f;
 	private static final float AUTO_SHIELD_PENALTY = .15f;
 	
+	private static final int WEAK_SHOT_COUNT = 7;
+	private static final int POWER_SHOT_COUNT = 3;
+	
 	//sound player
 	private static final String LAZER_SOUND = "sound/lazersmall.wav";
 	private static final String POWER_LAZER_SOUND = "sound/POWER.wav";
-	private SoundPlayer my_weak_shot_player;
-	private SoundPlayer my_power_shot_player;
+	private SoundPlayer[] my_weak_shot_players;
+	private int my_weak_shot_player_index;
+	private SoundPlayer[] my_power_shot_players;
+	private int my_power_shot_player_index;
 	
 	private final SceneGraphNode my_center_flame, my_left_flame, my_right_flame;
 	private final SceneGraphNode my_hull;
@@ -66,10 +71,18 @@ public class Ship extends PhyComposite {
 	 */
 	public Ship() {
 		//sound
-		my_weak_shot_player = new SoundPlayer();
-		my_power_shot_player = new SoundPlayer();
-		my_weak_shot_player.preLoad(LAZER_SOUND);
-		my_power_shot_player.preLoad(POWER_LAZER_SOUND);
+		my_weak_shot_players = new SoundPlayer[WEAK_SHOT_COUNT];
+		for (int i = 0; i < WEAK_SHOT_COUNT; i++) {
+			my_weak_shot_players[i] = new SoundPlayer();
+			my_weak_shot_players[i].preLoad(LAZER_SOUND);
+		}
+		
+		my_power_shot_players = new SoundPlayer[POWER_SHOT_COUNT];
+		for (int i = 0; i < POWER_SHOT_COUNT; i++) {
+			my_power_shot_players[i] = new SoundPlayer();
+			my_power_shot_players[i].preLoad(POWER_LAZER_SOUND);
+		}
+		
 		
 		int variability = 20;
 		PhyPolygon finLeft = PhyPolygon.getEqTriangle(.5f);
@@ -327,17 +340,14 @@ public class Ship extends PhyComposite {
 			my_heat += .3f + .07f;
 			kickBack(STRONG_KICKBACK);
 			my_reload_time = .07f;
+			my_power_shot_player_index = (my_power_shot_player_index + 1) % POWER_SHOT_COUNT;
+			my_power_shot_players[my_power_shot_player_index].play(POWER_LAZER_SOUND);
 			
-			my_power_shot_player.play(POWER_LAZER_SOUND);
-//			//my_power_shot_player.pause(POWER_LAZER_SOUND);
-//			my_power_shot_player.play(POWER_LAZER_SOUND);
-			
-		} else if (my_heat < .9f) {
+		} else if (my_heat < 1f) {
 			my_heat += .3f;
 			my_reload_time = .3f;
-			my_weak_shot_player.play(LAZER_SOUND);
-//			//my_weak_shot_player.pause(LAZER_SOUND);
-//			my_weak_shot_player.play(LAZER_SOUND);
+			my_weak_shot_player_index = (my_weak_shot_player_index + 1) % WEAK_SHOT_COUNT;
+			my_weak_shot_players[my_weak_shot_player_index].play(LAZER_SOUND);
 
 			kickBack(WEAK_KICKBACK);
 			weakShot();
@@ -347,9 +357,8 @@ public class Ship extends PhyComposite {
 			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
 			my_reload_time = .3f;
-			my_weak_shot_player.play(LAZER_SOUND);
-//			//my_weak_shot_player.pause(LAZER_SOUND);
-//			my_weak_shot_player.play(LAZER_SOUND);
+			my_weak_shot_player_index = (my_weak_shot_player_index + 1) % WEAK_SHOT_COUNT;
+			my_weak_shot_players[my_weak_shot_player_index].play(LAZER_SOUND);
 		}
 	}
 	
@@ -381,7 +390,7 @@ public class Ship extends PhyComposite {
 		bullet.position = new Vector2f(0, .4f);
 		bullet.position.rotate(orientation);
 		bullet.position.sum(position);
-		bullet.velocity = new Vector2f(0, 14 * 30f / 45);
+		bullet.velocity = new Vector2f(0, 17 * 30f / 45);
 		bullet.velocity.rotate(orientation);
 		my_bullets.add(bullet);
 	}

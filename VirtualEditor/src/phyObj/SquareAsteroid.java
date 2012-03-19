@@ -20,7 +20,7 @@ public class SquareAsteroid extends Asteroid{
 			size = my_object.getSize() / 2;
 			for (int i = 0; i < 4; i++) {
 				SquareAsteroid a = new SquareAsteroid(getOriginator(), size, my_hp_density);
-				a.getObject().setRotationDegrees(my_object.getRotationDegrees());
+				a.getObject().setRotationDegrees(my_object.getRotationDegrees() + 90 * i + 90);
 				a.getObject().setPosition(my_object.getPosition().x, my_object.getPosition().y);
 				a.getObject().setAngularVelocity(my_object.getAngularVelocity());
 				a.getObject().setVelocity(my_object.getVelocity());
