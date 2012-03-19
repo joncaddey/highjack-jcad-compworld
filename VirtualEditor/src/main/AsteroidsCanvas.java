@@ -24,7 +24,7 @@ import com.jogamp.opengl.util.FPSAnimator;
 @SuppressWarnings("serial")
 public class AsteroidsCanvas extends GLCanvas implements GLEventListener{
 	private static final float NANO = 1f / 1000000000;
-	private static final int TARGET_FPS = 90;
+	private static final int TARGET_FPS = 45;
 	private static final int FRAMES_TO_AVERAGE = 10;
 	private static final float MINIMUM_TIME_BETWEEN_FRAMES = 1f / 30;
 	

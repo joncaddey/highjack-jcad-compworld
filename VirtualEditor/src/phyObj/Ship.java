@@ -19,7 +19,7 @@ public class Ship extends PhyComposite {
 	
 	private static final float FORWARD_THRUST = LINEAR_DECAY + .3f * 45; // .25
 	private static final float MAX_VELOCITY = 20f * 30f / 45;
-	private static final float ANGULAR_THRUST = ANGULAR_DECAY +1f * 45; // 1.5f
+	private static final float ANGULAR_THRUST = ANGULAR_DECAY +.8f * 45; // 1.5f
 	private static final float MAX_ANGULAR_VELOCITY = 16 * 30f / 45;  // 15
 	
 	private static final float WEAK_KICKBACK = 1f;
@@ -328,15 +328,16 @@ public class Ship extends PhyComposite {
 			kickBack(STRONG_KICKBACK);
 			my_reload_time = .07f;
 			
-			my_power_shot_player.pause(POWER_LAZER_SOUND);
 			my_power_shot_player.play(POWER_LAZER_SOUND);
+//			//my_power_shot_player.pause(POWER_LAZER_SOUND);
+//			my_power_shot_player.play(POWER_LAZER_SOUND);
 			
 		} else if (my_heat < .9f) {
 			my_heat += .3f;
 			my_reload_time = .3f;
-			
-			my_weak_shot_player.pause(LAZER_SOUND);
 			my_weak_shot_player.play(LAZER_SOUND);
+//			//my_weak_shot_player.pause(LAZER_SOUND);
+//			my_weak_shot_player.play(LAZER_SOUND);
 
 			kickBack(WEAK_KICKBACK);
 			weakShot();
@@ -346,8 +347,9 @@ public class Ship extends PhyComposite {
 			my_heat += .05f;
 			kickBack(WEAK_KICKBACK);
 			my_reload_time = .3f;
-			my_weak_shot_player.pause(LAZER_SOUND);
 			my_weak_shot_player.play(LAZER_SOUND);
+//			//my_weak_shot_player.pause(LAZER_SOUND);
+//			my_weak_shot_player.play(LAZER_SOUND);
 		}
 	}
 	

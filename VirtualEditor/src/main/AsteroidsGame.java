@@ -30,7 +30,7 @@ public class AsteroidsGame extends Observable implements Observer{
 	private static final int MAX_BOMBS = 3;
 	private static final int RESOLUTION_REPEATS = 100;
 	private static final int POINTS_FOR_BOMB = 1000;
-	private static final int MAX_ASTEROIDS = 25;
+	private static final int MAX_ASTEROIDS = 15;
 	
 	//sound player
 	private static final String DEATH_SOUND = "sound/death.wav";
@@ -377,7 +377,7 @@ public class AsteroidsGame extends Observable implements Observer{
 				ait.remove();
 				my_asteroid_root.removeChild(a.getRenderable());
 				if (a.getDestination() != -1) {
-					for (Asteroid b : a.getFragments(my_min_size, 30f / 45)) {
+					for (Asteroid b : a.getFragments(my_min_size, my_max_momentum / 20)) {
 						ait.add(b);
 						my_asteroid_root.addChild(b.getRenderable());
 					}
