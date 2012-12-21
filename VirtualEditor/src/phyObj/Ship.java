@@ -343,8 +343,8 @@ public class Ship extends PhyComposite {
 			my_power_shot_player_index = (my_power_shot_player_index + 1) % POWER_SHOT_COUNT;
 			my_power_shot_players[my_power_shot_player_index].play(POWER_LAZER_SOUND);
 			
-		} else if (my_heat < 1f) {
-			my_heat += .3f;
+		} else if (my_heat < .9f) {
+			my_heat += .4f;
 			my_reload_time = .3f;
 			my_weak_shot_player_index = (my_weak_shot_player_index + 1) % WEAK_SHOT_COUNT;
 			my_weak_shot_players[my_weak_shot_player_index].play(LAZER_SOUND);
@@ -363,8 +363,8 @@ public class Ship extends PhyComposite {
 	}
 	
 	private void powerShot() {
-		final int bullet_spread = 6;
-		final int max_bullet_spread = 64;
+		final int bullet_spread = 10;
+		final int max_bullet_spread = 96;
 		for (int i = 0; i < bullet_spread; i++) {
 			Bullet bullet = new Bullet(1, 0, 1.3f, .2f, .5f);
 			bullet.position = new Vector2f(0, .3f);
